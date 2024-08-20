@@ -40,6 +40,3 @@ frappe.query_reports["Daily Sales by SKU"] = {
 		},
 	  ],
 };
-
-
-n
