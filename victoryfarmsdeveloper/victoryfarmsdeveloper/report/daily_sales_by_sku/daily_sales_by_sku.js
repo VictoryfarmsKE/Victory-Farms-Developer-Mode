@@ -26,6 +26,13 @@ frappe.query_reports["Daily Sales by SKU"] = {
 		  reqd: 1,
 		},
 		{
+			fieldname: "warehouse",
+			label: __("Warehouse"),
+			fieldtype: "Link",
+			options: "Warehouse",
+			reqd: 0,
+		},
+		{
 			fieldname: "show_with_zero_values",
 			label: __("Show with zero values"),
 			fieldtype: "Check",

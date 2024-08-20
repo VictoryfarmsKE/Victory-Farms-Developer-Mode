@@ -1,4 +1,4 @@
-# Copyright (c) 2023, Navari Limited and contributors
+# Copyright (c) 2024, Christine K and contributors
 # For license information, please see license.txt
 
 import frappe
@@ -8,6 +8,7 @@ def execute(filters=None):
     company = filters.get("company")
     from_date = filters.get("from_date")
     to_date = filters.get("to_date")
+    warehouse = filters.get("warehouse")
 
     if from_date > to_date:
         frappe.throw(_("From Date cannot be greater than To Date"))
@@ -64,6 +65,8 @@ def execute(filters=None):
         conditions = " AND si.docstatus = 1 "
         if company:
             conditions += f" AND si.company = '{company}'"
+        if warehouse:
+            conditions += f" AND sii.warehouse = '{warehouse}'"
 
         sales_invoice_items = frappe.db.sql(f"""
             SELECT sii.item_code 'item_code',
@@ -85,4 +88,31 @@ def execute(filters=None):
 
     columns, data = get_columns(), get_data()
 
-    return columns, data, None
+    chart = {
+        "data": {
+            "labels": [row["item_code"] for row in data],
+            "datasets": [
+                {
+                    "name": _("Qty"),
+                    "values": [row["qty"] for row in data]
+                },
+                {
+                    "name": _("Selling Amount"),
+                    "values": [row["selling_amount"] for row in data]
+                }
+            ]
+        },
+        "type": "bar",
+        "height": 500,
+        "filters": [
+            {
+                "fieldname": "warehouse",
+                "label": _("Warehouse"),
+                "fieldtype": "Link",
+                "options": "Warehouse",
+                "default": warehouse
+            }
+        ]
+    }
+
+    return columns, data, None, chart
