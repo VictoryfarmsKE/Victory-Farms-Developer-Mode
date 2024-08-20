@@ -26,35 +26,13 @@ frappe.query_reports["Daily Sales by SKU"] = {
 		  reqd: 1,
 		},
 		{
-		  fieldname: "item_group",
-		  label: "Item Group",
-		  fieldtype: "Link",
-		  options: "Item Group",
-		  reqd: 0,
-		},
-		{
-		  fieldname: "value_or_quantity",
-		  label: __("Value/Quantity"),
-		  fieldtype: "Select",
-		  options: ["Value", "Quantity"],
-		  default: "Value",
-		  reqd: 1,
-		},
-		{
-		  fieldname: "view_type_option",
-		  label: __("View type option"),
-		  fieldtype: "Select",
-		  options: ["Summary", "Range", "Compare"],
-		  default: "Summary",
-		  reqd: 1,
-		},
-		{
-		  fieldname: "warehouse",
-		  label: __("Warehouse"),
-		  fieldtype: "Link",
-		  options: "Warehouse",
-		  reqd: 0,
+			fieldname: "show_with_zero_values",
+			label: __("Show with zero values"),
+			fieldtype: "Check",
+			default: 0,
 		},
 	  ],
 };
 
+
+n
