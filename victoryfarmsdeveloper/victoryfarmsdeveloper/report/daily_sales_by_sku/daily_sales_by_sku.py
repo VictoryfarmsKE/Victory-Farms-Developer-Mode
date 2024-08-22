@@ -104,15 +104,8 @@ def execute(filters=None):
         },
         "type": "bar",
         "height": 500,
-        "filters": [
-            {
-                "fieldname": "warehouse",
-                "label": _("Warehouse"),
-                "fieldtype": "Link",
-                "options": "Warehouse",
-                "default": warehouse
-            }
-        ]
+        "colors":[ "#10812E","#61CE70"]
+       
     }
 
     return columns, data, None, chart
