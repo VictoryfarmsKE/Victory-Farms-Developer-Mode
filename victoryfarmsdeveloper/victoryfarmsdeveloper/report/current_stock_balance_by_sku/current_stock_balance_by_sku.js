@@ -33,6 +33,7 @@ frappe.query_reports["Current Stock Balance by SKU"] = {
 			fieldtype: "Link",
 			width: "80",
 			options: "Item Group",
+			default: "Gutted Fish-Tilapia",
 		},
 		{
 			fieldname: "item_code",

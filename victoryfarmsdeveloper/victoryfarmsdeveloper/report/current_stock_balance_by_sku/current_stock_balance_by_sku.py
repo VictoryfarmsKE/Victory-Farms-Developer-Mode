@@ -1,5 +1,6 @@
-# Copyright (c) 2024, Christine K and contributors
+# Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 # License: GNU General Public License v3. See license.txt
+
 
 from operator import itemgetter
 from typing import Any, TypedDict
@@ -22,7 +23,7 @@ class StockBalanceFilter(TypedDict):
 	company: str | None
 	from_date: str
 	to_date: str
-	item_group: str | None
+	item_group: str 
 	item: str | None
 	warehouse: str | None
 	warehouse_type: str | None
@@ -304,16 +305,17 @@ class StockBalanceReport:
 				sle.stock_value,
 				sle.batch_no,
 				sle.serial_no,
-				sle.serial_and_batch_bundle,
+				# sle.serial_and_batch_bundle,
 				sle.has_serial_no,
 				item_table.item_group,
 				item_table.stock_uom,
 				item_table.item_name,
 			)
-			.where((sle.docstatus < 2) & (sle.is_cancelled == 0))
+			
+            .groupby(item_table.item_name, sle.warehouse)
 			.orderby(sle.posting_datetime)
 			.orderby(sle.creation)
-			.orderby(sle.actual_qty)
+			.orderby(sle.actual_qty)    
 		)
 
 		query = self.apply_inventory_dimensions_filters(query, sle)
