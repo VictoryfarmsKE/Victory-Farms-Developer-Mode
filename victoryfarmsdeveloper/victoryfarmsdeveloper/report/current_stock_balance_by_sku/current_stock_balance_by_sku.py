@@ -311,8 +311,6 @@ class StockBalanceReport:
 				item_table.stock_uom,
 				item_table.item_name,
 			)
-			
-            .groupby(item_table.item_name, sle.warehouse)
 			.orderby(sle.posting_datetime)
 			.orderby(sle.creation)
 			.orderby(sle.actual_qty)    
