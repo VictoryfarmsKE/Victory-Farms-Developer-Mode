@@ -23,7 +23,7 @@ class StockBalanceFilter(TypedDict):
 	company: str | None
 	from_date: str
 	to_date: str
-	item_group: str 
+	item_group: str | None
 	item: str | None
 	warehouse: str | None
 	warehouse_type: str | None
@@ -106,7 +106,12 @@ class StockBalanceReport:
 		if self.filters.get("show_variant_attributes"):
 			variant_values = self.get_variant_values_for()
 
+		# Aggregate data by item_name
+		item_data = {}
+
 		for _key, report_data in self.item_warehouse_map.items():
+			item_name = report_data.item_name
+
 			if variant_data := variant_values.get(report_data.item_code):
 				report_data.update(variant_data)
 
@@ -146,7 +151,30 @@ class StockBalanceReport:
 			):
 				continue
 
-			self.data.append(report_data)
+			# Aggregate by item_name
+			if item_name not in item_data:
+				item_data[item_name] = report_data
+			else:
+				# Update existing entry (add quantities/values)
+				item_data[item_name]["bal_qty"] += report_data["bal_qty"]
+				item_data[item_name]["bal_val"] += report_data["bal_val"]
+				item_data[item_name]["opening_qty"] += report_data["opening_qty"]
+				item_data[item_name]["opening_val"] += report_data["opening_val"]
+				item_data[item_name]["in_qty"] += report_data["in_qty"]
+				item_data[item_name]["in_val"] += report_data["in_val"]
+				item_data[item_name]["out_qty"] += report_data["out_qty"]
+				item_data[item_name]["out_val"] += report_data["out_val"]
+
+				# Calculate valuation rate for each item
+				total_qty = item_data[item_name]["opening_qty"] + item_data[item_name]["in_qty"] - item_data[item_name]["out_qty"]
+				total_val = item_data[item_name]["opening_val"] + item_data[item_name]["in_val"] - item_data[item_name]["out_val"]
+
+				if total_qty:
+					item_data[item_name]["valuation_rate"] = total_val / total_qty
+				else:
+					item_data[item_name]["valuation_rate"] = 0
+
+		self.data = list(item_data.values())
 
 	def get_item_warehouse_map(self):
 		item_warehouse_map = {}
@@ -154,8 +182,6 @@ class StockBalanceReport:
 
 		if self.filters.get("show_stock_ageing_data"):
 			self.sle_entries = self.sle_query.run(as_dict=True)
-
-		# HACK: This is required to avoid causing db query in flt
 		_system_settings = frappe.get_cached_doc("System Settings")
 		with frappe.db.unbuffered_cursor():
 			if not self.filters.get("show_stock_ageing_data"):
@@ -306,14 +332,15 @@ class StockBalanceReport:
 				sle.batch_no,
 				sle.serial_no,
 				# sle.serial_and_batch_bundle,
-				sle.has_serial_no,
+				# sle.has_serial_no,
 				item_table.item_group,
 				item_table.stock_uom,
 				item_table.item_name,
 			)
+			.where((sle.docstatus < 2) & (sle.is_cancelled == 0))
 			.orderby(sle.posting_datetime)
 			.orderby(sle.creation)
-			.orderby(sle.actual_qty)    
+			.orderby(sle.actual_qty)
 		)
 
 		query = self.apply_inventory_dimensions_filters(query, sle)
