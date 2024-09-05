@@ -4,8 +4,8 @@ app_publisher = "Christine K"
 app_description = "VictoryFarmsDeveloper"
 app_email = "christinek@victoryfarmskenya.com"
 app_license = "mit"
-# required_apps = []
-
+app_include = ["erpnext"]
+required_apps = ["frappe", "erpnext"]
 # Includes in <head>
 # ------------------
 
