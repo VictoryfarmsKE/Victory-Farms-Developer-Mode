@@ -1,4 +1,4 @@
-# Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
+# Copyright (c) 2024, Christine K and contributors
 # License: GNU General Public License v3. See license.txt
 
 
