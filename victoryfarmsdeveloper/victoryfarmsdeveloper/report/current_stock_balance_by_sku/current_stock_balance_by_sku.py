@@ -100,7 +100,7 @@ class StockBalanceReport:
 
 		del self.sle_entries
 
-		sre_details = self.get_sre_reserved_qty_details()
+		# sre_details = self.get_sre_reserved_qty_details()
 
 		variant_values = {}
 		if self.filters.get("show_variant_attributes"):

@@ -123,6 +123,6 @@ frappe.query_reports["Current Stock Balance by SKU"] = {
 	},
 };
 
-erpnext.utils.add_inventory_dimensions("Stock Balance", 8);
+// erpnext.utils.add_inventory_dimensions("Stock Balance", 8);
 
 
