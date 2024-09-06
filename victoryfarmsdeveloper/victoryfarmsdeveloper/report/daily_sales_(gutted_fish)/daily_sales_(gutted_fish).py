@@ -30,7 +30,7 @@ def execute(filters=None):
             {
                 "fieldname": "qty",
                 "label": _("Qty"),
-                "fieldtype": "Data",
+                "fieldtype": "Float",
                 "width": "100px"
             },
             {
@@ -82,6 +82,8 @@ def execute(filters=None):
 
         for item in sales_invoice_items:
             item['avg_selling_amount'] = item['selling_amount'] / item['qty'] if item.get('selling_amount') and item.get('qty') else 0
+            
+        # frappe.log_error(message=f"Qty Value:{item.get('qty')}, Type:{type(item.get('qty'))}", title="Qty Debug")
 
         return sales_invoice_items
 
