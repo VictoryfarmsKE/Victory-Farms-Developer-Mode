@@ -165,11 +165,14 @@ class StockBalanceReport:
 			grouped_data[key]["in_val"] += report_data.get("in_val", 0)
 			grouped_data[key]["out_qty"] += report_data.get("out_qty", 0)
 			grouped_data[key]["out_val"] += report_data.get("out_val", 0)
-			grouped_data[key]["bal_qty"] = report_data.get("bal_qty", 0)
-			grouped_data[key]["bal_val"] = report_data.get("bal_val", 0)
 
-		# Calculate valuation rate
+		# Calculate balance quantities and values
 		for key, data in grouped_data.items():
+			# Calculate balance quantities and values
+			data["bal_qty"] = data["opening_qty"] + data["in_qty"] - data["out_qty"]
+			data["bal_val"] = data["opening_val"] + data["in_val"] - data["out_val"]
+
+			# Calculate valuation rate
 			try:
 				if data["bal_qty"] > 0:
 					data["val_rate"] = data["bal_val"] / data["bal_qty"]
@@ -177,9 +180,6 @@ class StockBalanceReport:
 					data["val_rate"] = 0.0
 			except ZeroDivisionError:
 				data["val_rate"] = 0.0
-
-			# Debugging output to check values
-			print(f"Item: {key}, Bal Qty: {data['bal_qty']}, Bal Val: {data['bal_val']}, Val Rate: {data['val_rate']}")
 
 		self.data = list(grouped_data.values())
 
