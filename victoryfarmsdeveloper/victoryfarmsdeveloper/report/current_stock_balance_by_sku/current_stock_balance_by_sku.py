@@ -88,7 +88,7 @@ class StockBalanceReport:
 			group_by_key = self.get_group_by_key(entry)
 			if group_by_key not in self.opening_data:
 				self.opening_data.setdefault(group_by_key, entry)
-    
+
 	def prepare_new_data(self):
 		try:
 			frappe.logger().info("Starting to prepare new data...")
@@ -527,102 +527,102 @@ class StockBalanceReport:
 
 		return columns
 
-		def add_additional_uom_columns(self):
-			if not self.filters.get("include_uom"):
-				return
+	def add_additional_uom_columns(self):
+		if not self.filters.get("include_uom"):
+			return
 
-			conversion_factors = self.get_itemwise_conversion_factor()
-			add_additional_uom_columns(self.columns, self.data, self.filters.include_uom, conversion_factors)
+		conversion_factors = self.get_itemwise_conversion_factor()
+		add_additional_uom_columns(self.columns, self.data, self.filters.include_uom, conversion_factors)
 
-		def get_itemwise_conversion_factor(self):
-			items = []
-			if self.filters.item_code or self.filters.item_group:
-				items = [d.item_code for d in self.data]
+	def get_itemwise_conversion_factor(self):
+		items = []
+		if self.filters.item_code or self.filters.item_group:
+			items = [d.item_code for d in self.data]
 
-			table = frappe.qb.DocType("UOM Conversion Detail")
-			query = (
-				frappe.qb.from_(table)
-				.select(
-					table.conversion_factor,
-					table.parent,
+		table = frappe.qb.DocType("UOM Conversion Detail")
+		query = (
+			frappe.qb.from_(table)
+			.select(
+				table.conversion_factor,
+				table.parent,
+			)
+			.where((table.parenttype == "Item") & (table.uom == self.filters.include_uom))
+		)
+
+		if items:
+			query = query.where(table.parent.isin(items))
+
+		result = query.run(as_dict=1)
+		if not result:
+			return {}
+
+		return {d.parent: d.conversion_factor for d in result}
+
+	def get_variant_values_for(self):
+		"""Returns variant values for items."""
+		attribute_map = {}
+		items = []
+		if self.filters.item_code or self.filters.item_group:
+			items = [d.item_code for d in self.data]
+
+		filters = {}
+		if items:
+			filters = {"parent": ("in", items)}
+
+		attribute_info = frappe.get_all(
+			"Item Variant Attribute",
+			fields=["parent", "attribute", "attribute_value"],
+			filters=filters,
+		)
+
+		for attr in attribute_info:
+			attribute_map.setdefault(attr["parent"], {})
+			attribute_map[attr["parent"]].update({attr["attribute"]: attr["attribute_value"]})
+
+		return attribute_map
+
+	def get_opening_vouchers(self):
+		opening_vouchers = {"Stock Entry": [], "Stock Reconciliation": []}
+
+		se = frappe.qb.DocType("Stock Entry")
+		sr = frappe.qb.DocType("Stock Reconciliation")
+
+		vouchers_data = (
+			frappe.qb.from_(
+				(
+					frappe.qb.from_(se)
+					.select(se.name, Coalesce("Stock Entry").as_("voucher_type"))
+					.where((se.docstatus == 1) & (se.posting_date <= self.to_date) & (se.is_opening == "Yes"))
 				)
-				.where((table.parenttype == "Item") & (table.uom == self.filters.include_uom))
-			)
-
-			if items:
-				query = query.where(table.parent.isin(items))
-
-			result = query.run(as_dict=1)
-			if not result:
-				return {}
-
-			return {d.parent: d.conversion_factor for d in result}
-
-		def get_variant_values_for(self):
-			"""Returns variant values for items."""
-			attribute_map = {}
-			items = []
-			if self.filters.item_code or self.filters.item_group:
-				items = [d.item_code for d in self.data]
-
-			filters = {}
-			if items:
-				filters = {"parent": ("in", items)}
-
-			attribute_info = frappe.get_all(
-				"Item Variant Attribute",
-				fields=["parent", "attribute", "attribute_value"],
-				filters=filters,
-			)
-
-			for attr in attribute_info:
-				attribute_map.setdefault(attr["parent"], {})
-				attribute_map[attr["parent"]].update({attr["attribute"]: attr["attribute_value"]})
-
-			return attribute_map
-
-		def get_opening_vouchers(self):
-			opening_vouchers = {"Stock Entry": [], "Stock Reconciliation": []}
-
-			se = frappe.qb.DocType("Stock Entry")
-			sr = frappe.qb.DocType("Stock Reconciliation")
-
-			vouchers_data = (
-				frappe.qb.from_(
-					(
-						frappe.qb.from_(se)
-						.select(se.name, Coalesce("Stock Entry").as_("voucher_type"))
-						.where((se.docstatus == 1) & (se.posting_date <= self.to_date) & (se.is_opening == "Yes"))
+				+ (
+					frappe.qb.from_(sr)
+					.select(sr.name, Coalesce("Stock Reconciliation").as_("voucher_type"))
+					.where(
+						(sr.docstatus == 1)
+						& (sr.posting_date <= self.to_date)
+						& (sr.purpose == "Opening Stock")
 					)
-					+ (
-						frappe.qb.from_(sr)
-						.select(sr.name, Coalesce("Stock Reconciliation").as_("voucher_type"))
-						.where(
-							(sr.docstatus == 1)
-							& (sr.posting_date <= self.to_date)
-							& (sr.purpose == "Opening Stock")
-						)
-					)
-				).select("voucher_type", "name")
-			).run(as_dict=True)
+				)
+			).select("voucher_type", "name")
+		).run(as_dict=True)
 
-			if vouchers_data:
-				for d in vouchers_data:
-					opening_vouchers[d.voucher_type].append(d.name)
+		if vouchers_data:
+			for d in vouchers_data:
+				opening_vouchers[d.voucher_type].append(d.name)
 
-			return opening_vouchers
+		return opening_vouchers
 
-		@staticmethod
-		def get_inventory_dimension_fields():
-			return [dimension.fieldname for dimension in get_inventory_dimensions()]
+	@staticmethod
+	def get_inventory_dimension_fields():
+		return [dimension.fieldname for dimension in get_inventory_dimensions()]
 
-		@staticmethod
-		def get_opening_fifo_queue(report_data):
-			opening_fifo_queue = report_data.get("opening_fifo_queue") or []
-			for row in opening_fifo_queue:
-				row[1] = getdate(row[1])
+	@staticmethod
+	def get_opening_fifo_queue(report_data):
+		opening_fifo_queue = report_data.get("opening_fifo_queue") or []
+		for row in opening_fifo_queue:
+			row[1] = getdate(row[1])
 
-			return opening_fifo_queue
+		return opening_fifo_queue
 
 
 def filter_items_with_no_transactions(
