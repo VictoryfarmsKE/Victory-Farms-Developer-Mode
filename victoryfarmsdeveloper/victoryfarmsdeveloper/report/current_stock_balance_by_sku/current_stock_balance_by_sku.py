@@ -90,104 +90,95 @@ class StockBalanceReport:
 				self.opening_data.setdefault(group_by_key, entry)
 
 	def prepare_new_data(self):
-		try:
-			frappe.logger().info("Starting to prepare new data...")
+		self.item_warehouse_map = self.get_item_warehouse_map()
 
-			self.item_warehouse_map = self.get_item_warehouse_map()
-			frappe.logger().info("Item warehouse map retrieved successfully.")
+		if self.filters.get("show_stock_ageing_data"):
+			self.filters["show_warehouse_wise_stock"] = True
+			item_wise_fifo_queue = FIFOSlots(self.filters, self.sle_entries).generate()
+
+		_func = itemgetter(1)
+
+		del self.sle_entries
+
+		variant_values = {}
+		if self.filters.get("show_variant_attributes"):
+			variant_values = self.get_variant_values_for()
+
+		# Group data by item_name or item_code
+		grouped_data = {}
+
+		for _key, report_data in self.item_warehouse_map.items():
+			if variant_data := variant_values.get(report_data.item_code):
+				report_data.update(variant_data)
 
 			if self.filters.get("show_stock_ageing_data"):
-				self.filters["show_warehouse_wise_stock"] = True
-				item_wise_fifo_queue = FIFOSlots(self.filters, self.sle_entries).generate()
-				frappe.logger().info("FIFO queue generated for stock ageing data.")
+				opening_fifo_queue = self.get_opening_fifo_queue(report_data) or []
 
-			_func = itemgetter(1)
+				fifo_queue = []
+				if fifo_queue := item_wise_fifo_queue.get((report_data.item_code, report_data.warehouse)):
+					fifo_queue = fifo_queue.get("fifo_queue")
 
-			del self.sle_entries
+				if fifo_queue:
+					opening_fifo_queue.extend(fifo_queue)
 
-			variant_values = {}
-			if self.filters.get("show_variant_attributes"):
-				variant_values = self.get_variant_values_for()
-				frappe.logger().info("Variant values fetched.")
+				stock_ageing_data = {"average_age": 0, "earliest_age": 0, "latest_age": 0}
+				if opening_fifo_queue:
+					fifo_queue = sorted(filter(_func, opening_fifo_queue), key=_func)
+					if not fifo_queue:
+						continue
 
-			grouped_data = {}
+					to_date = self.to_date
+					stock_ageing_data["average_age"] = get_average_age(fifo_queue, to_date)
+					stock_ageing_data["earliest_age"] = date_diff(to_date, fifo_queue[0][1])
+					stock_ageing_data["latest_age"] = date_diff(to_date, fifo_queue[-1][1])
+					stock_ageing_data["fifo_queue"] = fifo_queue
 
-			for _key, report_data in self.item_warehouse_map.items():
-				if variant_data := variant_values.get(report_data.item_code):
-					report_data.update(variant_data)
+				report_data.update(stock_ageing_data)
 
-				if self.filters.get("show_stock_ageing_data"):
-					opening_fifo_queue = self.get_opening_fifo_queue(report_data) or []
+			# Group by item_name or item_code
+			key = report_data.get('item_name')  # or 'item_code' if you prefer
+			if key not in grouped_data:
+				grouped_data[key] = {
+					"item_code": report_data.get("item_code"),
+					"item_name": report_data.get("item_name"),
+					"warehouse": report_data.get("warehouse"),
+					"item_group": report_data.get("item_group"),
+					"company": report_data.get("company"),
+					"currency": report_data.get("currency"),
+					"stock_uom": report_data.get("stock_uom"),
+					"opening_qty": 0.0,
+					"opening_val": 0.0,
+					"in_qty": 0.0,
+					"in_val": 0.0,
+					"out_qty": 0.0,
+					"out_val": 0.0,
+					"bal_qty": 0.0,
+					"bal_val": 0.0,
+					"val_rate": 0.0,
+					**(report_data.get('stock_ageing_data', {}))
+				}
 
-					fifo_queue = []
-					if fifo_queue := item_wise_fifo_queue.get((report_data.item_code, report_data.warehouse)):
-						fifo_queue = fifo_queue.get("fifo_queue")
+			# Aggregate the values
+			grouped_data[key]["opening_qty"] += report_data.get("opening_qty", 0)
+			grouped_data[key]["opening_val"] += report_data.get("opening_val", 0)
+			grouped_data[key]["in_qty"] += report_data.get("in_qty", 0)
+			grouped_data[key]["in_val"] += report_data.get("in_val", 0)
+			grouped_data[key]["out_qty"] += report_data.get("out_qty", 0)
+			grouped_data[key]["out_val"] += report_data.get("out_val", 0)
+			grouped_data[key]["bal_qty"] = report_data.get("bal_qty", 0)
+			grouped_data[key]["bal_val"] = report_data.get("bal_val", 0)
 
-					if fifo_queue:
-						opening_fifo_queue.extend(fifo_queue)
-
-					stock_ageing_data = {"average_age": 0, "earliest_age": 0, "latest_age": 0}
-					if opening_fifo_queue:
-						fifo_queue = sorted(filter(_func, opening_fifo_queue), key=_func)
-						if not fifo_queue:
-							continue
-
-						to_date = self.to_date
-						stock_ageing_data["average_age"] = get_average_age(fifo_queue, to_date)
-						stock_ageing_data["earliest_age"] = date_diff(to_date, fifo_queue[0][1])
-						stock_ageing_data["latest_age"] = date_diff(to_date, fifo_queue[-1][1])
-						stock_ageing_data["fifo_queue"] = fifo_queue
-
-					report_data.update(stock_ageing_data)
-
-				key = report_data.get('item_name')  # or 'item_code' if you prefer
-				if key not in grouped_data:
-					grouped_data[key] = {
-						"item_code": report_data.get("item_code"),
-						"item_name": report_data.get("item_name"),
-						"warehouse": report_data.get("warehouse"),
-						"item_group": report_data.get("item_group"),
-						"company": report_data.get("company"),
-						"currency": report_data.get("currency"),
-						"stock_uom": report_data.get("stock_uom"),
-						"opening_qty": 0.0,
-						"opening_val": 0.0,
-						"in_qty": 0.0,
-						"in_val": 0.0,
-						"out_qty": 0.0,
-						"out_val": 0.0,
-						"bal_qty": 0.0,
-						"bal_val": 0.0,
-						"val_rate": 0.0,
-						**(report_data.get('stock_ageing_data', {}))
-					}
-
-				grouped_data[key]["opening_qty"] += report_data.get("opening_qty", 0)
-				grouped_data[key]["opening_val"] += report_data.get("opening_val", 0)
-				grouped_data[key]["in_qty"] += report_data.get("in_qty", 0)
-				grouped_data[key]["in_val"] += report_data.get("in_val", 0)
-				grouped_data[key]["out_qty"] += report_data.get("out_qty", 0)
-				grouped_data[key]["out_val"] += report_data.get("out_val", 0)
-
-			for key, data in grouped_data.items():
-				data["bal_qty"] = data["opening_qty"] + data["in_qty"] - data["out_qty"]
-				data["bal_val"] = data["opening_val"] + data["in_val"] - data["out_val"]
-
-				try:
-					if data["bal_qty"] > 0:
-						data["val_rate"] = data["bal_val"] / data["bal_qty"]
-					else:
-						data["val_rate"] = 0.0
-				except ZeroDivisionError:
+		# Calculate valuation rate
+		for key, data in grouped_data.items():
+			try:
+				if data["bal_qty"] > 0:
+					data["val_rate"] = data["bal_val"] / data["bal_qty"]
+				else:
 					data["val_rate"] = 0.0
+			except ZeroDivisionError:
+				data["val_rate"] = 0.0
 
-			self.data = list(grouped_data.values())
-			frappe.logger().info("Data preparation completed successfully.")
-
-		except Exception as e:
-			frappe.log_error(message=str(e), title="Error in prepare_new_data Function")
-			frappe.logger().error(f"Exception occurred: {str(e)}")
-			frappe.throw(_("An error occurred while preparing the data. Please check the error logs for more details."))
+		self.data = list(grouped_data.values())
 
 	def get_item_warehouse_map(self):
 		item_warehouse_map = {}
