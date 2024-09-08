@@ -136,7 +136,7 @@ class StockBalanceReport:
 				report_data.update(stock_ageing_data)
 
 			# Group by item_name
-			key = report_data.get('item_name')  # or 'item_code' if you prefer
+			key = report_data.get('item_code')  # or 'item_code' if you prefer
 			if key not in grouped_data:
 				grouped_data[key] = {
 					"item_code": report_data.get("item_code"),
