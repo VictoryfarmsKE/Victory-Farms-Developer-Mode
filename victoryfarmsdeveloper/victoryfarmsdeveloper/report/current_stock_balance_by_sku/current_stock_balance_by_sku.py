@@ -135,7 +135,7 @@ class StockBalanceReport:
 
 				report_data.update(stock_ageing_data)
 
-			# Group by item_name or item_code
+			# Group by item_name
 			key = report_data.get('item_name')  # or 'item_code' if you prefer
 			if key not in grouped_data:
 				grouped_data[key] = {
@@ -165,18 +165,19 @@ class StockBalanceReport:
 			grouped_data[key]["in_val"] += report_data.get("in_val", 0)
 			grouped_data[key]["out_qty"] += report_data.get("out_qty", 0)
 			grouped_data[key]["out_val"] += report_data.get("out_val", 0)
-			grouped_data[key]["bal_qty"] = report_data.get("bal_qty", 0)
-			grouped_data[key]["bal_val"] = report_data.get("bal_val", 0)
 
-		# Calculate valuation rate
-		for key, data in grouped_data.items():
-			try:
-				if data["bal_qty"] > 0:
-					data["val_rate"] = data["bal_val"] / data["bal_qty"]
-				else:
-					data["val_rate"] = 0.0
-			except ZeroDivisionError:
-				data["val_rate"] = 0.0
+			# Recalculate balance quantities and values
+			grouped_data[key]["bal_qty"] = (
+				grouped_data[key]["opening_qty"] + grouped_data[key]["in_qty"] - grouped_data[key]["out_qty"]
+			)
+			grouped_data[key]["bal_val"] = (
+				grouped_data[key]["opening_val"] + grouped_data[key]["in_val"] - grouped_data[key]["out_val"]
+			)
+
+			# Recalculate valuation rate
+			total_qty = grouped_data[key]["bal_qty"]
+			total_val = grouped_data[key]["bal_val"]
+			grouped_data[key]["val_rate"] = total_val / total_qty if total_qty else 0.0
 
 		self.data = list(grouped_data.values())
 
