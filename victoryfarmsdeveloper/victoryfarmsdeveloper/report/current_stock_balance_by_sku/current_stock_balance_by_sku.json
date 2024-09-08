@@ -14,10 +14,10 @@
      "width": 0
     },
     {
-        "fieldname": "in_qty",
-        "fieldtype": "Float",
-        "label": "In Qty",
-        "width": 0
+    "fieldname": "in_qty",
+    "fieldtype": "Float",
+    "label": "In Qty",
+    "width": 0
     }
  ],
  "creation": "2024-08-19 16:23:25.228352",
