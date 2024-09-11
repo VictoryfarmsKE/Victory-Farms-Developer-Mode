@@ -177,7 +177,7 @@ class StockBalanceReport:
 			# Recalculate valuation rate
 			total_qty = grouped_data[key]["bal_qty"]
 			total_val = grouped_data[key]["bal_val"]
-			grouped_data[key]["val_rate"] = total_val / total_qty if total_qty else 0.0
+			grouped_data[key]["val_rate"] += report_data.get("val_rate", 0)
 
 		self.data = list(grouped_data.values())
 
