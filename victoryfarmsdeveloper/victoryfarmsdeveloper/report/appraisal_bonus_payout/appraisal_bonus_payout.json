@@ -10,7 +10,7 @@
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": "Standard",
- "modified": "2024-10-17 16:14:08.065834",
+ "modified": "2024-10-20 16:05:59.559933",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Appraisal Bonus Payout",
@@ -19,5 +19,12 @@
  "ref_doctype": "Appraisal Payout",
  "report_name": "Appraisal Bonus Payout",
  "report_type": "Script Report",
- "roles": []
+ "roles": [
+  {
+   "role": "HR Executive"
+  },
+  {
+   "role": "HR Manager"
+  }
+ ]
 }

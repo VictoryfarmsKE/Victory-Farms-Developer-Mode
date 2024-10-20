@@ -38,6 +38,7 @@ def get_data(filters):
         conditions.append("appraisal_cycle.name = %(appraisal_cycle)s")
         
     conditions.append("appraisal.docstatus = 1")
+    #necessary?
     conditions.append("department_appraisal.docstatus = 1")
     conditions.append("company_appraisal.docstatus = 1")
 

@@ -10,7 +10,7 @@
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": "Standard",
- "modified": "2024-10-20 14:50:46.467394",
+ "modified": "2024-10-20 16:06:22.582723",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Appraisal Score Report",
@@ -21,25 +21,13 @@
  "report_type": "Script Report",
  "roles": [
   {
-   "role": "Employee"
-  },
-  {
    "role": "HR Manager"
-  },
-  {
-   "role": "HR User"
   },
   {
    "role": "System Manager"
   },
   {
-   "role": "Regional Supervisor"
-  },
-  {
-   "role": "Manager"
-  },
-  {
-   "role": "Director"
+   "role": "HR Executive"
   }
  ]
 }
