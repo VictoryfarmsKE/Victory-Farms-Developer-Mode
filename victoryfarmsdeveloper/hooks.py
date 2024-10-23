@@ -6,6 +6,12 @@ app_email = "christinek@victoryfarmskenya.com"
 app_license = "mit"
 app_include = ["erpnext"]
 required_apps = ["frappe", "erpnext"]
+app_include_js = "/assets/victoryfarmsdeveloper/js/stock_entry.js"
+override_doctype_class = {
+    "Stock Entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.doctype.stock_entry.stock_entry.CustomStockEntry"
+}
+
+
 # Includes in <head>
 # ------------------
 
