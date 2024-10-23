@@ -1,27 +1,16 @@
 frappe.ui.form.on('Stock Entry', {
-    onload: function(frm) {
-        console.log('Custom onload logic');
-    },
     custom_pack_to_crates(frm){
         frappe.call({
-            method: 'victoryfarmsdeveloper.victoryfarmsdeveloper.customization.doctype.stock_entry.stock_entry.update_child_table',
-            args: {
-                doc: frm.doc
-            },
+            method: 'update_child_table',
+            doc: frm.doc,
+            btn: $('.primary-action'),
             freeze: true,
-            callback: function(r) {
-                console.log('Server response received');
-                if (r.message) {
-                    console.log(r.message);
-                    frm.refresh_field("crates");
-                } else {
-                    console.log('No message returned from the server.');
-                }
-            },
-            error: function(err) {
-                console.error("Error calling method:", err);
+            callback: (r) => {
+                let response = r.message
+                console.log(response)
+                refresh_field("custom_crates")
             }
-        });
+        })
     }
 });
 
