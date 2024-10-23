@@ -92,7 +92,7 @@ class CustomStockEntry(StockEntry):
     @frappe.whitelist()
     def update_child_table(self):
         self.custom_crates = []
-        # self.save()
+        self.save()
         self.adjust_crates()
 
     def adjust_crates(self):
@@ -182,7 +182,7 @@ class CustomStockEntry(StockEntry):
                 })
 
             # frappe.log("Crate List: {}".format(json.dumps(crate_list))) 
-            # self.save()
+            self.save()
 
     def on_submit(self):
         if not self.custom_crates:
