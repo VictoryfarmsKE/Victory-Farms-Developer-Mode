@@ -6,10 +6,6 @@ app_email = "christinek@victoryfarmskenya.com"
 app_license = "mit"
 app_include = ["erpnext"]
 required_apps = ["frappe", "erpnext"]
-app_include_js = "/assets/victoryfarmsdeveloper/js/stock_entry.js"
-override_doctype_class = {
-    "Stock Entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.doctype.stock_entry.stock_entry.CustomStockEntry"
-}
 
 
 # Includes in <head>
@@ -32,6 +28,7 @@ override_doctype_class = {
 
 # include js in page
 # page_js = {"page" : "public/js/file.js"}
+app_include_js = "/assets/victoryfarmsdeveloper/js/stock_entry.js"
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
@@ -123,7 +120,9 @@ override_doctype_class = {
 # override_doctype_class = {
 # 	"ToDo": "custom_app.overrides.CustomToDo"
 # }
-
+override_doctype_class = {
+    "Stock Entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry"
+}
 # Document Events
 # ---------------
 # Hook on document methods and events
@@ -135,6 +134,11 @@ override_doctype_class = {
 # 		"on_trash": "method"
 # 	}
 # }
+doc_events = {
+    "Stock Entry": {
+        "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.on_submit"
+    }
+}
 
 # Scheduled Tasks
 # ---------------
