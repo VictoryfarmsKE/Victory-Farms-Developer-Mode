@@ -55,7 +55,7 @@ class CustomStockEntry(StockEntry):
         self.enqueue_convert_to_crates(items_dict)
   
     def enqueue_convert_to_crates(self, items_dict):
-        frappe.enqueue('victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry.convert_to_crates', items_dict=items_dict)
+        frappe.enqueue('victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.convert_to_crates', items_dict=items_dict)
 
     def convert_to_crates(self, items_dict):
         for key, value in items_dict.items():
