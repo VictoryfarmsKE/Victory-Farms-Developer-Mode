@@ -15,6 +15,7 @@ fixtures = [
                 "name", "in", [
                     "Stock Entry-custom_crates",
                     "Stock Entry-custom_total_crates"
+                    "Stock Entry-custom_pack_to_crates"
                 ]
             ]
         ]
