@@ -7,6 +7,19 @@ app_license = "mit"
 app_include = ["erpnext"]
 required_apps = ["frappe", "erpnext"]
 
+fixtures = [
+    {
+        "doctype": "Custom Field",
+        "filters": [
+            [
+                "name", "in", [
+                    "Stock Entry-custom_crates",
+                    "Stock Entry-custom_total_crates"
+                ]
+            ]
+        ]
+    }
+]
 
 # Includes in <head>
 # ------------------
