@@ -3,7 +3,7 @@ from frappe import _, msgprint, throw
 from frappe.utils import nowdate
 
 @frappe.whitelist()
-def send_via_gateway(receiver_list, msg, sender_name="", success_msg=True):
+def send_sms(receiver_list, msg, sender_name="", success_msg=True):
     import json
 
     if isinstance(receiver_list, str):
@@ -43,8 +43,6 @@ def send_via_gateway(receiver_list, msg, sender_name="", success_msg=True):
         "ClientId": client_id
     }
 
-    # Log the request body and headers for verification
-    # frappe.log_error(f"Request Body: {json.dumps(request_body, indent=2)}", "SMS Request Body")
     try:
         response = requests.post(ss.sms_gateway_url, json=request_body, headers=headers)
         response.raise_for_status()
