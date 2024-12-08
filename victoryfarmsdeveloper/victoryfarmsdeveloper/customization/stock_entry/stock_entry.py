@@ -1,6 +1,7 @@
 import frappe
 from erpnext.stock.doctype.stock_entry.stock_entry import StockEntry
 import json
+from frappe import _
 
 class CustomStockEntry(StockEntry):
     @frappe.whitelist()
@@ -39,7 +40,6 @@ class CustomStockEntry(StockEntry):
                 custom_crates[item_code] = custom_crates.get(item_code, 0) + crate.get("qty")
         return custom_crates
 
-
     def adjust_crates(self):
         items_dict = {}
         if self.items:
@@ -52,7 +52,10 @@ class CustomStockEntry(StockEntry):
                     "qty": item.get("qty"),
                     "uom": item.get("uom"),
                 }
-        self.convert_to_crates(items_dict)
+        self.enqueue_convert_to_crates(items_dict)
+  
+    def enqueue_convert_to_crates(self, items_dict):
+        frappe.enqueue('"victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry.convert_to_crates', items_dict=items_dict)
 
     def convert_to_crates(self, items_dict):
         for key, value in items_dict.items():
@@ -104,10 +107,9 @@ class CustomStockEntry(StockEntry):
                     "crate_type": "Half Crate",
                 }
                 crate_list.append(crate_entry)
-                global_crate_number += 1  # Increment the global crate number
-                
+                global_crate_number += 1  # Increment the global crate number             
         self.append_crates(crate_list)
-    
+
     def append_crates(self, crate_list):
         for crate in crate_list:
             # Check if the crate already exists
@@ -165,8 +167,8 @@ class CustomStockEntry(StockEntry):
                     'total_crates': crates['total_crates'],
                 })
             self.save()
-        
-                
+            
+                         
             
 def on_submit(self, method):
     if not self.custom_crates:

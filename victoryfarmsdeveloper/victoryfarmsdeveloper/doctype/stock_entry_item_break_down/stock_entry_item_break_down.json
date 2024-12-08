@@ -10,7 +10,7 @@
   "item_code",
   "uom",
   "qty",
-  "custom_get_weights",
+  "get_weights",
   "crate_number"
  ],
  "fields": [
@@ -38,23 +38,23 @@
    "reqd": 1
   },
   {
-   "fieldname": "custom_get_weights",
-   "fieldtype": "Button",
-   "in_list_view": 1,
-   "label": "Get Weights"
-  },
-  {
    "fieldname": "crate_number",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Crate Number",
    "options": "VF Crate No"
+  },
+  {
+   "fieldname": "get_weights",
+   "fieldtype": "Button",
+   "in_list_view": 1,
+   "label": "Get Weights"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-10-30 23:09:02.435906",
+ "modified": "2024-11-14 12:24:52.954254",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Stock Entry Item Break Down",
