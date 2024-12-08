@@ -20,7 +20,6 @@ fixtures = [
         ]
     }
 ]
-
 # Includes in <head>
 # ------------------
 
