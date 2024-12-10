@@ -52,10 +52,11 @@ class CustomStockEntry(StockEntry):
                     "qty": item.get("qty"),
                     "uom": item.get("uom"),
                 }
-        self.enqueue_convert_to_crates(items_dict)
+        # self.enqueue_convert_to_crates(items_dict)
+        self.convert_to_crates(items_dict)
   
-    def enqueue_convert_to_crates(self, items_dict):
-        frappe.enqueue('victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.convert_to_crates', items_dict=items_dict)
+    # def enqueue_convert_to_crates(self, items_dict):
+    #     frappe.enqueue('victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntryconvert_to_crates', items_dict=items_dict)
 
     def convert_to_crates(self, items_dict):
         for key, value in items_dict.items():
@@ -170,6 +171,6 @@ class CustomStockEntry(StockEntry):
             
                          
             
-def on_submit(self, method):
-    if not self.custom_crates:
-        frappe.throw("Crates table is mandatory!")
+# def on_submit(self, method):
+#     if not self.custom_crates:
+#         frappe.throw("Crates table is mandatory!")
