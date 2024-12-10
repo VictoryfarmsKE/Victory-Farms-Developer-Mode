@@ -167,6 +167,7 @@ class CustomStockEntry(StockEntry):
                     'item_code': crates['item_code'],
                     'total_crates': crates['total_crates'],
                 })
+            self.custom_number_of_crates = sum(crates['total_crates'] for crates in aggregated_results)
             self.save()
             
                          
@@ -174,3 +175,4 @@ class CustomStockEntry(StockEntry):
 # def on_submit(self, method):
 #     if not self.custom_crates:
 #         frappe.throw("Crates table is mandatory!")
+
