@@ -7,20 +7,6 @@ app_license = "mit"
 app_include = ["erpnext"]
 required_apps = ["frappe", "erpnext"]
 
-fixtures = [
-    {
-        "doctype": "Custom Field",
-        "filters": [
-            [
-                "name", "in", [
-                    "Stock Entry-custom_crates",
-                    "Stock Entry-custom_total_crates"
-                    "Stock Entry-custom_pack_to_crates"
-                ]
-            ]
-        ]
-    }
-]
 # Includes in <head>
 # ------------------
 
@@ -147,11 +133,11 @@ override_doctype_class = {
 # 		"on_trash": "method"
 # 	}
 # }
-doc_events = {
-    "Stock Entry": {
-        "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.on_submit"
-    }
-}
+# doc_events = {
+#     "Stock Entry": {
+#         "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.on_submit"
+#     }
+# }
 
 # Scheduled Tasks
 # ---------------
