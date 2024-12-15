@@ -1,6 +1,5 @@
 frappe.ui.form.on('Stock Entry Item Break Down', {
-	get_weights: function (frm, cnd, cdt) {
-		console.log("Button clicked");
+    get_weights: function (frm, cnd, cdt) {
 		$.ajax({
 			type: 'POST',
 			url: "http:localhost:5000/get_weight_scale",

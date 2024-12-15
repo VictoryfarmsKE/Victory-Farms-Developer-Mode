@@ -7,6 +7,7 @@ app_license = "mit"
 app_include = ["erpnext"]
 required_apps = ["frappe", "erpnext"]
 
+fixtures = ["custom_field.json"]
 # Includes in <head>
 # ------------------
 
@@ -29,8 +30,12 @@ required_apps = ["frappe", "erpnext"]
 # page_js = {"page" : "public/js/file.js"}
 app_include_js = "/assets/victoryfarmsdeveloper/js/stock_entry.js"
 
+
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {
+    "Stock Entry": "victoryfarmsdeveloper/customization/stock_entry_item_break_down/stock_entry_item_break_down.js"
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
