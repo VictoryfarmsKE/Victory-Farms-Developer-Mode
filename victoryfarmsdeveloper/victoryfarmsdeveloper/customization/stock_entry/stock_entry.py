@@ -44,19 +44,23 @@ class CustomStockEntry(StockEntry):
         items_dict = {}
         if self.items:
             for item in self.items:
-                if not item.get("item_code") in items_dict.keys():
-                    items_dict[item.get("item_code")] = {}
+                item_code = item.get("item_code")
+                if item_code == "Crates":
+                    continue  # Skip items with item_code "Crates"
+                
+                if item_code not in items_dict:
+                    items_dict[item_code] = {}
 
-                items_dict[item.get("item_code")] = {
-                    "item_code": item.get("item_code"),
+                items_dict[item_code] = {
+                    "item_code": item_code,
                     "qty": item.get("qty"),
                     "uom": item.get("uom"),
                 }
-        # self.enqueue_convert_to_crates(items_dict)
+        self.enqueue_convert_to_crates(items_dict)
         self.convert_to_crates(items_dict)
   
-    # def enqueue_convert_to_crates(self, items_dict):
-    #     frappe.enqueue('victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntryconvert_to_crates', items_dict=items_dict)
+    def enqueue_convert_to_crates(self, items_dict):
+        frappe.enqueue('victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry.convert_to_crates', items_dict=items_dict)
 
     def convert_to_crates(self, items_dict):
         for key, value in items_dict.items():
