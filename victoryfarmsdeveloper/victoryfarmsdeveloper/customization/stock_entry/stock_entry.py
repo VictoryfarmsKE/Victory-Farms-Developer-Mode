@@ -1,6 +1,5 @@
 import frappe
 from erpnext.stock.doctype.stock_entry.stock_entry import StockEntry
-import json
 from frappe import _
 
 class CustomStockEntry(StockEntry):
@@ -56,13 +55,16 @@ class CustomStockEntry(StockEntry):
                     "qty": item.get("qty"),
                     "uom": item.get("uom"),
                 }
-        self.enqueue_convert_to_crates(items_dict)
-        self.convert_to_crates(items_dict)
-  
-    def enqueue_convert_to_crates(self, items_dict):
-        frappe.enqueue('victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry.convert_to_crates', items_dict=items_dict)
+        self.process_items_in_batches(items_dict)
 
-    def convert_to_crates(self, items_dict):
+    def process_items_in_batches(self, items_dict, batch_size=10):
+        items_list = list(items_dict.items())
+        for i in range(0, len(items_list), batch_size):
+            batch = items_list[i:i + batch_size]
+            frappe.enqueue(self.convert_to_crates, items_batch=batch, queue='long', timeout=5000)
+        
+    def convert_to_crates(self, items_batch):
+        items_dict = dict(items_batch)
         for key, value in items_dict.items():
             conv_factor = frappe.db.get_value(
                 "UOM Conversion Factor",
@@ -83,15 +85,11 @@ class CustomStockEntry(StockEntry):
         # Loop through each item in the dictionary
         for item_name, details in items_dict.items():
             total_qty = details["qty"]
-            full_crates = int(
-                total_qty // 25
-            )  # Calculate full crates (25 kgs per crate)
-            remaining_qty = (
-                total_qty % 25
-            )  # Calculate remaining quantity for half crate
+            full_crates = int(total_qty // 25)  # Calculate full crates (25 kgs per crate)
+            remaining_qty = total_qty % 25  # Calculate remaining quantity for half crate
 
             # Create entries for each full crate
-            for i in range(full_crates):
+            for _ in range(full_crates):
                 crate_entry = {
                     "item_code": details["item_code"],
                     "crate_number": global_crate_number,
@@ -127,11 +125,11 @@ class CustomStockEntry(StockEntry):
                 # If the crate does not exist, create a new entry
                 self.append("custom_crates", {
                     'item_code': crate['item_code'],
-                    # 'crate_number': crate['crate_number'],
+                    'crate_number': crate['crate_number'],
                     'uom': crate['uom'],
                     'qty': crate['qty'],
                 })
-            self.append_total_crates(crate_list)
+        self.append_total_crates(crate_list)
             
     def append_total_crates(self, crate_list):
         aggregated_crates = {}
@@ -167,16 +165,9 @@ class CustomStockEntry(StockEntry):
                 existing_crate.total_crates = crates['total_crates']
             else:
                 # If the crate does not exist, create a new entry
-                 self.append("custom_total_crates", {
+                self.append("custom_total_crates", {
                     'item_code': crates['item_code'],
                     'total_crates': crates['total_crates'],
                 })
-            self.custom_number_of_crates = sum(crates['total_crates'] for crates in aggregated_results)
-            self.save()
-            
-                         
-            
-# def on_submit(self, method):
-#     if not self.custom_crates:
-#         frappe.throw("Crates table is mandatory!")
-
+        self.custom_number_of_crates = sum(crates['total_crates'] for crates in aggregated_results)
+        self.save()
