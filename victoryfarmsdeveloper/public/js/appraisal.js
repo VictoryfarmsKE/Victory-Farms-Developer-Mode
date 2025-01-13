@@ -28,7 +28,7 @@ frappe.ui.form.on("Appraisal Goal", {
         frappe.model.set_value(cdt, cdn, "score_percentage", score_percentage);
     },
     custom_did_the_employee: function(frm, cdt, cdn) {
-        let row = locals[cdt][cdn];
+        let row = frappe.get_doc(cdt, cdn);
         if (row.custom_did_the_employee) {
             frappe.db.get_value('Appraisal Template Goal', row.custom_did_the_employee, 'custom_did_the_employee', (r) => {
                 if (r && r.custom_did_the_employee) {
