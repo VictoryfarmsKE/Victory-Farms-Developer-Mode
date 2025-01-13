@@ -28,7 +28,10 @@ fixtures = ["custom_field.json"]
 
 # include js in page
 # page_js = {"page" : "public/js/file.js"}
-app_include_js = "/assets/victoryfarmsdeveloper/js/stock_entry.js"
+app_include_js = [
+    "/assets/victoryfarmsdeveloper/js/stock_entry.js",
+    "/assets/victoryfarmsdeveloper/js/appraisal.js"  
+]
 
 
 # include js in doctype views
