@@ -1,0 +1,13 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Appraisal",
+  "enabled": 1,
+  "modified": "2025-01-14 15:33:45.572896",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Appraisal Score Definitions",
+  "script": "frappe.ui.form.on('Appraisal', {\r\n    onload: function (frm) {\r\n        const image_path = '/private/files/1-5 Score Definitions.jpg';\r\n        const image_html = `<img src=\"${image_path}\" alt=\"Score Definitions\" style=\"max-width: 100%; height: auto;\">`;\r\n        frm.set_df_property('custom_score_descriptions', 'options', image_html);\r\n    }\r\n});\r\n",
+  "view": "Form"
+ }
+]

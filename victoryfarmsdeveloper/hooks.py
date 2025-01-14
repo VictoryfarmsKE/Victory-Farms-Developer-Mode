@@ -7,7 +7,10 @@ app_license = "mit"
 app_include = ["erpnext"]
 required_apps = ["frappe", "erpnext"]
 
-fixtures = ["custom_field.json"]
+fixtures = [
+    "custom_field.json",
+    "Client Script"
+    ]
 # Includes in <head>
 # ------------------
 
@@ -29,10 +32,8 @@ fixtures = ["custom_field.json"]
 # include js in page
 # page_js = {"page" : "public/js/file.js"}
 app_include_js = [
-    "/assets/victoryfarmsdeveloper/js/stock_entry.js",
-    "/assets/victoryfarmsdeveloper/js/appraisal.js"  
+    "/assets/victoryfarmsdeveloper/js/stock_entry.js"
 ]
-
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
@@ -128,7 +129,8 @@ doctype_js = {
 # 	"ToDo": "custom_app.overrides.CustomToDo"
 # }
 override_doctype_class = {
-    "Stock Entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry"
+    "Stock Entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry",
+    "Appraisal Goal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_goal.appraisal_goal.CustomAppraisalGoal"
 }
 # Document Events
 # ---------------
