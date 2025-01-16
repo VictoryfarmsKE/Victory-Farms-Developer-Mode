@@ -8,9 +8,11 @@ app_include = ["erpnext"]
 required_apps = ["frappe", "erpnext"]
 
 fixtures = [
-    "custom_field.json",
-    "Client Script"
-    ]
+    "Client Script",
+    "Custom Field",
+    {"dt": "Client Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+    {"dt": "Custom Field", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+]
 # Includes in <head>
 # ------------------
 
@@ -129,8 +131,8 @@ doctype_js = {
 # 	"ToDo": "custom_app.overrides.CustomToDo"
 # }
 override_doctype_class = {
-    "Stock Entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry",
-    "Appraisal Goal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_goal.appraisal_goal.CustomAppraisalGoal"
+    "Stock Entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry"
+    # "Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal.appraisal.CustomAppraisal"
 }
 # Document Events
 # ---------------
