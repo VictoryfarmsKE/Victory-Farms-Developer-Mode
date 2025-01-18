@@ -15,21 +15,10 @@
   "doctype": "Client Script",
   "dt": "Appraisal",
   "enabled": 1,
-  "modified": "2025-01-16 20:26:32.775011",
+  "modified": "2025-01-18 10:39:29.760067",
   "module": "VictoryFarmsDeveloper",
   "name": "Appraisal Score Definitions",
-  "script": "frappe.ui.form.on('Appraisal', {\r\n    before_load: function (frm) {\r\n        frm.set_value('custom_score_def_image', '/private/files/1-5 Score Definitions.jpg');\r\n    }\r\n});\r\n\r\nfrappe.ui.form.on('Appraisal Goal', {\r\n     score(frm, cdt, cdn) {\r\n        let d = locals[cdt][cdn]; \r\n        if (d.score) {\r\n            if (d.score < 1) {\r\n                frappe.throw(__(\"Score should be between 1 to 5\")) \r\n            }\r\n            d.score = Math.round(d.score);\r\n        }\r\n    },\r\n    // refresh: function(frm) {\r\n    //     $(\"[data-kra='start_date']\").attr(\"kra\", \"Please mention the order begin date\");\r\n    // }\r\n})",
-  "view": "Form"
- },
- {
-  "docstatus": 0,
-  "doctype": "Client Script",
-  "dt": "Department Appraisal",
-  "enabled": 1,
-  "modified": "2025-01-16 16:08:38.579879",
-  "module": "VictoryFarmsDeveloper",
-  "name": "Score Definition Image",
-  "script": "frappe.ui.form.on('Department Appraisal', {\n    before_load: function (frm) {\n        frm.set_value('custom_score_def_image', '/private/files/1-5 Score Definitions.jpg');\n    }\n});",
+  "script": "frappe.ui.form.on('Appraisal', {\r\n    before_load: function (frm) {\r\n        frm.set_value('custom_score_def_image', '/private/files/1-5 Score Definitions.jpg');\r\n        frm.set_value('custom_goal_reference_image', '/private/files/goal reference.png');\r\n    }\r\n});\r\n\r\nfrappe.ui.form.on('Appraisal Goal', {\r\n     score(frm, cdt, cdn) {\r\n        let d = locals[cdt][cdn];\r\n        if (d.score) {\r\n            if (d.score < 1) {\r\n                frappe.throw(__(\"Score should be between 1 to 5\")) \r\n            }\r\n            frappe.model.set_value(cdt, cdn, \"score\", Math.round(d.score))\r\n        }\r\n    }\r\n})",
   "view": "Form"
  }
 ]
