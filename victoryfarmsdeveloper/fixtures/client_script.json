@@ -2,23 +2,23 @@
  {
   "docstatus": 0,
   "doctype": "Client Script",
-  "dt": "Appraisal Goal",
-  "enabled": 0,
-  "modified": "2025-01-14 20:55:20.679221",
-  "module": "VictoryFarmsDeveloper",
-  "name": "Appraisal Description",
-  "script": "frappe.ui.form.on('Appraisal Goal', {\r\n    kra: function (frm, cdt, cdn) {\r\n        let row = locals[cdt][cdn];\r\n        if (row.kra) {\r\n            frappe.call({\r\n                method: \"victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal.appraisal.CustomAppraisal.fetch_kra_description\",\r\n                args: {\r\n                    title: row.kra\r\n                },\r\n                callback: function (r) {\r\n                    if (r.message) {\r\n                        frappe.model.set_value(cdt, cdn, \"did_the_employee\", r.message);\r\n                    }\r\n                }\r\n            });\r\n        }\r\n    }\r\n});\r\n",
-  "view": "Form"
- },
- {
-  "docstatus": 0,
-  "doctype": "Client Script",
   "dt": "Appraisal",
   "enabled": 1,
   "modified": "2025-01-18 10:39:29.760067",
   "module": "VictoryFarmsDeveloper",
   "name": "Appraisal Score Definitions",
   "script": "frappe.ui.form.on('Appraisal', {\r\n    before_load: function (frm) {\r\n        frm.set_value('custom_score_def_image', '/private/files/1-5 Score Definitions.jpg');\r\n        frm.set_value('custom_goal_reference_image', '/private/files/goal reference.png');\r\n    }\r\n});\r\n\r\nfrappe.ui.form.on('Appraisal Goal', {\r\n     score(frm, cdt, cdn) {\r\n        let d = locals[cdt][cdn];\r\n        if (d.score) {\r\n            if (d.score < 1) {\r\n                frappe.throw(__(\"Score should be between 1 to 5\")) \r\n            }\r\n            frappe.model.set_value(cdt, cdn, \"score\", Math.round(d.score))\r\n        }\r\n    }\r\n})",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Appraisal Cycle",
+  "enabled": 0,
+  "modified": "2025-01-20 20:00:48.406433",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Appraisal Cycle - Template Filter",
+  "script": "frappe.ui.form.on('Appraisal Cycle', {\n    refresh: function(frm) {\n        frm.set_query('appraisal_template', function() {\n            return {\n                filters: {\n                    'custom_appraisal_template': 1\n                }\n            };\n        });\n\n        frm.set_query('employee', function() {\n            return {\n                query: 'hrms.hr.doctype.appraisal_cycle.appraisal_cycle.get_employees_with_template',\n                filters: {\n                    'appraisal_template': frm.doc.custom_appraisal_template\n                }\n            };\n        });\n    }\n});",
   "view": "Form"
  }
 ]
