@@ -50,8 +50,9 @@ def send_sms(receiver_list, msg, sender_name="", success_msg=True):
         frappe.msgprint(_("SMS sent successfully"))
 
     except requests.exceptions.RequestException as e:
-        frappe.log_error(f"Error sending SMS: {e}")
-        frappe.msgprint(f"Error sending SMS: {e}")
+        error_message = f"Error sending SMS: {e}\nStatus Code: {response.status_code if response else 'N/A'}\nResponse Text: {response.text if response else 'N/A'}"
+        frappe.log_error(f"Error sending SMS: {error_message}")
+        frappe.msgprint(f"Error sending SMS: {error_message}")
 
 def get_headers(self):
     headers = {"Accept": "text/plain, text/html, */*"}
