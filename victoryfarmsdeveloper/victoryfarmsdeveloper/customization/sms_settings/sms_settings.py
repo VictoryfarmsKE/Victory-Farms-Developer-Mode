@@ -42,6 +42,7 @@ def send_sms(receiver_list, msg, sender_name="", success_msg=True):
         "ApiKey": api_key,
         "ClientId": client_id
     }
+    response = None
 
     try:
         response = requests.post(ss.sms_gateway_url, json=request_body, headers=headers)
