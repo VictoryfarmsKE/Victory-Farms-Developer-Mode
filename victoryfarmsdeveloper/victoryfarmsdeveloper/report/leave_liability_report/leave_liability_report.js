@@ -8,14 +8,14 @@ frappe.query_reports["Leave Liability Report"] = {
             "fieldname": "from_date",
             "label": __("From Date"),
             "fieldtype": "Date",
-            "default": frappe.datetime.add_months(frappe.datetime.nowdate(), -1),
+            "default": frappe.datetime.year_start(),
             "reqd": 0  
         },
         {
             "fieldname": "to_date",
             "label": __("To Date"),
             "fieldtype": "Date",
-            "default": frappe.datetime.nowdate(),
+            "default": frappe.datetime.year_end(),
             "reqd": 0  
         },
 		{
