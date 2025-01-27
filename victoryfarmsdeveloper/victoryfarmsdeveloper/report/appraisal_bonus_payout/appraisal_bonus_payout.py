@@ -31,8 +31,11 @@ def execute(filters=None):
             "employee_name": item["employee_name"],
             "department": item["department"],
             "individual_score": item["individual_score"],
+            "individual_bonus": item["individual_bonus"],
             "department_score": item["department_score"],
+            "department_bonus": item["department_bonus"],
             "company_score": item["company_score"],
+            "company_bonus": item["company_bonus"],
             "total_bonus": item["total_bonus"]
         }
         for item in appraisal_payout_items
@@ -57,8 +60,11 @@ def get_appraisal_payout_details(filtered_appraisal_payouts):
             AppraisalPayoutItem.employee_name,
             AppraisalPayoutItem.department,
             AppraisalPayoutItem.individual_score,
+            AppraisalPayoutItem.individual_bonus,
             AppraisalPayoutItem.department_score,
+            AppraisalPayoutItem.department_bonus,
             AppraisalPayoutItem.company_score,
+            AppraisalPayoutItem.company_bonus,
             AppraisalPayoutItem.total_bonus,
             AppraisalPayout.company,
             AppraisalPayout.payout_frequency,
@@ -84,7 +90,7 @@ def get_appraisal_payouts(filters):
     if filters.get("posting_date"):
         conditions.append(AppraisalPayout.posting_date == filters["posting_date"])
 
-    query = frappe.qb.from_(AppraisalPayout).select(
+    query = frappe.qb.from_(AppraisalPayout ).select(
         AppraisalPayout.name,
         AppraisalPayout.company,
         AppraisalPayout.payout_frequency,
@@ -102,15 +108,18 @@ def get_appraisal_payouts(filters):
 def get_columns():
     return [
         {"label": _("Employee"), "fieldname": "employee", "fieldtype": "Link", "options": "Employee", "width": 120},
-        {"label": _("Employee Name"), "fieldname": "employee_name", "fieldtype": "Data", "width": 140},
-        {"label": _("Company"), "fieldname": "company", "fieldtype": "Link", "options": "Company", "width": 120},
+        # {"label": _("Employee Name"), "fieldname": "employee_name", "fieldtype": "Data", "width": 140},
+        # {"label": _("Company"), "fieldname": "company", "fieldtype": "Link", "options": "Company", "width": 120},
         {"label": _("Department"), "fieldname": "department", "fieldtype": "Data", "width": 160},
         {"label": _("Payout Frequency"), "fieldname": "payout_frequency", "fieldtype": "Select", "width": 120},
-        {"label": _("Start Date"), "fieldname": "start_date", "fieldtype": "Date", "width": 120},
-        {"label": _("End Date"), "fieldname": "end_date", "fieldtype": "Date", "width": 120},
+        # {"label": _("Start Date"), "fieldname": "start_date", "fieldtype": "Date", "width": 120},
+        # {"label": _("End Date"), "fieldname": "end_date", "fieldtype": "Date", "width": 120},
         {"label": _("Posting Date"), "fieldname": "posting_date", "fieldtype": "Date", "width": 120},
         {"label": _("Individual Score"), "fieldname": "individual_score", "fieldtype": "Percent", "width": 120},
+        {"label": _("Individual Bonus"), "fieldname": "individual_bonus", "fieldtype": "Currency", "width": 120},
         {"label": _("Department Score"), "fieldname": "department_score", "fieldtype": "Percent", "width": 120},
+        {"label": _("Department Bonus"), "fieldname": "department_bonus", "fieldtype": "Currency", "width": 120},
         {"label": _("Company Score"), "fieldname": "company_score", "fieldtype": "Percent", "width": 120},
+        {"label": _("Company Bonus"), "fieldname": "company_bonus", "fieldtype": "Currency", "width": 120},
         {"label": _("Total Bonus"), "fieldname": "total_bonus", "fieldtype": "Currency", "width": 120},
     ]

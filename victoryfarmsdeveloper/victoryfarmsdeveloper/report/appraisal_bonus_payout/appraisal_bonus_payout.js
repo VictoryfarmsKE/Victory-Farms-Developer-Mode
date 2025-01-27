@@ -46,13 +46,13 @@ frappe.query_reports["Appraisal Bonus Payout"] = {
             "fieldtype": "Date",
             "reqd": 0  
         },
-        {
-            "fieldname": "employee",
-            "label": __("Employee"),
-            "fieldtype": "Link",
-            "options": "Employee",
-            "reqd": 0  
-        }
+        // {
+        //     "fieldname": "employee",
+        //     "label": __("Employee"),
+        //     "fieldtype": "Link",
+        //     "options": "Employee",
+        //     "reqd": 0  
+        // }
     ]
 };
 
