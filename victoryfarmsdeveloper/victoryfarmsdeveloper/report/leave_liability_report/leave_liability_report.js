@@ -24,15 +24,6 @@ frappe.query_reports["Leave Liability Report"] = {
             "fieldtype": "Link",
             "options": "Department",
             "reqd": 0, 
-        },
-        {
-            "fieldname": "leave_type",
-            "label": __("Leave Type"),
-            "fieldtype": "Link",
-			"options": "Leave Type",
-			"default": "Annual Leave",
-            "reqd": 0,
-			"read_only": 1 
         }
     ]
 };
