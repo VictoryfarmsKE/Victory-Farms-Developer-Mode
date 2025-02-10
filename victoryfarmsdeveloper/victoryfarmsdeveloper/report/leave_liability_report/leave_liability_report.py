@@ -115,7 +115,7 @@ def get_data(filters: Filters) -> list:
                 filters.from_date, filters.to_date, employee.name, leave_type
             )
 
-            if new_allocation > 0 or leaves_taken != 0 or expired_leaves != 0:
+            if new_allocation:
                 opening = get_opening_balance(employee.name, leave_type, filters, carry_forwarded_leaves)
 
                 row.leaves_allocated = flt(new_allocation, precision)
