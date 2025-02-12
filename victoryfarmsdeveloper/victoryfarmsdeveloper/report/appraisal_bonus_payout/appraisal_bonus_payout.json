@@ -10,7 +10,7 @@
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": "Standard",
- "modified": "2025-01-27 20:15:31.183623",
+ "modified": "2025-02-12 12:53:52.866689",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Appraisal Bonus Payout",
@@ -28,6 +28,9 @@
   },
   {
    "role": "System Manager"
+  },
+  {
+   "role": "HR User"
   }
  ]
 }
