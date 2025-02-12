@@ -10,7 +10,7 @@
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": "Standard",
- "modified": "2024-10-20 21:50:29.556172",
+ "modified": "2025-02-12 12:17:00.980149",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Appraisal Score Report",
@@ -28,6 +28,12 @@
   },
   {
    "role": "System Manager"
+  },
+  {
+   "role": "HR User"
+  },
+  {
+   "role": "Employee"
   }
  ]
 }
