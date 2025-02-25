@@ -1,6 +1,3 @@
-# Copyright (c) 2022, Frappe Technologies Pvt. Ltd. and contributors
-# For license information, please see license.txt
-
 import frappe
 from frappe import _
 from frappe.model.document import Document
@@ -67,6 +64,9 @@ class CustomAppraisalCycle(Document):
         return self
 
     def get_employees_for_appraisal(self):
+        # Debug statement to check the value of custom_appraisal_template_multiselect
+        # frappe.msgprint(f"Value of custom_appraisal_template_multiselect: {self.custom_appraisal_template_multiselect}")
+
         filters = {
             "status": "Active",
             "company": self.company,
@@ -77,8 +77,16 @@ class CustomAppraisalCycle(Document):
             filters["branch"] = self.branch
         if self.designation:
             filters["designation"] = self.designation
-        if self.custom_appraisal_template:
-            filters["custom_appraisal_template"] = self.custom_appraisal_template
+
+        # Extract the custom_appraisal_template values from the child table
+        selected_templates = [d.template for d in self.custom_appraisal_template_multiselect]
+
+        # frappe.msgprint(f"Parsed selected templates: {selected_templates}")
+
+        if selected_templates:
+            filters["custom_appraisal_template"] = ["in", selected_templates]
+
+        # frappe.msgprint(f"Filters used for fetching employees: {filters}")
 
         employees = frappe.db.get_all(
             "Employee",
@@ -90,9 +98,10 @@ class CustomAppraisalCycle(Document):
                 "designation",
                 "department",
                 "custom_appraisal_template"
-    
             ],
         )
+
+        frappe.logger().debug(f"Employees fetched: {employees}")
 
         return employees
 
