@@ -172,6 +172,19 @@ override_doctype_class = {
 # 	],
 # }
 
+scheduler_events = {
+    "hourly": [
+        "victoryfarmsdeveloper.notifications.check_low_stock.check_low_stock"
+    ]
+}
+
+
+doc_events = {
+    "Sales Invoice": {
+        "on_change": "victoryfarmsdeveloper.notifications.sales_invoice_status_change.sales_invoice_status_change"
+    }
+}
+
 # Testing
 # -------
 
