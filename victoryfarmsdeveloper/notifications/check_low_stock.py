@@ -17,9 +17,9 @@ def check_low_stock():
     
     stock_qty = stock_data.get("qty", 0)
 
-    frappe.log_error(f"Stock Balance for {item_code}: {stock_qty}")
+    # frappe.log_error(f"Stock Balance for {item_code}: {stock_qty}")
 
-    if stock_qty <= 1000:
+    if stock_qty <= 100:
         # frappe.log_error(f"Stock is low ({stock_qty}), sending notification...")
         
         # Notify users if stock is low
