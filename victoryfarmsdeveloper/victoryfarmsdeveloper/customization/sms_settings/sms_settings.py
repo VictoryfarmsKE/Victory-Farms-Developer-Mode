@@ -62,26 +62,46 @@ def get_headers(self):
             headers.update({d.parameter: d.value})
     return headers
 
-def send_request(self, gateway_url, params, headers=None, use_post=False, use_json=False):
+def send_request(gateway_url, params, headers=None, use_post=True, use_json=True):
     import requests
+    import json
 
-    if not headers:
-        headers = self.get_headers()
-    kwargs = {"headers": headers}
+    if headers is None:
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        }
 
-    if use_json:
-        kwargs["json"] = params
-    elif use_post:
-        kwargs["data"] = params
-    else:
-        kwargs["params"] = params
+    # Fix request format
+    formatted_params = {
+        "SenderId": params.get("SenderId"),
+        "MessageParameters": [
+            {
+                "Number": params.get("mobile"), 
+                "Text": params.get("message")  
+            }
+        ],
+        "ApiKey": params.get("ApiKey"),
+        "ClientId": params.get("ClientId"),
+    }
 
-    if use_post:
+    kwargs = {"headers": headers, "json": formatted_params}
+
+    try:
         response = requests.post(gateway_url, **kwargs)
-    else:
-        response = requests.get(gateway_url, **kwargs)
-    response.raise_for_status()
-    return response.status_code
+        response.raise_for_status()
+        return response.status_code
+
+    except requests.exceptions.RequestException as e:
+        error_details = {
+            "URL": gateway_url,
+            "Headers": headers,
+            "Payload Sent": formatted_params,
+            "Error": str(e),
+        }
+
+        frappe.log_error(title="SMS API Error", message=json.dumps(error_details, indent=2))
+        return None
 
 def create_sms_log(args, sent_to):
     sl = frappe.new_doc("SMS Log")
