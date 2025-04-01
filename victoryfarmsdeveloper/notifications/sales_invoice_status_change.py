@@ -59,8 +59,5 @@ def send_sms_notification(doc):
             receiver_list=mobile_no,
             msg=message
         )
-
-        frappe.log_error(f"SMS response: {response}")
-
     except Exception as e:
         frappe.log_error(f"SMS error: {str(e)}")
