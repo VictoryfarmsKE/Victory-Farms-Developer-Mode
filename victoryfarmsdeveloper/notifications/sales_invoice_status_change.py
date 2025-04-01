@@ -1,7 +1,7 @@
 import frappe
 
 def sales_invoice_status_change(doc, method):
-    # Get the document's state before the current save
+    # Get the document's state
     previous_doc = doc.get_doc_before_save()
     previous_status = previous_doc.status if previous_doc else None
     
@@ -10,8 +10,6 @@ def sales_invoice_status_change(doc, method):
 
     if previous_status != "Paid" and doc.status == "Paid" and not doc.sms_sent and has_payment_entry:
         send_sms_notification(doc)
-
-        # Mark as SMS sent to avoid duplication
         frappe.db.set_value("Sales Invoice", doc.name, "sms_sent", 1)
         frappe.db.commit()
 
@@ -19,7 +17,6 @@ def sales_invoice_status_change(doc, method):
 def send_sms_notification(doc):
     """ Sends an SMS when a Sales Invoice is marked as Paid. """
     try:
-        # Construct the SMS message
         text_items = ""
         items = doc.get("items")
 
@@ -37,7 +34,6 @@ def send_sms_notification(doc):
         items_header = f'<br />Items :: <br />'
         total_qty = f'<br />Total Qty :: {str(rounded_total_qty)}<br />'
         total_amount = f'Grand Total :: {doc.currency} {frappe.utils.fmt_money(doc.rounded_total)}<br />'
-        # receipt_link = f'<br /> Receipt Link :: {receipt_link}{doc.name} <br /><br />'
         terms_info1 = 'Pre-payment of goods is not allowed. <br />'
         terms_info2 = 'All transactions are done in real-time. <br />'
         terms_info3 = 'Always pay through the Victory Farms official till number.'
@@ -56,8 +52,6 @@ def send_sms_notification(doc):
         if not mobile_no:
             frappe.log_error(f"Invoice {doc.name}: No valid mobile number found.")
             return
-
-        # frappe.log_error(f"Sending SMS to {mobile_no}: {message}")
 
         # Send SMS
         response = frappe.call(
