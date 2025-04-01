@@ -14,6 +14,10 @@ def vf_send_token_via_sms(otpsecret, token=None, phone_no=None):
         frappe.log_error("Phone number missing in 2FA SMS", "Custom 2FA")
         return False
 
+    # Ensure phone number is in international format
+    if phone_no.startswith("0"):  # Assuming local number starts with '0'
+        phone_no = "+254" + phone_no[1:]  # Replace leading '0' with '+254'
+
     ss = frappe.get_doc("SMS Settings", "SMS Settings")
     if not ss.sms_gateway_url:
         frappe.log_error("SMS Gateway URL missing", "Custom 2FA")
