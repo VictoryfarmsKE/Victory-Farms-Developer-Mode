@@ -198,10 +198,6 @@ doc_events = {
 # 	"frappe.desk.doctype.event.event.get_events": "victoryfarmsdeveloper.event.get_events"
 # }
 #
-override_whitelisted_methods = {
-    "frappe.twofactor.send_token_via_sms": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.twofactor.vf_send_token_via_sms"
-}
-
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
