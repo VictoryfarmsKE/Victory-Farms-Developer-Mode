@@ -2,6 +2,83 @@
  {
   "docstatus": 0,
   "doctype": "Client Script",
+  "dt": "Stock Entry",
+  "enabled": 1,
+  "modified": "2025-04-02 09:17:54.504410",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Sum Qtys and Crates",
+  "script": "frappe.ui.form.on('Stock Entry', {\r\n        onload: function (frm) {\r\n                if (!frm.doc.custom_total_qty && !frm.doc.custom_number_of_crates) {\r\n                        frm.doc.custom_total_qty = 0;\r\n                        frm.doc.custom_number_of_crates = 0;\r\n                        cur_frm.refresh_field('custom_total_qty');\r\n                        cur_frm.refresh_field('custom_number_of_crates');\r\n                }\r\n\r\n                let total_qty = 0;\r\n                let number_of_crates = 0;\r\n\r\n                frm.doc.items.forEach((entry) => {\r\n                        if (entry.item_code != 'Crates') {\r\n                                total_qty += entry.qty;\r\n                                if (entry.vf_crate_no) {\r\n                                        number_of_crates += 1;\r\n                                }\r\n                        } else {\r\n                                number_of_crates = entry.qty;\r\n                        }\r\n                });\r\n\r\n                frm.doc.custom_total_qty = total_qty;\r\n                frm.doc.custom_number_of_crates = number_of_crates;\r\n                cur_frm.refresh_field('custom_total_qty');\r\n                cur_frm.refresh_field('custom_number_of_crates');\r\n        }\r\n});\r\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Employee",
+  "enabled": 1,
+  "modified": "2025-04-02 09:17:04.196850",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Payroll Cost Center Mapping",
+  "script": "frappe.ui.form.on('Employee', {\r\n    department: function(frm) {\r\n        if (frm.doc.department) {\r\n            frappe.db.get_value('Department', frm.doc.department, 'payroll_cost_center', (r) => {\r\n                if (r && r.payroll_cost_center) {\r\n                    frm.set_value('payroll_cost_center', r.payroll_cost_center);\r\n                } else {\r\n                    frm.set_value('payroll_cost_center', null);\r\n                }\r\n            });\r\n        } else {\r\n            frm.set_value('payroll_cost_center', null);\r\n        }\r\n    },\r\n    validate: function(frm) {\r\n        if (frm.doc.department) {\r\n            frappe.db.get_value('Department', frm.doc.department, 'payroll_cost_center', (r) => {\r\n                if (r && r.payroll_cost_center && r.payroll_cost_center !== frm.doc.payroll_cost_center) {\r\n                    frappe.msgprint(__('Payroll Cost Center does not match the Department\\'s Payroll Cost Center.'));\r\n                    frappe.validated = false;\r\n                }\r\n            });\r\n        }\r\n    }\r\n});\r\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Employee",
+  "enabled": 1,
+  "modified": "2025-04-02 09:17:33.696421",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Update Employee Payroll Cost Centers",
+  "script": "frappe.listview_settings['Employee'] = {\r\n    onload: function(listview) {\r\n        listview.settings.add_fields = ['department'];\r\n\r\n        listview.page.add_action_item(__('Update Payroll Cost Center'), function() {\r\n            let selected_employees = listview.get_checked_items();\r\n\r\n            if (selected_employees.length === 0) {\r\n                frappe.msgprint(__('Please select at least one employee.'));\r\n                return;\r\n            }\r\n\r\n            frappe.show_alert({\r\n                message: __('Updating Payroll Cost Center for selected employees'),\r\n                indicator: 'blue'\r\n            });\r\n\r\n            let updated_count = 0;\r\n            let total_employees = selected_employees.length;\r\n\r\n            function processEmployee(index) {\r\n                if (index >= total_employees) {\r\n                    frappe.msgprint({\r\n                        title: __('Process Complete'),\r\n                        message: `${updated_count} out of ${total_employees} employees updated successfully.`,\r\n                        indicator: updated_count === total_employees ? 'green' : 'orange'\r\n                    });\r\n                    listview.refresh();\r\n                    return;\r\n                }\r\n\r\n                let emp = selected_employees[index];\r\n\r\n                frappe.db.get_value('Employee', emp.name, 'department', (r) => {\r\n                    if (!r || !r.department) {\r\n                        console.log(`Employee ${emp.name} has no department.`);\r\n                        processEmployee(index + 1);\r\n                        return;\r\n                    }\r\n\r\n                    frappe.db.get_value('Department', r.department, 'payroll_cost_center', (dept) => {\r\n                        if (!dept || !dept.payroll_cost_center) {\r\n                            console.log(`Department ${r.department} has no payroll cost center.`);\r\n                            processEmployee(index + 1);\r\n                            return;\r\n                        }\r\n\r\n                        frappe.db.set_value('Employee', emp.name, {\r\n                            payroll_cost_center: dept.payroll_cost_center\r\n                        }).then(() => {\r\n                            updated_count++;\r\n                            processEmployee(index + 1);\r\n                        }).catch((err) => {\r\n                            console.error(`Error updating ${emp.name}:`, err);\r\n                            processEmployee(index + 1);\r\n                        });\r\n                    });\r\n                });\r\n            }\r\n\r\n            processEmployee(0);\r\n        });\r\n        listview.page.add_action_item(__(\"Update Base Salary\"), () => {\r\n            const selected_values = listview.get_checked_items();\r\n\t\t\tfrappe.call({\r\n\t\t\t\tmethod: \"navari_vf.navari_vf.customizations.employee.utils.update_salary_details.update_salary_details\",\r\n\t\t\t\tfreeze: true,\r\n\t\t\t\targs: {\r\n\t\t\t\t\tselected_values: selected_values,\r\n\t\t\t\t},\r\n\t\t\t\tcallback: function (r) {\r\n\t\t\t\t\tif (!r.exc) {\r\n                        frappe.msgprint(__(\"Salary details updated for selected Employees\"))\r\n\t\t\t\t\t\tlistview.refresh();\r\n\t\t\t\t\t}\r\n\t\t\t\t},\r\n\t\t\t});\r\n        })\r\n    }\r\n};",
+  "view": "List"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Sales Invoice",
+  "enabled": 1,
+  "modified": "2025-03-27 09:07:36.085514",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Redeem Points",
+  "script": "frappe.ui.form.on('Sales Invoice', {\r\n    refresh: function(frm) {\r\n        // Check if redeem_loyalty_points is checked\r\n        if (frm.doc.redeem_loyalty_points) {\r\n            // Calculate loyalty points needed to cover the grand total\r\n            let grand_total = frm.doc.grand_total;\r\n            let points_needed = grand_total / 500;\r\n\r\n            // Set the calculated points to the loyalty_points field\r\n            frm.set_value('loyalty_points', points_needed);\r\n            \r\n            //Set correct debit_to account \r\n            // frm.set_value('debit_to', '600015 - KES Grant Liability - VFL');\r\n\r\n            // Set the selling_price_list to \"Victory Farms Loyalty Program\"\r\n            frm.set_value('selling_price_list', 'Victory Farms Loyalty Program');\r\n        }\r\n    }\r\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Appraisal Cycle",
+  "enabled": 0,
+  "modified": "2025-01-20 20:00:48.406433",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Appraisal Cycle - Template Filter",
+  "script": "frappe.ui.form.on('Appraisal Cycle', {\n    refresh: function(frm) {\n        frm.set_query('appraisal_template', function() {\n            return {\n                filters: {\n                    'custom_appraisal_template': 1\n                }\n            };\n        });\n\n        frm.set_query('employee', function() {\n            return {\n                query: 'hrms.hr.doctype.appraisal_cycle.appraisal_cycle.get_employees_with_template',\n                filters: {\n                    'appraisal_template': frm.doc.custom_appraisal_template\n                }\n            };\n        });\n    }\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Department Appraisal",
+  "enabled": 0,
+  "modified": "2025-03-13 12:27:42.003734",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Appraisal Templates",
+  "script": "frappe.ui.form.on('Department Appraisal', {\n    refresh(frm) {\n        \n    }\n});\n\nfrappe.ui.form.on('Appraisal Multiplier', {\n\trefresh(frm) {\n\t\tfrm.set_value('score', 1);\n\t}\n})",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Requisition Form",
+  "enabled": 1,
+  "modified": "2025-03-18 13:35:17.503215",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Req Form Item Project",
+  "script": "frappe.ui.form.on('Requisition Form', {\r\n    custom_project: function(frm) {\r\n        frm.fields_dict.items.grid.get_field('project').df.reqd = frm.doc.custom_project ? 1 : 0;\r\n        frm.fields_dict.items.grid.refresh();\r\n    },\r\n    validate: function(frm) {\r\n        if (frm.doc.custom_project) {\r\n            frm.doc.items.forEach(function(item) {\r\n                if (!item.project) {\r\n                    frappe.throw(__('Project is mandatory for all items when Project is set.'));\r\n                }\r\n            });\r\n        }\r\n    }\r\n});\r\n\r\nfrappe.ui.form.on('Requisition Form Item', {\r\n    project: function(frm, cdt, cdn) {\r\n        var item = locals[cdt][cdn];\r\n        if (frm.doc.custom_project && !item.project) {\r\n            frappe.model.set_value(cdt, cdn, 'project', frm.doc.custom_project);\r\n        }\r\n    }\r\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
   "dt": "Appraisal",
   "enabled": 1,
   "modified": "2025-02-25 09:17:00.688667",

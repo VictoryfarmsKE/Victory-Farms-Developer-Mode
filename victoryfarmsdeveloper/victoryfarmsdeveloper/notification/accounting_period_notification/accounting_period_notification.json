@@ -1,0 +1,32 @@
+{
+ "attach_print": 0,
+ "channel": "Email",
+ "condition": "",
+ "creation": "2025-04-02 10:07:57.699518",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Accounting Period",
+ "enabled": 1,
+ "event": "Save",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "<p><b>Accounting Period Updated!</b></p>\n\n<p><b>Updated By:</b> {{ doc.modified_by }}</p>\n\n<p>{% if doc.modified %}\n    <p><b>Last Modified:</b> {{ frappe.utils.format_datetime(doc.modified, \"MMMM dd, yyyy hh:mm\") }}</p>\n{% endif %}</p>\n\n<p>You can view the record <a href=\"{{ frappe.utils.get_url_to_form(doc.doctype, doc.name) }}\">here</a>.</p>\n",
+ "message_type": "Markdown",
+ "modified": "2025-04-02 10:56:25.334722",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Accounting Period Notification",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_document_field": "",
+   "receiver_by_role": "Accounts Manager"
+  }
+ ],
+ "send_system_notification": 1,
+ "send_to_all_assignees": 0,
+ "sender": "Victory Farms Ltd",
+ "sender_email": "erp@victoryfarmskenya.com",
+ "subject": "Accounting Period {{ doc.name }} has been updated"
+}
