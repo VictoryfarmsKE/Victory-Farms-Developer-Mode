@@ -155,7 +155,7 @@ def send_sms_notification(doc):
             except json.JSONDecodeError as e:
                 frappe.log_error(f"Invalid JSON response: {e}")
         else:
-            frappe.log_error("Empty response from send_sms")
+            return None
             
     except Exception as e:
         frappe.log_error(f"SMS error: {str(e)}")
