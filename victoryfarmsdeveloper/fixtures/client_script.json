@@ -37,10 +37,10 @@
   "doctype": "Client Script",
   "dt": "Sales Invoice",
   "enabled": 1,
-  "modified": "2025-03-27 09:07:36.085514",
+  "modified": "2025-04-08 09:21:07.023979",
   "module": "VictoryFarmsDeveloper",
   "name": "Redeem Points",
-  "script": "frappe.ui.form.on('Sales Invoice', {\r\n    refresh: function(frm) {\r\n        // Check if redeem_loyalty_points is checked\r\n        if (frm.doc.redeem_loyalty_points) {\r\n            // Calculate loyalty points needed to cover the grand total\r\n            let grand_total = frm.doc.grand_total;\r\n            let points_needed = grand_total / 500;\r\n\r\n            // Set the calculated points to the loyalty_points field\r\n            frm.set_value('loyalty_points', points_needed);\r\n            \r\n            //Set correct debit_to account \r\n            // frm.set_value('debit_to', '600015 - KES Grant Liability - VFL');\r\n\r\n            // Set the selling_price_list to \"Victory Farms Loyalty Program\"\r\n            frm.set_value('selling_price_list', 'Victory Farms Loyalty Program');\r\n        }\r\n    }\r\n});",
+  "script": "frappe.ui.form.on('Sales Invoice', {\n    before_save: function(frm) {\n        // Set the selling_price_list to \"Victory Farms Loyalty Program\"\n        frm.set_value('selling_price_list', 'Victory Farms Loyalty Program');\n        \n        // Check if redeem_loyalty_points is checked and doc status is Draft\n        if (frm.doc.redeem_loyalty_points && frm.doc.docstatus === 0) {\n            let grand_total = frm.doc.grand_total;\n\n            frm.doc.items = frm.doc.items.map(item => {\n                \n                // Calculate loyalty points based on loyalty item\n                if (item.item_name === \"Trolley Cooler Box\") {\n                    item.loyalty_points = grand_total / 1.14;\n                } else if (item.item_name === \"Apron\") {\n                    item.loyalty_points = grand_total / 3.47;\n                } else if (item.item_name === \"Parasol\") {\n                    item.loyalty_points = grand_total / 5;\n                } else if (item.item_name === \"Large Frying Pan\") {\n                    item.loyalty_points = grand_total / 2.2;\n                } else if (item.item_name === \"Ladle\") {\n                    item.loyalty_points = grand_total / 2.5;\n                } else if (item.item_name === \"Dust Coat\") {\n                    item.loyalty_points = grand_total / 4.7;\n                } else {\n                    item.loyalty_points = grand_total / 1; \n                }\n\n                // Set income_account and expense_account directly\n                item.income_account = '600016 - Grant Loyalty Earned - VFL';\n                item.expense_account = '600015 - KES Grant Liability - VFL';\n                item.cost_center = '406001 - Commercial Management - VFL';\n\n                return item;\n            });\n\n           // Refresh the items table to reflect changes\n            frm.refresh_field('items');\n\n            // Calculate and set the total loyalty points (rounded)\n            const total_loyalty_points = frm.doc.items.reduce((sum, item) => sum + (item.loyalty_points || 0), 0);\n            frm.set_value('loyalty_points', Math.round(total_loyalty_points));\n            // frm.set_value('paid_amount', grand_total);\n            // frm.set_value('loyalty_amount', grand_total);\n\n            // Set correct debit_to account\n            // frm.set_value('debit_to', '600016 - Grant Loyalty Earned - VFL');\n        }\n    }\n});",
   "view": "Form"
  },
  {
@@ -85,6 +85,17 @@
   "module": "VictoryFarmsDeveloper",
   "name": "Appraisal Score Definitions",
   "script": "frappe.ui.form.on('Appraisal Goal', {\r\n     score(frm, cdt, cdn) {\r\n        let d = locals[cdt][cdn];\r\n        if (d.score) {\r\n            if (d.score < 1) {\r\n                frappe.throw(__(\"Score should be between 1 to 5\")) \r\n            }\r\n            frappe.model.set_value(cdt, cdn, \"score\", Math.round(d.score))\r\n        }\r\n    }\r\n})",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Requisition Form",
+  "enabled": 1,
+  "modified": "2025-04-11 10:57:38.598024",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Purchase Requisitions",
+  "script": "frappe.ui.form.on('Requisition Form', {\n    onload: function (frm) {\n        // Check if the user has a specific role\n        if (!frappe.user_roles.includes('Store Assistant')) {\n            // Filter out the \"Purchase\" option for users without the role\n            frm.set_df_property('material_request_type', 'options', [\n                'Material Transfer',\n                'Material Issue',\n                'Manufacture',\n                'Customer Provided'\n            ]);\n        }\n    }\n});",
   "view": "Form"
  }
 ]
