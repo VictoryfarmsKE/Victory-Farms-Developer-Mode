@@ -97,5 +97,16 @@
   "name": "Purchase Requisitions",
   "script": "frappe.ui.form.on('Requisition Form', {\n    onload: function (frm) {\n        // Check if the user has a specific role\n        if (!frappe.user_roles.includes('Store Assistant')) {\n            // Filter out the \"Purchase\" option for users without the role\n            frm.set_df_property('material_request_type', 'options', [\n                'Material Transfer',\n                'Material Issue',\n                'Manufacture',\n                'Customer Provided'\n            ]);\n        }\n    }\n});",
   "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Department Appraisal",
+  "enabled": 1,
+  "modified": "2025-04-14 10:54:37.234410",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Department Appraisal View",
+  "script": "frappe.ui.form.on('Department Appraisal', {\r\n    refresh: function(frm) {\r\n        // Hide actions for non-privileged users\r\n        if (!has_privileged_role()) {\r\n            // Hide menu items\r\n            frm.page.btn_secondary.hide();\r\n            frm.page.menu.hide();\r\n            \r\n            // Disable form if not user's department\r\n            if (frm.doc.department !== frm.doc.user_department) {\r\n                frm.set_read_only();\r\n                frappe.msgprint(__(\"You only have permission to view appraisals from your department\"));\r\n            }\r\n        }\r\n    },\r\n    \r\n    setup: function(frm) {\r\n        // Load user's department for client-side checks\r\n        frm.doc.user_department = frappe.user_roles.includes(\"Employee\") ? \r\n            frappe.db.get_value('Employee', {user_id: frappe.session.user}, 'department') : null;\r\n    }\r\n});\r\n\r\nfunction has_privileged_role() {\r\n    const privileged_roles = [\r\n        \"HR User\", \"Department Appraisal Bulk Updater\", \r\n        \"HOD\", \"System Manager\", \r\n        \"Executive Manager\", \"Payroll Officer\"\r\n    ];\r\n    return privileged_roles.some(role => frappe.user_roles.includes(role));\r\n}\r\n\r\nfrappe.listview_settings['Department Appraisal'] = {\r\n    onload: function(listview) {\r\n        if (!has_privileged_role() && frappe.user_roles.includes(\"Employee\")) {\r\n            const user_dept = frappe.db.get_value('Employee', {user_id: frappe.session.user}, 'department');\r\n            if (user_dept) {\r\n                listview.filter_area.add([\r\n                    ['Department Appraisal', 'department', '=', user_dept, true]\r\n                ]);\r\n                listview.filter_area.toggle(false); // Hide filter area\r\n            }\r\n        }\r\n    }\r\n};",
+  "view": "Form"
  }
 ]
