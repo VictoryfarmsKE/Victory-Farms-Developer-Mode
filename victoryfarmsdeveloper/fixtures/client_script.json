@@ -46,17 +46,6 @@
  {
   "docstatus": 0,
   "doctype": "Client Script",
-  "dt": "Department Appraisal",
-  "enabled": 0,
-  "modified": "2025-03-13 12:27:42.003734",
-  "module": "VictoryFarmsDeveloper",
-  "name": "Appraisal Templates",
-  "script": "frappe.ui.form.on('Department Appraisal', {\n    refresh(frm) {\n        \n    }\n});\n\nfrappe.ui.form.on('Appraisal Multiplier', {\n\trefresh(frm) {\n\t\tfrm.set_value('score', 1);\n\t}\n})",
-  "view": "Form"
- },
- {
-  "docstatus": 0,
-  "doctype": "Client Script",
   "dt": "Requisition Form",
   "enabled": 1,
   "modified": "2025-03-18 13:35:17.503215",
