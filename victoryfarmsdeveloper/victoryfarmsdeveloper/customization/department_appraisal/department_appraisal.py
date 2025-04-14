@@ -29,9 +29,7 @@ def get_permission_query_conditions(user):
         return ""
 
     full_access_roles = [
-        "HR User",
         "Department Appraisal Bulk Updater",
-        "HOD",
         "System Manager",
         "Executive Manager",
         "Payroll Officer"
