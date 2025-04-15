@@ -2,6 +2,17 @@
  {
   "docstatus": 0,
   "doctype": "Client Script",
+  "dt": "Department Appraisal",
+  "enabled": 1,
+  "modified": "2025-04-15 10:51:34.610193",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Default Multiplier Score",
+  "script": "frappe.ui.form.on('Department Appraisal', {\r\n  multiplier_template: function(frm) {\r\n    frappe.after_ajax(() => {\r\n      frm.fields_dict['appraisal_multiplier'].grid.refresh();\r\n      setTimeout(() => {\r\n        frm.fields_dict['appraisal_multiplier'].grid.grid_rows.forEach(row => {\r\n          if (!row.doc.score) {\r\n            row.doc.score = \"1\";\r\n          }\r\n        });\r\n        frm.refresh_field('appraisal_multiplier');\r\n      }, 10);\r\n    });\r\n  }\r\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
   "dt": "Stock Entry",
   "enabled": 1,
   "modified": "2025-04-02 09:17:54.504410",
