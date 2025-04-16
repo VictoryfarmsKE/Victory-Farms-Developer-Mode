@@ -4,6 +4,17 @@
   "doctype": "Client Script",
   "dt": "Department Appraisal",
   "enabled": 1,
+  "modified": "2025-04-16 18:42:27.430407",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Department Scoring References",
+  "script": "frappe.ui.form.on(\"Department Appraisal\", {\r\n  refresh: function (frm) {\r\n    render_goal_template(frm);\r\n  },\r\n  department: function (frm) {\r\n    render_goal_template(frm);\r\n  },\r\n});\r\n\r\nfunction render_goal_template(frm) {\r\n  if (!frm.doc.department) {\r\n    frm.fields_dict.custom_scoring_references.$wrapper.html(\r\n      \"<p><i>Please select a department.</i></p>\"\r\n    );\r\n    return;\r\n  }\r\n\r\n  frappe.call({\r\n    method: \"victoryfarmsdeveloper.victoryfarmsdeveloper.customization.department_appraisal.department_appraisal.get_rendered_scoring_references\",\r\n    args: {\r\n      department: frm.doc.department,\r\n      doc_name: frm.doc.name,\r\n    },\r\n    callback: function (r) {\r\n      frm.fields_dict.custom_scoring_references.$wrapper.html(\r\n        r.message || \"<p><i>Unable to load template.</i></p>\"\r\n      );\r\n    },\r\n  });\r\n}\r\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Department Appraisal",
+  "enabled": 1,
   "modified": "2025-04-15 10:51:34.610193",
   "module": "VictoryFarmsDeveloper",
   "name": "Default Multiplier Score",
