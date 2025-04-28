@@ -1,6 +1,8 @@
 import frappe
 from erpnext.stock.doctype.stock_entry.stock_entry import StockEntry
 from frappe import _
+from erpnext.stock.doctype.stock_entry.stock_entry import make_stock_in_entry as original_make_stock_in_entry
+
 
 class CustomStockEntry(StockEntry):
     @frappe.whitelist()
@@ -171,3 +173,23 @@ class CustomStockEntry(StockEntry):
                 })
         self.custom_number_of_crates = sum(crates['total_crates'] for crates in aggregated_results)
         self.save()
+            
+@frappe.whitelist()
+def make_stock_in_entry(source_name, target_doc=None):
+    # Check if a stock entry has already been created for this source
+    existing_entry = frappe.db.exists(
+        "Stock Entry",
+        {
+            "outgoing_stock_entry": source_name,
+            "docstatus": ["!=", 2],  # Exclude cancelled entries
+        },
+    )
+    if existing_entry:
+        # Throw an exception to stop further execution
+        frappe.throw(
+            _("A Stock Entry has already been created for this transaction: {0}").format(existing_entry),
+            title=_("Duplicate Stock Entry")
+        )
+
+    # Call the original function if no duplicate exists
+    return original_make_stock_in_entry(source_name, target_doc)
