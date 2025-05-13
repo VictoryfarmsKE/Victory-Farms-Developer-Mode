@@ -127,19 +127,15 @@ doctype_js = {
 # }
 
 permission_query_conditions = {
+    "Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal.appraisal.get_permission_query_conditions",
     "Department Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.department_appraisal.department_appraisal.get_permission_query_conditions"
+
 }
 
 has_permission = {
+    "Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal.appraisal.has_permission",
     "Department Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.department_appraisal.department_appraisal.has_permission"
-}
 
-permission_query_conditions = {
-    "Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal.appraisal.get_permission_query_conditions"
-}
-
-has_permission = {
-    "Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal.appraisal.has_permission"
 }
 # DocType Class
 # ---------------
