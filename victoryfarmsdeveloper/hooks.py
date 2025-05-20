@@ -46,6 +46,8 @@ doctype_js = {
     "Stock Entry": "victoryfarmsdeveloper/customization/stock_entry_item_break_down/stock_entry_item_break_down.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
+doctype_list_js = {
+    "Leave Application" : "public/js/leave_application_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
@@ -146,7 +148,8 @@ has_permission = {
 # }
 override_doctype_class = {
     "Stock Entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry",
-    "Appraisal Cycle": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_cycle.appraisal_cycle.CustomAppraisalCycle"
+    "Appraisal Cycle": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_cycle.appraisal_cycle.CustomAppraisalCycle",
+    "Leave Application": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.leave_application.leave_application.CustomLeaveApplication",
 }
 # Document Events
 # ---------------
