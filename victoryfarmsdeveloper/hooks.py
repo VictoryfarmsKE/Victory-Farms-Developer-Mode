@@ -193,7 +193,7 @@ scheduler_events = {
     "hourly": [
         "victoryfarmsdeveloper.notifications.check_low_stock.check_low_stock"
     ],
-    "daily": {
+    "cron": {
         "00 8 * * *": [
             "victoryfarmsdeveloper.notifications.po_pending_approval.send_pending_po_notifications"
         ]
