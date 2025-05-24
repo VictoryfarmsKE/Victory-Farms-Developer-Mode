@@ -16,6 +16,7 @@ fixtures = [
     {"dt": "Custom Field", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
 ]
 
+
 # Includes in <head>
 # ------------------
 
@@ -148,8 +149,8 @@ has_permission = {
 # }
 override_doctype_class = {
     "Stock Entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry",
-    "Appraisal Cycle": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_cycle.appraisal_cycle.CustomAppraisalCycle",
-    "Leave Application": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.leave_application.leave_application.CustomLeaveApplication"
+    "Appraisal Cycle": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_cycle.appraisal_cycle.CustomAppraisalCycle"
+    # "Leave Application": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.leave_application.leave_application.CustomLeaveApplication"
 }
 # Document Events
 # ---------------
