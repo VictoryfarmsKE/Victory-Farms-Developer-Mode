@@ -1,0 +1,178 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:TP-{#####}-{preffered_job_role}",
+ "creation": "2025-05-25 21:33:02.897040",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "first_name",
+  "section_break_2ako3",
+  "middle_name",
+  "section_break_gkarv",
+  "surname",
+  "section_break_hvoxx",
+  "full_name",
+  "section_break_ddny1",
+  "email",
+  "column_break_9wia8",
+  "phone_number",
+  "column_break_jkxna",
+  "location",
+  "section_break_5whsu",
+  "resume",
+  "section_break_cro66",
+  "preffered_job_role",
+  "column_break_f8lh3",
+  "years_of_experience",
+  "column_break_duklr",
+  "highest_level_of_education",
+  "column_break_gsj0n",
+  "availability"
+ ],
+ "fields": [
+  {
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "First Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "middle_name",
+   "fieldtype": "Data",
+   "label": "Middle Name"
+  },
+  {
+   "fieldname": "surname",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Surname",
+   "reqd": 1
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "phone_number",
+   "fieldtype": "Data",
+   "label": "Phone Number",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "label": "Location",
+   "options": "Country"
+  },
+  {
+   "fieldname": "preffered_job_role",
+   "fieldtype": "Link",
+   "label": "Preffered Job Role",
+   "options": "Designation"
+  },
+  {
+   "fieldname": "years_of_experience",
+   "fieldtype": "Select",
+   "label": "Years of Experience",
+   "options": "\n0 - 1 year\n1 - 3 years\n3 - 5 years\n5 - 10 years\n10+ years"
+  },
+  {
+   "fieldname": "highest_level_of_education",
+   "fieldtype": "Select",
+   "label": "Highest Level of Education",
+   "options": "\nDoctorate Degree\nMaster's Degree\nBachelor's Degree\nPrimary/Elementary Education\nSecondary Education"
+  },
+  {
+   "fieldname": "resume",
+   "fieldtype": "Attach",
+   "label": "Resume"
+  },
+  {
+   "fieldname": "section_break_2ako3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_gkarv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_hvoxx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_jkxna",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_ddny1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_cro66",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_f8lh3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_duklr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_5whsu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Full Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_9wia8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "availability",
+   "fieldtype": "Select",
+   "label": "Availability",
+   "options": "\nImmediate\n1 Month\n3 Months\nFlexible"
+  },
+  {
+   "fieldname": "column_break_gsj0n",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-05-25 22:02:55.201968",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Talent Pool",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

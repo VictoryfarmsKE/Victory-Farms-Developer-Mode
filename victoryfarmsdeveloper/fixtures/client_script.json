@@ -2,6 +2,17 @@
  {
   "docstatus": 0,
   "doctype": "Client Script",
+  "dt": "Appraisal",
+  "enabled": 1,
+  "modified": "2025-04-28 20:16:55.839105",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Appraisal List View",
+  "script": "frappe.listview_settings['Appraisal'] = {\r\n    hide_name_column: true,\r\n    formatters: {\r\n        'total_goal_score_percentage': function(value, df, doc) {\r\n            if (df.fieldtype === \"Percent\") {\r\n                return `${value}%`;\r\n            }\r\n            return frappe.format(value, df, null, doc);\r\n        }\r\n    }\r\n};\r\n",
+  "view": "List"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
   "dt": "Department Appraisal",
   "enabled": 1,
   "modified": "2025-04-16 18:42:27.430407",
@@ -96,6 +107,17 @@
   "module": "VictoryFarmsDeveloper",
   "name": "Purchase Requisitions",
   "script": "frappe.ui.form.on('Requisition Form', {\n    onload: function (frm) {\n        // Check if the user has a specific role\n        if (!frappe.user_roles.includes('Store Assistant')) {\n            // Filter out the \"Purchase\" option for users without the role\n            frm.set_df_property('material_request_type', 'options', [\n                'Material Transfer',\n                'Material Issue',\n                'Manufacture',\n                'Customer Provided'\n            ]);\n        }\n    }\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Leave Application",
+  "enabled": 1,
+  "modified": "2025-05-24 22:07:12.364502",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Pending Leave Balance",
+  "script": "frappe.ui.form.on('Leave Application', {\n    before_submit(frm) {\n        // Block submission if status is \"Pending Sufficient Balance\"\n        if (frm.doc.status === \"Pending Sufficient Balance\") {\n            frappe.throw(__(\"You cannot submit a Leave Application while it is in Pending Sufficient Balance status.\"));\n        }\n    },\n\n    validate(frm) {\n        // Only check and set status for Annual Leave\n        if (frm.doc.leave_type === \"Annual Leave\") {\n            frappe.call({\n                method: \"hrms.hr.doctype.leave_application.leave_application.get_leave_balance_on\",\n                args: {\n                    employee: frm.doc.employee,\n                    leave_type: frm.doc.leave_type,\n                    date: frm.doc.from_date\n                },\n                callback: function(r) {\n                    const balance = r.message || 0;\n                    const total_days = frm.doc.total_leave_days || 0;\n\n                    if (balance < total_days) {\n                        // Set status to pending if not already set\n                        if (frm.doc.status !== \"Pending Sufficient Balance\") {\n                            frm.set_value(\"status\", \"Pending Sufficient Balance\");\n                            frappe.msgprint({\n                                title: __(\"Insufficient Leave Balance\"),\n                                message: __(\"Leave balance is insufficient. Status set to 'Pending Sufficient Balance'.\"),\n                                indicator: \"orange\"\n                            });\n                        }\n                    }\n                }\n            });\n        }\n    }\n});",
   "view": "Form"
  }
 ]

@@ -17,22 +17,6 @@
  },
  {
   "allow_guest": 0,
-  "api_method": null,
-  "cron_format": null,
-  "disabled": 0,
-  "docstatus": 0,
-  "doctype": "Server Script",
-  "doctype_event": "Before Insert",
-  "event_frequency": "Daily",
-  "modified": "2025-04-02 09:18:16.287812",
-  "module": "VictoryFarmsDeveloper",
-  "name": "Deleting Draft Invoices",
-  "reference_doctype": null,
-  "script": "frappe.enqueue(\"delete_draft_invoices_worker\", queue=\"long\", is_async=True)",
-  "script_type": "Scheduler Event"
- },
- {
-  "allow_guest": 0,
   "api_method": "delete_draft_invoices_worker",
   "cron_format": null,
   "disabled": 0,
@@ -51,16 +35,16 @@
   "allow_guest": 0,
   "api_method": null,
   "cron_format": null,
-  "disabled": 1,
+  "disabled": 0,
   "docstatus": 0,
   "doctype": "Server Script",
-  "doctype_event": "Before Submit",
-  "event_frequency": "All",
-  "modified": "2025-04-03 23:10:04.669245",
+  "doctype_event": "Before Insert",
+  "event_frequency": "Daily",
+  "modified": "2025-04-02 09:18:16.287812",
   "module": "VictoryFarmsDeveloper",
-  "name": "Projected Accrual",
-  "reference_doctype": "Leave Application",
-  "script": "def validate_future_accrual(doc, method):\r\n    if doc.leave_type and doc.from_date and doc.total_leave_days:\r\n        employee = doc.employee\r\n        leave_type = doc.leave_type\r\n        from_date = getdate(doc.from_date)\r\n        total_leave_days = doc.total_leave_days\r\n\r\n        # Get current leave balance\r\n        leave_balance = get_leave_balance(employee, leave_type)\r\n\r\n        # Calculate projected leave days by the start date of the requested leave\r\n        projected_leave_days = calculate_projected_leave_days(employee, leave_type, from_date)\r\n\r\n        # Compare requested leave days with projected balance\r\n        if total_leave_days > (leave_balance + projected_leave_days):\r\n            frappe.throw(\r\n                _(\"Requested leave days exceed the projected leave balance for Leave Type {0}.\").format(frappe.bold(leave_type)),\r\n                title=_(\"Insufficient Leave Balance\")\r\n            )\r\n\r\ndef get_leave_balance(employee, leave_type):\r\n    leave_balance = frappe.db.get_value(\"Leave Ledger Entry\", \r\n        {\"employee\": employee, \"leave_type\": leave_type, \"is_carry_forward\": 1}, \r\n        \"sum(leaves)\") or 0\r\n    return leave_balance\r\n\r\ndef calculate_projected_leave_days(employee, leave_type, from_date):\r\n    # Assuming a monthly accrual rate, adjust as necessary\r\n    monthly_accrual_rate = frappe.db.get_value(\"Leave Type\", leave_type, \"monthly_accrual_rate\") or 0\r\n    today = getdate()\r\n    \r\n    if from_date > today:\r\n        months_difference = (from_date.year - today.year) * 12 + (from_date.month - today.month)\r\n        return months_difference * monthly_accrual_rate\r\n    \r\n    return 0\r\n\r\nfrappe.get_doc(\"Leave Application\").validate = validate_future_accrual",
-  "script_type": "DocType Event"
+  "name": "Deleting Draft Invoices",
+  "reference_doctype": null,
+  "script": "frappe.enqueue(\"delete_draft_invoices_worker\", queue=\"long\", is_async=True)",
+  "script_type": "Scheduler Event"
  }
 ]
