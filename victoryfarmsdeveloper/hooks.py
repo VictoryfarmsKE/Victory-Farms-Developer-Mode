@@ -198,7 +198,7 @@ scheduler_events = {
         "0 8 * * *": [
             "victoryfarmsdeveloper.notifications.po_pending_approval.send_pending_po_notifications"
         ],
-        "50 19 * * *": [
+        "0 8 * * *": [
             "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check"
         ]
     }
