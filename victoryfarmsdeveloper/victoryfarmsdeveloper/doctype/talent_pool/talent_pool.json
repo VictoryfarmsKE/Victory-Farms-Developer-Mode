@@ -17,14 +17,14 @@
   "full_name",
   "section_break_ddny1",
   "email",
-  "column_break_9wia8",
-  "phone_number",
-  "column_break_jkxna",
-  "location",
   "section_break_5whsu",
-  "resume",
+  "phone_number",
   "section_break_cro66",
+  "location",
+  "column_break_jkxna",
   "preffered_job_role",
+  "section_break_l9agd",
+  "resume",
   "column_break_f8lh3",
   "years_of_experience",
   "column_break_duklr",
@@ -56,49 +56,41 @@
    "fieldname": "email",
    "fieldtype": "Data",
    "label": "Email",
-   "options": "Email",
-   "reqd": 1
+   "options": "Email"
   },
   {
    "fieldname": "phone_number",
-   "fieldtype": "Data",
+   "fieldtype": "Phone",
    "label": "Phone Number",
-   "options": "Phone",
-   "reqd": 1
+   "options": "Phone"
   },
   {
    "fieldname": "location",
    "fieldtype": "Data",
-   "label": "Location",
-   "options": "Country",
-   "reqd": 1
+   "label": "Location"
   },
   {
    "fieldname": "preffered_job_role",
    "fieldtype": "Link",
    "label": "Preffered Job Role",
-   "options": "Designation",
-   "reqd": 1
+   "options": "Designation"
   },
   {
    "fieldname": "years_of_experience",
    "fieldtype": "Select",
    "label": "Years of Experience",
-   "options": "\n0 - 1 year\n1 - 3 years\n3 - 5 years\n5 - 10 years\n10+ years",
-   "reqd": 1
+   "options": "\n0 - 1 year\n1 - 3 years\n3 - 5 years\n5 - 10 years\n10+ years"
   },
   {
    "fieldname": "highest_level_of_education",
    "fieldtype": "Select",
    "label": "Highest Level of Education",
-   "options": "\nDoctorate Degree\nMaster's Degree\nBachelor's Degree\nPrimary/Elementary Education\nSecondary Education",
-   "reqd": 1
+   "options": "\nDoctorate Degree\nMaster's Degree\nBachelor's Degree\nPrimary/Elementary Education\nSecondary Education"
   },
   {
    "fieldname": "resume",
    "fieldtype": "Attach",
-   "label": "Resume (pdf)",
-   "reqd": 1
+   "label": "Resume"
   },
   {
    "fieldname": "section_break_2ako3",
@@ -126,7 +118,7 @@
   },
   {
    "fieldname": "column_break_f8lh3",
-   "fieldtype": "Column Break"
+   "fieldtype": "Section Break"
   },
   {
    "fieldname": "column_break_duklr",
@@ -143,24 +135,23 @@
    "read_only": 1
   },
   {
-   "fieldname": "column_break_9wia8",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "availability",
    "fieldtype": "Select",
    "label": "Availability",
-   "options": "\nImmediate\n1 Month\n3 Months\nFlexible",
-   "reqd": 1
+   "options": "\nImmediate\n1 Month\n3 Months\nFlexible"
   },
   {
    "fieldname": "column_break_gsj0n",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_l9agd",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-05-25 22:02:55.201968",
+ "modified": "2025-05-27 22:34:58.037212",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Talent Pool",

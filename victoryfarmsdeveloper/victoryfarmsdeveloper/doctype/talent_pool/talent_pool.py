@@ -13,10 +13,13 @@ class TalentPool(Document):
 			self.full_name = f"{self.first_name} {self.middle_name}"
 		else:
 			self.full_name = self.first_name
-   
-# def validate(self):
-# 	if self.resume:
-# 		ext = os.path.splitext(self.resume)[1].lower()
-# 		if ext != ".pdf":
-# 			frappe.throw("Only PDF files are allowed for this field.")
-
+   #validate unique email address for every talent pool entry
+	def validate(self):
+		if self.email:
+			existing_entry = frappe.db.exists("Talent Pool", {"email": self.email, "name": ["!=", self.name]})
+			if existing_entry:
+				frappe.throw(f"Email {self.email} is already used in another talent pool entry.")
+		
+		# Ensure the file is in pdf format
+		if self.resume and not self.resume.endswith('.pdf'):
+			frappe.throw("Resume must be in PDF format.")
