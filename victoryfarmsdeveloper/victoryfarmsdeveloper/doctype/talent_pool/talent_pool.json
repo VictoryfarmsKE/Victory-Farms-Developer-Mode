@@ -56,42 +56,49 @@
    "fieldname": "email",
    "fieldtype": "Data",
    "label": "Email",
-   "options": "Email"
+   "options": "Email",
+   "reqd": 1
   },
   {
    "fieldname": "phone_number",
    "fieldtype": "Data",
    "label": "Phone Number",
-   "options": "Phone"
+   "options": "Phone",
+   "reqd": 1
   },
   {
    "fieldname": "location",
    "fieldtype": "Data",
    "label": "Location",
-   "options": "Country"
+   "options": "Country",
+   "reqd": 1
   },
   {
    "fieldname": "preffered_job_role",
    "fieldtype": "Link",
    "label": "Preffered Job Role",
-   "options": "Designation"
+   "options": "Designation",
+   "reqd": 1
   },
   {
    "fieldname": "years_of_experience",
    "fieldtype": "Select",
    "label": "Years of Experience",
-   "options": "\n0 - 1 year\n1 - 3 years\n3 - 5 years\n5 - 10 years\n10+ years"
+   "options": "\n0 - 1 year\n1 - 3 years\n3 - 5 years\n5 - 10 years\n10+ years",
+   "reqd": 1
   },
   {
    "fieldname": "highest_level_of_education",
    "fieldtype": "Select",
    "label": "Highest Level of Education",
-   "options": "\nDoctorate Degree\nMaster's Degree\nBachelor's Degree\nPrimary/Elementary Education\nSecondary Education"
+   "options": "\nDoctorate Degree\nMaster's Degree\nBachelor's Degree\nPrimary/Elementary Education\nSecondary Education",
+   "reqd": 1
   },
   {
    "fieldname": "resume",
    "fieldtype": "Attach",
-   "label": "Resume"
+   "label": "Resume (pdf)",
+   "reqd": 1
   },
   {
    "fieldname": "section_break_2ako3",
@@ -143,7 +150,8 @@
    "fieldname": "availability",
    "fieldtype": "Select",
    "label": "Availability",
-   "options": "\nImmediate\n1 Month\n3 Months\nFlexible"
+   "options": "\nImmediate\n1 Month\n3 Months\nFlexible",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_gsj0n",

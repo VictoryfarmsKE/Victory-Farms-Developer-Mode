@@ -23,7 +23,7 @@
  "list_columns": [],
  "login_required": 0,
  "max_attachment_size": 10,
- "modified": "2025-05-25 22:02:46.559806",
+ "modified": "2025-05-27 19:53:19.413386",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "talent-pool-registration",
@@ -108,7 +108,7 @@
    "max_value": 0,
    "options": "City",
    "read_only": 0,
-   "reqd": 0,
+   "reqd": 1,
    "show_in_filter": 0
   },
   {
@@ -119,8 +119,9 @@
    "label": "Resume",
    "max_length": 0,
    "max_value": 0,
+   "options": "{\u2018accept\u2019:\u2018application/pdf\u2019}",
    "read_only": 0,
-   "reqd": 0,
+   "reqd": 1,
    "show_in_filter": 0
   },
   {
@@ -133,7 +134,7 @@
    "max_value": 0,
    "options": "Designation",
    "read_only": 0,
-   "reqd": 0,
+   "reqd": 1,
    "show_in_filter": 0
   },
   {
@@ -146,7 +147,7 @@
    "max_value": 0,
    "options": "\n0 - 1 year\n1 - 3 years\n3 - 5 years\n5 - 10 years\n10+ years",
    "read_only": 0,
-   "reqd": 0,
+   "reqd": 1,
    "show_in_filter": 0
   },
   {
@@ -159,7 +160,7 @@
    "max_value": 0,
    "options": "\nDoctorate Degree\nMaster's Degree\nBachelor's Degree\nPrimary/Elementary Education\nSecondary Education",
    "read_only": 0,
-   "reqd": 0,
+   "reqd": 1,
    "show_in_filter": 0
   },
   {
@@ -172,7 +173,7 @@
    "max_value": 0,
    "options": "\nImmediate\n1 Month\n3 Months\nFlexible",
    "read_only": 0,
-   "reqd": 0,
+   "reqd": 1,
    "show_in_filter": 0
   }
  ]

@@ -1,7 +1,8 @@
 # Copyright (c) 2025, Christine K and contributors
 # For license information, please see license.txt
 
-# import frappe
+import frappe
+import os
 from frappe.model.document import Document
 
 class TalentPool(Document):
@@ -12,4 +13,10 @@ class TalentPool(Document):
 			self.full_name = f"{self.first_name} {self.middle_name}"
 		else:
 			self.full_name = self.first_name
+   
+# def validate(self):
+# 	if self.resume:
+# 		ext = os.path.splitext(self.resume)[1].lower()
+# 		if ext != ".pdf":
+# 			frappe.throw("Only PDF files are allowed for this field.")
 
