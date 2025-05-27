@@ -39,8 +39,6 @@ def send_pending_po_notifications(batch_size=20):
                                 )
                             except Exception as e:
                                 frappe.log_error(f"Email error for {user_info['user']}: {e}", "PO Notification Debug")
-                frappe.log_error(f"All emails sent for PO: {doc.name}", "PO Notification Debug")
                 processed_count = processed_count 
-            frappe.sleep(2)
     except Exception as e:
         frappe.log_error(f"General error: {e}", "PO Notification Debug")
