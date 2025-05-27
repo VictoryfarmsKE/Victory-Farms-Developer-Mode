@@ -187,7 +187,7 @@ def make_stock_in_entry(source_name, target_doc=None):
     if existing_entry:
         # Throw an exception to stop further execution
         frappe.throw(
-            _("A Stock Entry has already been created for this transaction: {0}").format(existing_entry),
+            _('A Stock Entry has already been created for this transaction: Click <a href="/app/stock-entry/{0}" target="_blank">{0}</a> to go to the created stock entry').format(existing_entry),
             title=_("Duplicate Stock Entry")
         )
 
