@@ -2,8 +2,8 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Tiered NSSF Report (Managers)"] = {
-  "filters": [
+frappe.query_reports["NSSF M-level"] = {
+	"filters": [
     {
       "fieldname": "from_date",
       "label": "From Date",

@@ -1,9 +1,6 @@
 # Copyright (c) 2025, Christine K and contributors
 # For license information, please see license.txt
 
-# Copyright (c) 2025, Christine K and contributors
-# For license information, please see license.txt
-
 import frappe
 
 def execute(filters=None):
