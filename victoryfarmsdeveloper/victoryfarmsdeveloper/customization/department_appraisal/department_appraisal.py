@@ -44,7 +44,7 @@ def get_permission_query_conditions(user):
     employee_department = frappe.db.get_value("Employee", {"user_id": user}, "department")
     if employee_department:
         return f"""(`tabDepartment Appraisal`.department = '{employee_department}'
-                    and `tabDepartment Appraisal`.docstatus = 1 
+                    and `tabDepartment Appraisal`.docstatus = 0 
                     and `tabDepartment Appraisal`.workflow_state = 'Approved')"""
 
     # If no department is found, show nothing
