@@ -25,7 +25,7 @@ frappe.query_reports["Salary Register V2"] = {
 			fieldtype: "Link",
 			options: "Currency",
 			label: __("Currency"),
-			default: erpnext.get_currency(frappe.defaults.get_default("Company")),
+			// default: erpnext.get_currency(frappe.defaults.get_default("Company")),
 			width: "50px",
 		},
 		{

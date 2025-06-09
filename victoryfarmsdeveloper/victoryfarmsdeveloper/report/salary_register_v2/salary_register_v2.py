@@ -40,6 +40,7 @@ def execute(filters=None):
 			"salary_slip_id": ss.name,
 			"employee": ss.employee,
 			"employee_name": ss.employee_name,
+			"grade": ss.custom_grade,
 			"data_of_joining": doj_map.get(ss.employee),
 			"branch": ss.branch,
 			"department": ss.department,
@@ -90,8 +91,22 @@ def get_earning_and_deduction_types(salary_slips):
 	for salary_component in get_salary_components(salary_slips):
 		component_type = get_salary_component_type(salary_component)
 		salary_component_and_type[_(component_type)].append(salary_component)
+  
+		# Custom order for earnings
+		preferred_earning_order = ["Basic Pay", "Basic Salary", "OT hours", "Holiday Hours", "Overtime Hours", "Arrear", "Bonus Department", "Bonus Department (Quarterly)", "Bonus Department (Annual)", "Bonus Individual", "Bonus Individual (Quarterly)", "Bonus Individual (Annual)", "Commercial Commission", "Commercial Holiday Pay", "Education Allowance", "General Allowance", "House Rent", "Leave Encashment", "Net Arrears", "Notice Allowance", "OP Arrears", "Taxable Income", "Transport Allowance", "Unpaid Leave"]
+		earnings = salary_component_and_type[_("Earning")]
+		ordered_earnings = [e for e in preferred_earning_order if e in earnings]
+		ordered_earnings += [e for e in earnings if e not in preferred_earning_order]
+  
+		# Custom order for deductions
+		preferred_deduction_order = ["Notice Pay Deduction", "Social Health Insurance Fund", "Employee Housing Levy", "Employer Housing Levy", "Employee NSSF T1", "Employee NSSF T2", "Employer NSSF T1", "Employer NSSF T2", "Voluntary NSSF", "HELB", "Gross Insurance Relief", "Gross PAYE", "Insurance", "Insurance 2", "Insurance Relief", "Bereavement Fund", "COTU Fees", "KLDTD Union", "Max Insurance Relief", "Mortgage Interest", "Personal Relief", "PAYE", "Sacco Deposits", "Sacco Loan (Deduction)", "Sacco Registration Fee", "Lost Items", "Accidents Repair Deduction"]
+		deductions = salary_component_and_type[_("Deduction")]
+		ordered_deductions = [d for d in preferred_deduction_order if d in deductions]
+		ordered_deductions += [d for d in deductions if d not in preferred_deduction_order]
 
-	return sorted(salary_component_and_type[_("Earning")]), sorted(salary_component_and_type[_("Deduction")])
+	return ordered_earnings, ordered_deductions
+
+	# return sorted(salary_component_and_type[_("Earning")]), sorted(salary_component_and_type[_("Deduction")])
 
 
 def update_column_width(ss, columns):
@@ -128,18 +143,25 @@ def get_columns(earning_types, ded_types):
 			"width": 140,
 		},
 		{
+			"label": _("Grade"),
+			"fieldname": "grade",	
+			"fieldtype": "Link",
+			"options": "Employee Grade",
+			"width": 120,
+		},
+		{
 			"label": _("Date of Joining"),
 			"fieldname": "data_of_joining",
 			"fieldtype": "Date",
 			"width": 80,
 		},
-		{
-			"label": _("Branch"),
-			"fieldname": "branch",
-			"fieldtype": "Link",
-			"options": "Branch",
-			"width": -1,
-		},
+		# {
+		# 	"label": _("Branch"),
+		# 	"fieldname": "branch",
+		# 	"fieldtype": "Link",
+		# 	"options": "Branch",
+		# 	"width": -1,
+		# },
 		{
 			"label": _("Department"),
 			"fieldname": "department",
@@ -224,15 +246,15 @@ def get_columns(earning_types, ded_types):
 			}
 		)
 
-	columns.append(
-		{
-			"label": _("Gross Pay"),
-			"fieldname": "gross_pay",
-			"fieldtype": "Currency",
-			"options": "currency",
-			"width": 120,
-		}
-	)
+	# columns.append(
+	# 	{
+	# 		"label": _("Gross Pay"),
+	# 		"fieldname": "gross_pay",
+	# 		"fieldtype": "Currency",
+	# 		"options": "currency",
+	# 		"width": 120,
+	# 	}
+	# )
 
 	for deduction in ded_types:
 		columns.append(
