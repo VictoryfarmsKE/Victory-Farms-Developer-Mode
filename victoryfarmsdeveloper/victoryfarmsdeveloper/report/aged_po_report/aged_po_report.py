@@ -7,12 +7,7 @@ def execute(filters=None):
     if not filters:
         filters = {}
 
-    # Pagination parameters
-    page = int(filters.get("page", 1))
-    page_length = int(filters.get("page_length", 50))
-    offset = (page - 1) * page_length
-
-    sql = f"""
+    sql = """
         SELECT
             po.name AS purchase_order,
             po.supplier,
@@ -32,7 +27,6 @@ def execute(filters=None):
             AND DATEDIFF(NOW(), po.creation) >= 10
         ORDER BY
             po.creation DESC
-        LIMIT {page_length} OFFSET {offset}
     """
 
     data = frappe.db.sql(sql, filters, as_dict=True)
@@ -40,8 +34,6 @@ def execute(filters=None):
     # Get the active workflow for Purchase Order (cached)
     workflow_name = frappe.get_value("Workflow", {"document_type": "Purchase Order", "is_active": 1}, "name")
     workflow_doc = frappe.get_cached_doc("Workflow", workflow_name) if workflow_name else None
-
-    # Cache user info to minimize DB hits
     user_cache = {}
 
     for row in data:
