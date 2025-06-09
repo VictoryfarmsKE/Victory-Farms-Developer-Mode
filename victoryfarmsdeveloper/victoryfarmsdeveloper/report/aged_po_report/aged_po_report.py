@@ -7,7 +7,12 @@ def execute(filters=None):
     if not filters:
         filters = {}
 
-    sql = """
+    # Pagination parameters
+    page = int(filters.get("page", 1))
+    page_length = int(filters.get("page_length", 50))
+    offset = (page - 1) * page_length
+
+    sql = f"""
         SELECT
             po.name AS purchase_order,
             po.supplier,
@@ -22,16 +27,22 @@ def execute(filters=None):
         WHERE
             po.per_billed < 100
             AND po.per_received < 100
+            AND po.status != 'Completed'
+            AND po.workflow_state LIKE 'Pending Approval%%'
             AND DATEDIFF(NOW(), po.creation) >= 10
         ORDER BY
             po.creation DESC
+        LIMIT {page_length} OFFSET {offset}
     """
 
     data = frappe.db.sql(sql, filters, as_dict=True)
 
-    # Get the active workflow for Purchase Order
+    # Get the active workflow for Purchase Order (cached)
     workflow_name = frappe.get_value("Workflow", {"document_type": "Purchase Order", "is_active": 1}, "name")
-    workflow_doc = frappe.get_doc("Workflow", workflow_name) if workflow_name else None
+    workflow_doc = frappe.get_cached_doc("Workflow", workflow_name) if workflow_name else None
+
+    # Cache user info to minimize DB hits
+    user_cache = {}
 
     for row in data:
         row["workflow_role"] = ""
@@ -49,13 +60,18 @@ def execute(filters=None):
                     )
                     filtered_users = []
                     for u in users:
-                        # Exclude users who have the "System Manager" role
-                        has_sys_mgr = frappe.db.exists(
-                            "Has Role",
-                            {"role": "System Manager", "parent": u.parent, "parenttype": "User"}
-                        )
-                        if not has_sys_mgr and frappe.db.get_value("User", u.parent, "enabled") == 1:
-                            full_name = frappe.db.get_value("User", u.parent, "full_name")
+                        user_id = u["parent"]
+                        if user_id not in user_cache:
+                            has_sys_mgr = frappe.db.exists(
+                                "Has Role",
+                                {"role": "System Manager", "parent": user_id, "parenttype": "User"}
+                            )
+                            enabled = frappe.db.get_value("User", user_id, "enabled")
+                            full_name = frappe.db.get_value("User", user_id, "full_name")
+                            user_cache[user_id] = (has_sys_mgr, enabled, full_name)
+                        else:
+                            has_sys_mgr, enabled, full_name = user_cache[user_id]
+                        if not has_sys_mgr and enabled == 1:
                             filtered_users.append(full_name)
                     row["users_with_role"] = ", ".join([u["parent"] for u in users])
                     row["users_first_names"] = ", ".join(filtered_users)
@@ -65,8 +81,6 @@ def execute(filters=None):
         {"label": "Purchase Order #", "fieldname": "purchase_order", "fieldtype": "Link", "options": "Purchase Order", "width": 150},
         {"label": "Supplier", "fieldname": "supplier", "fieldtype": "Link", "options": "Supplier", "width": 220},
         {"label": "Workflow State", "fieldname": "workflow_state", "fieldtype": "Data", "width": 180},
-        # {"label": "Workflow Role", "fieldname": "workflow_role", "fieldtype": "Data", "width": 180},
-        # {"label": "Users With Role", "fieldname": "users_with_role", "fieldtype": "Data", "width": 220},
         {"label": "Pending Approver", "fieldname": "users_first_names", "fieldtype": "Data", "width": 220},
         {"label": "Billed (%)", "fieldname": "per_billed", "fieldtype": "Percent", "width": 100},
         {"label": "Received (%)", "fieldname": "per_received", "fieldtype": "Percent", "width": 120},
