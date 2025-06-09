@@ -33,6 +33,9 @@ def execute(filters=None):
 	ss_ded_map = get_salary_slip_details(salary_slips, currency, company_currency, "deductions")
 
 	doj_map = get_employee_doj_map()
+ 
+	# Get employee payroll cost center map
+	payroll_cost_center_map = get_employee_payroll_cost_center_map()
 
 	data = []
 	for ss in salary_slips:
@@ -42,6 +45,7 @@ def execute(filters=None):
 			"employee_name": ss.employee_name,
 			"grade": ss.custom_grade,
 			"data_of_joining": doj_map.get(ss.employee),
+			"payroll_cost_center": payroll_cost_center_map.get(ss.employee),
 			"branch": ss.branch,
 			"department": ss.department,
 			"designation": ss.designation,
@@ -61,6 +65,7 @@ def execute(filters=None):
 		update_column_width(ss, columns)
 
 		for e in earning_types:
+			
 			row.update({frappe.scrub(e): ss_earning_map.get(ss.name, {}).get(e)})
 
 		for d in ded_types:
@@ -93,7 +98,7 @@ def get_earning_and_deduction_types(salary_slips):
 		salary_component_and_type[_(component_type)].append(salary_component)
   
 		# Custom order for earnings
-		preferred_earning_order = ["Basic Pay", "Basic Salary", "OT hours", "Holiday Hours", "Overtime Hours", "Arrear", "Bonus Department", "Bonus Department (Quarterly)", "Bonus Department (Annual)", "Bonus Individual", "Bonus Individual (Quarterly)", "Bonus Individual (Annual)", "Commercial Commission", "Commercial Holiday Pay", "Education Allowance", "General Allowance", "House Rent", "Leave Encashment", "Net Arrears", "Notice Allowance", "OP Arrears", "Taxable Income", "Transport Allowance", "Unpaid Leave"]
+		preferred_earning_order = ["Basic Pay", "Basic Salary", "OT hours", "Holiday Hours", "Overtime 2.0", "Overtime 1.5" "Arrear", "Bonus Department", "Bonus Department (Quarterly)", "Bonus Department (Annual)", "Bonus Individual", "Bonus Individual (Quarterly)", "Bonus Individual (Annual)", "Commercial Commission", "Commercial Holiday Pay", "Education Allowance", "General Allowance", "House Rent", "Leave Encashment", "Net Arrears", "Notice Allowance", "OP Arrears", "Taxable Income", "Transport Allowance", "Unpaid Leave"]
 		earnings = salary_component_and_type[_("Earning")]
 		ordered_earnings = [e for e in preferred_earning_order if e in earnings]
 		ordered_earnings += [e for e in earnings if e not in preferred_earning_order]
@@ -164,9 +169,9 @@ def get_columns(earning_types, ded_types):
 		# },
 		{
 			"label": _("Department"),
-			"fieldname": "department",
+			"fieldname": "payroll_cost_center",
 			"fieldtype": "Link",
-			"options": "Department",
+			"options": "Cost Center",
 			"width": -1,
 		},
 		{
@@ -208,19 +213,19 @@ def get_columns(earning_types, ded_types):
 			"width": 120,
 		},
 		{
-			"label": _("Regular Working Hours"),
+			"label": _("Regular Working Hours (hr)"),
 			"fieldname": "regular_working_hours",
 			"fieldtype": "Float",
 			"width": 120,
 		},
 		{
-			"label": _("Overtime Hours"),
+			"label": _("Overtime Hours (hr)"),
 			"fieldname": "overtime_hours",
 			"fieldtype": "Float",
 			"width": 120,				
 		},
 		{
-			"label": _("Holiday Hours"),
+			"label": _("Holiday Hours (hr)"),
 			"fieldname": "holiday_hourss",
 			"fieldtype": "Float",									
 			"width": 120,
@@ -236,6 +241,15 @@ def get_columns(earning_types, ded_types):
 	]
 
 	for earning in earning_types:
+      #change the heading for column OT hours to "OT hours (KES)?
+		if earning == "OT hours":
+			earning = "OT hours (KES)"
+		elif earning == "Holiday Hours":
+			earning = "Holiday Hours (KES)"
+		elif earning == "Overtime 1.5":
+			earning = "Overtime 1.5 (KES)"
+		elif earning == "Overtime 2.0":
+			earning = "Overtime 2.0 (KES)"
 		columns.append(
 			{
 				"label": earning,
@@ -350,6 +364,13 @@ def get_employee_doj_map():
 
 	return frappe._dict(result)
 
+#get employee payroll cost center map
+def get_employee_payroll_cost_center_map():
+	employee = frappe.qb.DocType("Employee")
+
+	result = (frappe.qb.from_(employee).select(employee.name, employee.payroll_cost_center)).run()
+
+	return frappe._dict(result)
 
 def get_salary_slip_details(salary_slips, currency, company_currency, component_type):
 	salary_slips = [ss.name for ss in salary_slips]
