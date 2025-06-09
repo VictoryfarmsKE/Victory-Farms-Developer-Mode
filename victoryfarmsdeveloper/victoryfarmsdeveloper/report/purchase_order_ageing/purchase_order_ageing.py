@@ -22,8 +22,6 @@ def execute(filters=None):
         WHERE
             po.per_billed < 100
             AND po.per_received < 100
-            AND po.status != 'Completed'
-            AND po.workflow_state LIKE 'Pending Approval%%'
             AND DATEDIFF(NOW(), po.creation) >= 10
         ORDER BY
             po.creation DESC
