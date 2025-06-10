@@ -46,5 +46,21 @@
   "reference_doctype": null,
   "script": "frappe.enqueue(\"delete_draft_invoices_worker\", queue=\"long\", is_async=True)",
   "script_type": "Scheduler Event"
+ },
+ {
+  "allow_guest": 0,
+  "api_method": null,
+  "cron_format": null,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "event_frequency": "All",
+  "modified": "2025-06-10 19:45:23.534259",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Purchase Invoice Description",
+  "reference_doctype": "Purchase Order",
+  "script": "for item in doc.items:\r\n    item.description = \"\"\r\n    if item.custom_item_description:\r\n        item.description = item.custom_item_description\r\n",
+  "script_type": "DocType Event"
  }
 ]
