@@ -1,7 +1,7 @@
 {
  "add_total_row": 1,
  "columns": [],
- "creation": "2024-10-17 16:14:08.065834",
+ "creation": "2025-05-26 09:46:29.696161",
  "disable_prepared_report": 0,
  "disabled": 0,
  "docstatus": 0,
@@ -10,27 +10,21 @@
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": "Standard",
- "modified": "2025-02-12 12:53:52.866689",
+ "modified": "2025-05-26 09:46:29.696161",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
- "name": "Appraisal Bonus Payout",
+ "name": "Salary Register V2",
  "owner": "Administrator",
  "prepared_report": 0,
- "ref_doctype": "Appraisal Payout",
- "report_name": "Appraisal Bonus Payout",
+ "ref_doctype": "Salary Slip",
+ "report_name": "Salary Register V2",
  "report_type": "Script Report",
  "roles": [
-  {
-   "role": "HR Executive"
-  },
   {
    "role": "HR Manager"
   },
   {
-   "role": "System Manager"
-  },
-  {
-   "role": "HR User"
+   "role": "Payroll Officer"
   }
  ]
 }

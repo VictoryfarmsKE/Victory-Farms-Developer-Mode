@@ -6,6 +6,17 @@ app_email = "christinek@victoryfarmskenya.com"
 app_license = "mit"
 app_include = ["erpnext"]
 required_apps = ["frappe", "erpnext"]
+
+fixtures = [
+    "Client Script",
+    "Server Script",
+    "Custom Field",
+    {"dt": "Client Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+    {"dt": "Server Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+    {"dt": "Custom Field", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+]
+
+
 # Includes in <head>
 # ------------------
 
@@ -26,10 +37,18 @@ required_apps = ["frappe", "erpnext"]
 
 # include js in page
 # page_js = {"page" : "public/js/file.js"}
+app_include_js = [
+    "/assets/victoryfarmsdeveloper/js/stock_entry.js"
+]
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {
+    "Stock Entry": "victoryfarmsdeveloper/customization/stock_entry_item_break_down/stock_entry_item_break_down.js"
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
+doctype_list_js = {
+    "Leave Application" : "public/js/leave_application_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
@@ -110,6 +129,17 @@ required_apps = ["frappe", "erpnext"]
 # 	"Event": "frappe.desk.doctype.event.event.has_permission",
 # }
 
+permission_query_conditions = {
+    "Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal.appraisal.get_permission_query_conditions"
+    # "Department Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.department_appraisal.department_appraisal.get_permission_query_conditions"
+
+}
+
+has_permission = {
+    "Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal.appraisal.has_permission"
+    # "Department Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.department_appraisal.department_appraisal.has_permission"
+
+}
 # DocType Class
 # ---------------
 # Override standard doctype classes
@@ -117,7 +147,11 @@ required_apps = ["frappe", "erpnext"]
 # override_doctype_class = {
 # 	"ToDo": "custom_app.overrides.CustomToDo"
 # }
-
+override_doctype_class = {
+    "Stock Entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry",
+    "Appraisal Cycle": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_cycle.appraisal_cycle.CustomAppraisalCycle"
+    # "Leave Application": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.leave_application.leave_application.CustomLeaveApplication"
+}
 # Document Events
 # ---------------
 # Hook on document methods and events
@@ -128,6 +162,11 @@ required_apps = ["frappe", "erpnext"]
 # 		"on_cancel": "method",
 # 		"on_trash": "method"
 # 	}
+# }
+# doc_events = {
+#     "Stock Entry": {
+#         "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.on_submit"
+#     }
 # }
 
 # Scheduled Tasks
@@ -151,6 +190,25 @@ required_apps = ["frappe", "erpnext"]
 # 	],
 # }
 
+scheduler_events = {
+    "hourly": [
+        "victoryfarmsdeveloper.notifications.check_low_stock.check_low_stock"
+    ],
+    "cron": {
+        "0 7 * * *": [
+            "victoryfarmsdeveloper.notifications.po_pending_approval.send_pending_po_notifications",
+            "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check"
+        ]
+    }
+}
+
+
+doc_events = {
+    "Sales Invoice": {
+        "on_change": "victoryfarmsdeveloper.notifications.sales_invoice_status_change.sales_invoice_status_change"
+    }
+}
+
 # Testing
 # -------
 
@@ -162,6 +220,9 @@ required_apps = ["frappe", "erpnext"]
 # override_whitelisted_methods = {
 # 	"frappe.desk.doctype.event.event.get_events": "victoryfarmsdeveloper.event.get_events"
 # }
+override_whitelisted_methods = {
+    "erpnext.stock.doctype.stock_entry.stock_entry.make_stock_in_entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.make_stock_in_entry"
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
@@ -169,7 +230,9 @@ required_apps = ["frappe", "erpnext"]
 # override_doctype_dashboards = {
 # 	"Task": "victoryfarmsdeveloper.task.get_dashboard_data"
 # }
-
+# override_doctype_dashboards = {
+#     "Purchase Order": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.purchase_order.purchase_order_dashboard.get_data"
+# }
 # exempt linked doctypes from being automatically cancelled
 #
 # auto_cancel_exempted_doctypes = ["Auto Repeat"]
