@@ -191,7 +191,7 @@ override_doctype_class = {
 # }
 
 scheduler_events = {
-    "hourly": [
+    "daily": [
         "victoryfarmsdeveloper.notifications.check_low_stock.check_low_stock"
     ],
     "cron": {

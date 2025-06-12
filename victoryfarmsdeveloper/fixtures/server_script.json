@@ -62,5 +62,37 @@
   "reference_doctype": "Purchase Order",
   "script": "for item in doc.items:\r\n    item.description = \"\"\r\n    if item.custom_item_description:\r\n        item.description = item.custom_item_description\r\n",
   "script_type": "DocType Event"
+ },
+ {
+  "allow_guest": 0,
+  "api_method": null,
+  "cron_format": null,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Server Script",
+  "doctype_event": "After Insert",
+  "event_frequency": "All",
+  "modified": "2025-06-12 20:37:05.634935",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Employee Document Folder Create",
+  "reference_doctype": "Employee",
+  "script": "folders = [\"Employment\", \"Disciplinary\", \"Performance Management\", \"Payroll Administration\"]\r\nparent_folder = f\"Home/Employee Documents/{doc.name}\"\r\n\r\n# Ensure root employee folder exists\r\nif not frappe.db.exists(\"File\", {\"file_name\": doc.name, \"folder\": \"Home/Employee Documents\", \"is_folder\": 1}):\r\n    frappe.get_doc({\r\n        \"doctype\": \"File\",\r\n        \"file_name\": doc.name,\r\n        \"folder\": \"Home/Employee Documents\",\r\n        \"is_folder\": 1,\r\n        \"is_private\": 1\r\n    }).insert(ignore_permissions=True)\r\n\r\n# Create subfolders\r\nfor folder in folders:\r\n    if not frappe.db.exists(\"File\", {\"file_name\": folder, \"folder\": parent_folder, \"is_folder\": 1}):\r\n        frappe.get_doc({\r\n            \"doctype\": \"File\",\r\n            \"file_name\": folder,\r\n            \"folder\": parent_folder,\r\n            \"is_folder\": 1,\r\n            \"is_private\": 1\r\n        }).insert(ignore_permissions=True)",
+  "script_type": "DocType Event"
+ },
+ {
+  "allow_guest": 0,
+  "api_method": null,
+  "cron_format": null,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Server Script",
+  "doctype_event": "After Insert",
+  "event_frequency": "All",
+  "modified": "2025-06-12 20:36:41.707423",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Employee Documents Permissions",
+  "reference_doctype": "File",
+  "script": "hr_roles = [\"HR Manager\", \"HR Assistant\", \"Payroll Officer\"]\r\n\r\nuser_roles = [r.role for r in frappe.get_all(\"Has Role\", filters={\"parent\": frappe.session.user}, fields=[\"role\"])]\r\n\r\n# Check if the user has any HR role\r\nif not set(hr_roles).intersection(user_roles):\r\n    condition = \"`tabFile`.`folder` NOT LIKE 'Home/Employee Documents%'\"\r\nelse:\r\n    condition = \"1=1\"\r\n\r\ncondition\r\n",
+  "script_type": "Permission Query"
  }
 ]
