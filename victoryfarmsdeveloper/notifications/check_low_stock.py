@@ -5,7 +5,7 @@ from erpnext.stock.doctype.stock_reconciliation.stock_reconciliation import get_
 @frappe.whitelist()
 def check_low_stock():
     item_code = "Cement in 50KG bags"
-    warehouse = ""
+    warehouse = "Consumables Store - VFL"
     
     # Get the current date & time
     now = datetime.now()
@@ -17,12 +17,12 @@ def check_low_stock():
     
     stock_qty = stock_data.get("qty", 0)
 
-    if stock_qty <= 100:
+    if stock_qty <= 300:
         # Notify users if stock is low
         recipients = [user.email for user in frappe.get_all("User", filters={"role": "Store Assistant"}, fields=["email"])]
 
-        subject = "⚠️ Low Stock Alert: Cement"
-        message = f"Cement stock is at {stock_qty} units. Please restock!"
+        subject = "⚠️ Low Stock Alert: Cement in 50KG bags"
+        message = f"Item Cement in 50KG bags stock is at {stock_qty} units. Please restock!"
      
         frappe.sendmail(
             recipients=recipients,
