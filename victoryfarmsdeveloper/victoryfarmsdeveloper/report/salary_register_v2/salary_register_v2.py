@@ -36,6 +36,9 @@ def execute(filters=None):
  
 	# Get employee payroll cost center map
 	payroll_cost_center_map = get_employee_payroll_cost_center_map()
+ 
+	# Get employee grade map
+	employee_grade_map = get_employee_grade_map()
 
 	data = []
 	for ss in salary_slips:
@@ -43,7 +46,7 @@ def execute(filters=None):
 			"salary_slip_id": ss.name,
 			"employee": ss.employee,
 			"employee_name": ss.employee_name,
-			"grade": ss.custom_grade,
+			"grade": employee_grade_map.get(ss.employee),
 			"data_of_joining": doj_map.get(ss.employee),
 			"payroll_cost_center": payroll_cost_center_map.get(ss.employee),
 			"branch": ss.branch,
@@ -361,6 +364,14 @@ def get_employee_doj_map():
 	employee = frappe.qb.DocType("Employee")
 
 	result = (frappe.qb.from_(employee).select(employee.name, employee.date_of_joining)).run()
+
+	return frappe._dict(result)
+
+#get emmployee grade map
+def get_employee_grade_map():	
+	employee = frappe.qb.DocType("Employee")
+
+	result = (frappe.qb.from_(employee).select(employee.name, employee.grade)).run()
 
 	return frappe._dict(result)
 
