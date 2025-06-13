@@ -68,12 +68,12 @@ def execute(filters=None):
 		update_column_width(ss, columns)
 
 		for e in earning_types:
-			
-			row.update({frappe.scrub(e): ss_earning_map.get(ss.name, {}).get(e)})
+			value = ss_earning_map.get(ss.name, {}).get(e)
+			row.update({frappe.scrub(e): value if value is not None else 0})
 
 		for d in ded_types:
-			row.update({frappe.scrub(d): ss_ded_map.get(ss.name, {}).get(d)})
-
+			value = ss_ded_map.get(ss.name, {}).get(d)
+			row.update({frappe.scrub(d): value if value is not None else 0})
 		if currency == company_currency:
 			row.update(
 				{
@@ -101,17 +101,18 @@ def get_earning_and_deduction_types(salary_slips):
 		salary_component_and_type[_(component_type)].append(salary_component)
   
 		# Custom order for earnings
-		preferred_earning_order = ["Basic Pay", "Basic Salary", "OT hours", "Holiday Hours", "Overtime 2.0", "Overtime 1.5" "Arrear", "Bonus Department", "Bonus Department (Quarterly)", "Bonus Department (Annual)", "Bonus Individual", "Bonus Individual (Quarterly)", "Bonus Individual (Annual)", "Commercial Commission", "Commercial Holiday Pay", "Education Allowance", "General Allowance", "House Rent", "Leave Encashment", "Net Arrears", "Notice Allowance", "OP Arrears", "Taxable Income", "Transport Allowance", "Unpaid Leave"]
-		earnings = salary_component_and_type[_("Earning")]
-		ordered_earnings = [e for e in preferred_earning_order if e in earnings]
-		ordered_earnings += [e for e in earnings if e not in preferred_earning_order]
+		preferred_earning_order = ["Basic Pay", "Basic Salary", "OT hours", "Holiday Hours", "Overtime 2.0", "Overtime 1.5", "Arrear", "Bonus Department", "Bonus Department (Quarterly)", "Bonus Department (Annual)", "Bonus Individual", "Bonus Individual (Quarterly)", "Bonus Individual (Annual)", "Commercial Commission", "Commercial Holiday Pay", "Education Allowance", "General Allowance", "House Rent", "Leave Encashment", "Net Arrears", "Notice Allowance", "OP Arrears", "Taxable Income", "Transport Allowance", "Unpaid Leave"]
+		ordered_earnings = preferred_earning_order
+  		# earnings = salary_component_and_type[_("Earning")]
+		# ordered_earnings = [e for e in preferred_earning_order if e in earnings]
+		# ordered_earnings += [e for e in earnings if e not in preferred_earning_order]
   
 		# Custom order for deductions
 		preferred_deduction_order = ["Notice Pay Deduction", "Social Health Insurance Fund", "Employee Housing Levy", "Employer Housing Levy", "Employee NSSF T1", "Employee NSSF T2", "Employer NSSF T1", "Employer NSSF T2", "Voluntary NSSF", "HELB", "Gross Insurance Relief", "Gross PAYE", "Insurance", "Insurance 2", "Insurance Relief", "Bereavement Fund", "COTU Fees", "KLDTD Union", "Max Insurance Relief", "Mortgage Interest", "Personal Relief", "PAYE", "Sacco Deposits", "Sacco Loan (Deduction)", "Sacco Registration Fee", "Lost Items", "Accidents Repair Deduction"]
-		deductions = salary_component_and_type[_("Deduction")]
-		ordered_deductions = [d for d in preferred_deduction_order if d in deductions]
-		ordered_deductions += [d for d in deductions if d not in preferred_deduction_order]
-
+		ordered_deductions = preferred_deduction_order
+		# deductions = salary_component_and_type[_("Deduction")]
+		# ordered_deductions = [d for d in preferred_deduction_order if d in deductions]
+		# ordered_deductions += [d for d in deductions if d not in preferred_deduction_order]
 	return ordered_earnings, ordered_deductions
 
 	# return sorted(salary_component_and_type[_("Earning")]), sorted(salary_component_and_type[_("Deduction")])
