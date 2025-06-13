@@ -68,12 +68,13 @@ def execute(filters=None):
 		update_column_width(ss, columns)
 
 		for e in earning_types:
-			value = ss_earning_map.get(ss.name, {}).get(e)
+			value = ss_earning_map.get(ss.name, {}).get(e, 0)
 			row.update({frappe.scrub(e): value if value is not None else 0})
 
 		for d in ded_types:
-			value = ss_ded_map.get(ss.name, {}).get(d)
+			value = ss_ded_map.get(ss.name, {}).get(d, 0)
 			row.update({frappe.scrub(d): value if value is not None else 0})
+    
 		if currency == company_currency:
 			row.update(
 				{
@@ -101,14 +102,15 @@ def get_earning_and_deduction_types(salary_slips):
 		salary_component_and_type[_(component_type)].append(salary_component)
   
 		# Custom order for earnings
-		preferred_earning_order = ["Basic Pay", "Basic Salary", "OT hours", "Holiday Hours", "Overtime 2.0", "Overtime 1.5", "Arrear", "Bonus Department", "Bonus Department (Quarterly)", "Bonus Department (Annual)", "Bonus Individual", "Bonus Individual (Quarterly)", "Bonus Individual (Annual)", "Commercial Commission", "Commercial Holiday Pay", "Education Allowance", "General Allowance", "House Rent", "Leave Encashment", "Net Arrears", "Notice Allowance", "OP Arrears", "Taxable Income", "Transport Allowance", "Unpaid Leave"]
+		# preferred_earning_order = ["Basic Pay", "Basic Salary", "OT hours", "Holiday Hours", "Overtime 2.0", "Overtime 1.5", "Arrear", "Bonus Department", "Bonus Department (Quarterly)", "Bonus Department (Annual)", "Bonus Individual", "Bonus Individual (Quarterly)", "Bonus Individual (Annual)", "Bonus Company (Annual)", "Commercial Commission", "Commercial Holiday Pay", "Education Allowance", "General Allowance", "House Rent", "Leave Encashment", "Net Arrears", "Notice Allowance", "OP Arrears", "Taxable Income", "Transport Allowance", "Unpaid Leave"]
+		preferred_earning_order = ["Basic Pay", "Basic Salary", "OT hours", "Holiday Hours", "Arrear", "Bonus Department", "Bonus Department (Quarterly)", "Bonus Department (Annual)", "Bonus Individual", "Bonus Individual (Quarterly)", "Bonus Individual (Annual)", "Bonus Company (Annual)", "Commercial Commission", "Commercial Holiday Pay", "Education Allowance", "General Allowance", "House Rent", "Leave Encashment", "Net Arrears", "Notice Allowance", "OP Arrears", "Taxable Income", "Transport Allowance", "Unpaid Leave"]
 		ordered_earnings = preferred_earning_order
   		# earnings = salary_component_and_type[_("Earning")]
 		# ordered_earnings = [e for e in preferred_earning_order if e in earnings]
 		# ordered_earnings += [e for e in earnings if e not in preferred_earning_order]
   
 		# Custom order for deductions
-		preferred_deduction_order = ["Notice Pay Deduction", "Social Health Insurance Fund", "Employee Housing Levy", "Employer Housing Levy", "Employee NSSF T1", "Employee NSSF T2", "Employer NSSF T1", "Employer NSSF T2", "Voluntary NSSF", "HELB", "Gross Insurance Relief", "Gross PAYE", "Insurance", "Insurance 2", "Insurance Relief", "Bereavement Fund", "COTU Fees", "KLDTD Union", "Max Insurance Relief", "Mortgage Interest", "Personal Relief", "PAYE", "Sacco Deposits", "Sacco Loan (Deduction)", "Sacco Registration Fee", "Lost Items", "Accidents Repair Deduction"]
+		preferred_deduction_order = ["Notice Pay Deduction", "Social Health Insurance Fund", "Employee Housing Levy", "Employer Housing Levy", "Employee NSSF T1", "Employee NSSF T2", "Employer NSSF T1", "Employer NSSF T2", "Voluntary NSSF", "HELB", "Gross Insurance Relief", "Gross PAYE", "Insurance", "Insurance 2", "Insurance Relief", "Bereavement Fund", "COTU Fees", "KLDTD Union", "Max Insurance Relief", "Mortgage Interest", "Personal Relief", "PAYE", "Sacco Deposits", "Sacco Loan (Deduction)", "Sacco Registration Fee", "Lost Items", "Accidents Repair Deduction", "VF Store"]
 		ordered_deductions = preferred_deduction_order
 		# deductions = salary_component_and_type[_("Deduction")]
 		# ordered_deductions = [d for d in preferred_deduction_order if d in deductions]
@@ -250,10 +252,10 @@ def get_columns(earning_types, ded_types):
 			earning = "OT hours (KES)"
 		elif earning == "Holiday Hours":
 			earning = "Holiday Hours (KES)"
-		elif earning == "Overtime 1.5":
-			earning = "Overtime 1.5 (KES)"
-		elif earning == "Overtime 2.0":
-			earning = "Overtime 2.0 (KES)"
+		# elif earning == "Overtime 1.5":
+		# 	earning = "Overtime 1.5 (KES)"
+		# elif earning == "Overtime 2.0":
+		# 	earning = "Overtime 2.0 (KES)"
 		columns.append(
 			{
 				"label": earning,
@@ -264,15 +266,15 @@ def get_columns(earning_types, ded_types):
 			}
 		)
 
-	# columns.append(
-	# 	{
-	# 		"label": _("Gross Pay"),
-	# 		"fieldname": "gross_pay",
-	# 		"fieldtype": "Currency",
-	# 		"options": "currency",
-	# 		"width": 120,
-	# 	}
-	# )
+	columns.append(
+		{
+			"label": _("Gross Pay"),
+			"fieldname": "gross_pay",
+			"fieldtype": "Currency",
+			"options": "currency",
+			"width": 120,
+		}
+	)
 
 	for deduction in ded_types:
 		columns.append(
