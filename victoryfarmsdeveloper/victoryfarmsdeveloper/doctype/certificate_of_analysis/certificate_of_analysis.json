@@ -41,7 +41,8 @@
   "column_break_znxta",
   "truck_driver",
   "tab_break_obqke",
-  "stock_entry_reference"
+  "stock_entry_reference",
+  "amended_from"
  ],
  "fields": [
   {
@@ -50,8 +51,7 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Product Name",
-   "read_only": 1,
-   "reqd": 1
+   "read_only": 1
   },
   {
    "default": "Whole, Gutted Tilapia",
@@ -71,21 +71,18 @@
    "fieldname": "batch_number",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Batch Number",
-   "reqd": 1
+   "label": "Batch Number"
   },
   {
    "fieldname": "production_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "Production Date",
-   "reqd": 1
+   "label": "Production Date"
   },
   {
    "fieldname": "expiry_date",
    "fieldtype": "Date",
-   "label": "Expiry Date",
-   "reqd": 1
+   "label": "Expiry Date"
   },
   {
    "fieldname": "dispatch_date",
@@ -96,20 +93,17 @@
   {
    "fieldname": "product_unit_size",
    "fieldtype": "Data",
-   "label": "Product Unit Size",
-   "reqd": 1
+   "label": "Product Unit Size"
   },
   {
    "fieldname": "packaging_type",
    "fieldtype": "Data",
-   "label": "Packaging Type",
-   "reqd": 1
+   "label": "Packaging Type"
   },
   {
    "fieldname": "storage_condition",
    "fieldtype": "Data",
-   "label": "Storage Condition",
-   "reqd": 1
+   "label": "Storage Condition"
   },
   {
    "fieldname": "destination",
@@ -121,27 +115,23 @@
   {
    "fieldname": "conclusion",
    "fieldtype": "Data",
-   "label": "Conclusion",
-   "reqd": 1
+   "label": "Conclusion"
   },
   {
    "fieldname": "product_temperatures",
    "fieldtype": "Data",
-   "label": "Product Temperatures",
-   "reqd": 1
+   "label": "Product Temperatures"
   },
   {
    "fieldname": "truck_temperature",
    "fieldtype": "Data",
-   "label": "Truck Temperature",
-   "reqd": 1
+   "label": "Truck Temperature"
   },
   {
    "fieldname": "truck_driver",
    "fieldtype": "Link",
    "label": "Truck Driver",
-   "options": "Driver",
-   "reqd": 1
+   "options": "Driver"
   },
   {
    "fieldname": "column_break_d12xg",
@@ -204,8 +194,7 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "QC Personnel",
-   "options": "Employee",
-   "reqd": 1
+   "options": "Employee"
   },
   {
    "fieldname": "column_break_8t26a",
@@ -219,23 +208,34 @@
    "fieldname": "analysis",
    "fieldtype": "Table",
    "label": "Analysis",
-   "options": "CoA Analysis",
-   "reqd": 1
+   "options": "CoA Analysis"
   },
   {
    "fieldname": "tab_break_obqke",
-   "fieldtype": "Tab Break"
+   "fieldtype": "Tab Break",
+   "label": "Reference"
   },
   {
    "fieldname": "stock_entry_reference",
    "fieldtype": "Link",
    "label": "Stock Entry Reference",
    "options": "Stock Entry"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Certificate of Analysis",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2025-06-16 21:43:26.363684",
+ "modified": "2025-06-16 23:00:51.711123",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Certificate of Analysis",
