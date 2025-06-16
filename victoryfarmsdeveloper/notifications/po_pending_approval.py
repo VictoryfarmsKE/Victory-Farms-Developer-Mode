@@ -76,13 +76,13 @@ def send_po_approved_notification(doc, method):
                         print_letterhead=True
                     )
                     frappe.sendmail(
-                        recipients=[supplier_email],
+                        recipients=[supplier_email, owner_email],
                         cc =[owner_email],
-                        bcc=["christinek@victoryfarmskenya.com"],
+                        # bcc=["christinek@victoryfarmskenya.com"],
                         subject=f"Purchase Order {doc.name} from Victory Farms Limited for {doc.supplier}",
                         message=(
-                            f"Hello,<br><br>Please find attached a Purchase Order <b>{doc.name} for {doc.grand_total}{doc.currency}</b>"
-                            f"The delivery due date, address and instructions are included in the Purchase Order.<br>"
+                            f"Hello,<br><br>Please find attached a Purchase Order <b>{doc.name} for {doc.grand_total}{doc.currency}</b>.<br>"
+                            f"<br>The delivery due date, address and instructions are included in the Purchase Order.<br>"
                             f"<br>If you have any questions, please let us know. Thank you</a>.<br>"
                             f"<br>Best Regards,<br>Victory Farms Limited<br>"
                         ),

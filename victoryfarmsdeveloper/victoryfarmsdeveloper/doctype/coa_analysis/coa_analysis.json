@@ -1,0 +1,54 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-06-16 13:08:35.979169",
+ "default_view": "List",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "physical_attributes",
+  "specification",
+  "test_results",
+  "test_method"
+ ],
+ "fields": [
+  {
+   "fieldname": "physical_attributes",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Physical Attributes",
+   "read_only": 1
+  },
+  {
+   "fieldname": "specification",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Specification\u00a0",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "test_results",
+   "fieldtype": "Data",
+   "label": "Test Results "
+  },
+  {
+   "fieldname": "test_method",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Test Method  "
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-06-16 21:13:03.862402",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "CoA Analysis",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
