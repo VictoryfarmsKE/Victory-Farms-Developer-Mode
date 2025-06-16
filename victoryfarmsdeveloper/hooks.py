@@ -206,8 +206,16 @@ scheduler_events = {
 doc_events = {
     "Sales Invoice": {
         "on_change": "victoryfarmsdeveloper.notifications.sales_invoice_status_change.sales_invoice_status_change"
+    },
+    "Purchase Order": {
+        "on_update": "victoryfarmsdeveloper.notifications.po_pending_approval.send_po_approved_notification"
+    },
+    "Stock Entry": {
+        "before_save": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_save_stock_entry",
+        "before_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_submit_stock_entry"
     }
 }
+
 
 # Testing
 # -------

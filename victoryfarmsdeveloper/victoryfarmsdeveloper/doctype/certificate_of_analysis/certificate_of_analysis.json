@@ -1,0 +1,260 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-06-13 21:38:25.096400",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "product_name",
+  "column_break_d12xg",
+  "product_description",
+  "column_break_w4mb7",
+  "allergen_information",
+  "column_break_8t26a",
+  "qc_personnel",
+  "section_break_a3vso",
+  "batch_number",
+  "column_break_zzved",
+  "production_date",
+  "column_break_yd5hs",
+  "expiry_date",
+  "column_break_gkiay",
+  "dispatch_date",
+  "section_break_sa5me",
+  "product_unit_size",
+  "column_break_vmsoy",
+  "packaging_type",
+  "column_break_wnefy",
+  "storage_condition",
+  "column_break_uizoz",
+  "destination",
+  "section_break_pffzk",
+  "analysis",
+  "section_break_szfet",
+  "conclusion",
+  "column_break_vyis6",
+  "product_temperatures",
+  "section_break_3lj9q",
+  "truck_temperature",
+  "column_break_znxta",
+  "truck_driver",
+  "tab_break_obqke",
+  "stock_entry_reference",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "Oreochromis niloticus",
+   "fieldname": "product_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Product Name",
+   "read_only": 1
+  },
+  {
+   "default": "Whole, Gutted Tilapia",
+   "fieldname": "product_description",
+   "fieldtype": "Data",
+   "label": "Product Description",
+   "read_only": 1
+  },
+  {
+   "default": " This product is Fish, an allergen",
+   "fieldname": "allergen_information",
+   "fieldtype": "Data",
+   "label": "Allergen Information",
+   "read_only": 1
+  },
+  {
+   "fieldname": "batch_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Batch Number"
+  },
+  {
+   "fieldname": "production_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Production Date"
+  },
+  {
+   "fieldname": "expiry_date",
+   "fieldtype": "Date",
+   "label": "Expiry Date"
+  },
+  {
+   "fieldname": "dispatch_date",
+   "fieldtype": "Date",
+   "label": "Dispatch Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "product_unit_size",
+   "fieldtype": "Data",
+   "label": "Product Unit Size"
+  },
+  {
+   "fieldname": "packaging_type",
+   "fieldtype": "Data",
+   "label": "Packaging Type"
+  },
+  {
+   "fieldname": "storage_condition",
+   "fieldtype": "Data",
+   "label": "Storage Condition"
+  },
+  {
+   "fieldname": "destination",
+   "fieldtype": "Link",
+   "label": "Destination",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "conclusion",
+   "fieldtype": "Data",
+   "label": "Conclusion"
+  },
+  {
+   "fieldname": "product_temperatures",
+   "fieldtype": "Data",
+   "label": "Product Temperatures"
+  },
+  {
+   "fieldname": "truck_temperature",
+   "fieldtype": "Data",
+   "label": "Truck Temperature"
+  },
+  {
+   "fieldname": "truck_driver",
+   "fieldtype": "Link",
+   "label": "Truck Driver",
+   "options": "Driver"
+  },
+  {
+   "fieldname": "column_break_d12xg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_w4mb7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_a3vso",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_zzved",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_yd5hs",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_gkiay",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_sa5me",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_vmsoy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_wnefy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_uizoz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_pffzk",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_vyis6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_3lj9q",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_znxta",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "qc_personnel",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "QC Personnel",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "column_break_8t26a",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_szfet",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "analysis",
+   "fieldtype": "Table",
+   "label": "Analysis",
+   "options": "CoA Analysis"
+  },
+  {
+   "fieldname": "tab_break_obqke",
+   "fieldtype": "Tab Break",
+   "label": "Reference"
+  },
+  {
+   "fieldname": "stock_entry_reference",
+   "fieldtype": "Link",
+   "label": "Stock Entry Reference",
+   "options": "Stock Entry"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Certificate of Analysis",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-06-16 23:00:51.711123",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Certificate of Analysis",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
