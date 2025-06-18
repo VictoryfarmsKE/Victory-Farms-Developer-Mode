@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:{destination}-{#####}",
  "creation": "2025-06-13 21:38:25.096400",
  "default_view": "List",
  "doctype": "DocType",
@@ -235,10 +236,11 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-16 23:00:51.711123",
+ "modified": "2025-06-17 12:44:41.229080",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Certificate of Analysis",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
