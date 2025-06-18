@@ -1,6 +1,6 @@
 import frappe
 
-def send_pending_po_notifications(batch_size=20):
+def send_pending_po_notifications(batch_size=10):
     try:
         pending_pos = frappe.get_all(
             "Purchase Order",
