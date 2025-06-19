@@ -199,8 +199,7 @@ def before_save_stock_entry(doc, method):
         #Get previous workflow state
         previous_doc = doc.get_doc_before_save()
         previous_state = previous_doc.workflow_state if previous_doc else None
-        
-        if doc.stock_entry_type == "Material Transfer" and doc.items and all(item.item_group == "Gutted Fish-Tilapia" for item in doc.items):
+        if doc.stock_entry_type == "Material Transfer" and doc.items and all(item.item_group == "Gutted Fish-Tilapia" for item in doc.items) and doc.destination_warehouse_type in ["Branch", "LC"]:
             if previous_state != "Transfer Pending Confirmation-Driver" and doc.workflow_state == "Transfer Pending Confirmation-Driver":
                 # Auto-create CoA if workflow state is "Transfer Pending Confirmation - Driver"
         
@@ -221,7 +220,7 @@ def before_submit_stock_entry(doc, method):
     previous_doc = doc.get_doc_before_save()
     previous_state = previous_doc.workflow_state if previous_doc else None
     
-    if doc.stock_entry_type == "Material Transfer" and doc.items and all(item.item_group == "Gutted Fish-Tilapia" for item in doc.items):
+    if doc.stock_entry_type == "Material Transfer" and doc.items and all(item.item_group == "Gutted Fish-Tilapia" for item in doc.items) and doc.destination_warehouse_type in ["Branch", "LC"]:
         if previous_state != "Transfer Confirmed by Driver" and doc.workflow_state == "Transfer Confirmed by Driver":
         # Prevent final confirmation without submitted CoA
             submitted_coa = frappe.get_all("Certificate of Analysis", {
