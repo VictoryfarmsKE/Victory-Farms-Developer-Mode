@@ -59,41 +59,40 @@ def send_po_approved_notification(doc, method):
             owner_email = frappe.db.get_value("User", doc.owner, "email")
             supplier_email = frappe.db.get_value("Supplier", doc.supplier, "email_id")
 
-            if not owner_email or not supplier_email:
-                frappe.log_error(
-                    title="PO Approved Email Notification",
-                    message=f"Missing email(s) for PO {doc.name}. Owner: {owner_email}, Supplier: {supplier_email}"
-                )
-                return
-            else:
+            # if not owner_email or not supplier_email:
+            #     frappe.log_error(
+            #         title="PO Approved Email Notification",
+            #         message=f"Missing email(s) for PO {doc.name}. Owner: {owner_email}, Supplier: {supplier_email}"
+            #     )
+            #     return
+            # else:
                 #Compose and send email
-                try:
-                    pdf_attachment = frappe.attach_print(
-                        doctype=doc.doctype,
-                        name=doc.name,
-                        file_name=f"{doc.name}",
-                        print_format="Purchase Order VF",
-                        print_letterhead=True
-                    )
-                    frappe.sendmail(
-                        recipients=[supplier_email, owner_email],
-                        cc =[owner_email],
-                        # bcc=["christinek@victoryfarmskenya.com"],
-                        subject=f"Purchase Order {doc.name} from Victory Farms Limited for {doc.supplier}",
-                        message=(
-                            f"Hello,<br><br>Please find attached a Purchase Order <b>{doc.name} for {doc.grand_total}{doc.currency}</b>.<br>"
-                            f"<br>The delivery due date, address and instructions are included in the Purchase Order.<br>"
-                            f"<br>If you have any questions, please let us know. Thank you</a>.<br>"
-                            f"<br>Best Regards,<br>Victory Farms Limited<br>"
-                        ),
-                        attachments=[pdf_attachment]
-                    )
-                except Exception as e:
+            try:
+                pdf_attachment = frappe.attach_print(
+                    doctype=doc.doctype,
+                    name=doc.name,
+                    file_name=f"{doc.name}",
+                    print_format="Purchase Order VF",
+                    print_letterhead=True
+                )
+                frappe.sendmail(
+                    recipients=[supplier_email, owner_email],
+                    cc =[owner_email],
+                    # bcc=["christinek@victoryfarmskenya.com"],
+                    subject=f"Purchase Order {doc.name} from Victory Farms Limited for {doc.supplier}",
+                    message=(
+                        f"Hello,<br><br>Please find attached a Purchase Order <b>{doc.name} for {doc.grand_total}{doc.currency}</b>.<br>"
+                        f"<br>The delivery due date, address and instructions are included in the Purchase Order.<br>"
+                        f"<br>If you have any questions, please let us know. Thank you</a>.<br>"
+                        f"<br>Best Regards,<br>Victory Farms Limited<br>"
+                    ),
+                    attachments=[pdf_attachment]
+                )
+            except Exception as e:
                     frappe.log_error(
                         title="PO Approved Email Notification",
                         message=f"Email sending failed for PO {doc.name}: {e}"
                     )
-
         else:
             return
     except Exception as e:

@@ -199,34 +199,33 @@ def before_save_stock_entry(doc, method):
         #Get previous workflow state
         previous_doc = doc.get_doc_before_save()
         previous_state = previous_doc.workflow_state if previous_doc else None
+        if doc.stock_entry_type == "Material Transfer" and doc.items and all(item.item_group == "Gutted Fish-Tilapia" for item in doc.items) and doc.destination_warehouse_type in ["Branch", "LC"]:
+            if previous_state != "Transfer Pending Confirmation-Driver" and doc.workflow_state == "Transfer Pending Confirmation-Driver":
+                # Auto-create CoA if workflow state is "Transfer Pending Confirmation - Driver"
         
-        # Only send if transitioning to Submitted or Transfer Pending Confirmation - Driver
-        if previous_state != "Transfer Pending Confirmation-Driver" and doc.workflow_state == "Transfer Pending Confirmation-Driver":
-            # 1. Auto-create CoA if workflow state is "Transfer Pending Confirmation - Driver"
-    
-            if not frappe.db.exists("Certificate of Analysis", {"stock_entry_reference": doc.name}):
-                coa = frappe.new_doc("Certificate of Analysis")
-                coa.stock_entry_reference = doc.name
-                coa.dispatch_date = nowdate()
-                coa.destination = doc.destination_warehouse
-                coa.truck_driver = doc.driver
-                coa.insert()
-                frappe.msgprint(_("A Certificate of Analysis has been created. Please complete and submit it."))
-                coa.save()
-                # frappe.throw(_("You must submit the Certificate of Analysis before proceeding."))
-            else:
-                frappe.msgprint(_("A Certificate of Analysis already exists for this Stock Entry. Please complete and submit it."))
-                
+                if not frappe.db.exists("Certificate of Analysis", {"stock_entry_reference": doc.name}):
+                    coa = frappe.new_doc("Certificate of Analysis")
+                    coa.stock_entry_reference = doc.name
+                    coa.dispatch_date = nowdate()
+                    coa.destination = doc.destination_warehouse
+                    coa.truck_driver = doc.driver
+                    coa.insert()
+                    frappe.msgprint(_("A Certificate of Analysis has been created. Please complete and submit it."))
+                    coa.save()
+                else:
+                    frappe.msgprint(_("A Certificate of Analysis already exists for this Stock Entry. Please complete and submit it."))
+                    
 def before_submit_stock_entry(doc, method):
     #Get previous workflow state
     previous_doc = doc.get_doc_before_save()
     previous_state = previous_doc.workflow_state if previous_doc else None
     
-    if previous_state != "Transfer Confirmed by Driver" and doc.workflow_state == "Transfer Confirmed by Driver":
-    # Prevent final confirmation without submitted CoA
-        submitted_coa = frappe.get_all("Certificate of Analysis", {
-            "stock_entry_reference": doc.name,
-            "docstatus": 1
-        })
-        if not submitted_coa:
-            frappe.throw(_("You must submit the Certificate of Analysis before confirming this Stock Entry."))
+    if doc.stock_entry_type == "Material Transfer" and doc.items and all(item.item_group == "Gutted Fish-Tilapia" for item in doc.items) and doc.destination_warehouse_type in ["Branch", "LC"]:
+        if previous_state != "Transfer Confirmed by Driver" and doc.workflow_state == "Transfer Confirmed by Driver":
+        # Prevent final confirmation without submitted CoA
+            submitted_coa = frappe.get_all("Certificate of Analysis", {
+                "stock_entry_reference": doc.name,
+                "docstatus": 1
+            })
+            if not submitted_coa:
+                frappe.throw(_("You must submit the Certificate of Analysis before confirming this Stock Entry."))
