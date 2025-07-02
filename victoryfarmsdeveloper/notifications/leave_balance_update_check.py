@@ -50,3 +50,41 @@ def leave_balance_update_check():
                 frappe.log_error(f"Error processing Leave Balance Notification {app['name']}: {app_err}", "Leave Balance Notification")
     except Exception as e:
         return e
+    
+def create_employee_folders():
+    batch_size = 5
+    folders = ["Employment", "Disciplinary", "Performance Management", "Payroll Administration"]
+    employees = frappe.get_all("Employee", filters={"status": "Active"}, pluck="name")
+    # log(employees)
+    for i in range(0, len(employees), batch_size):
+        batch = employees[i:i+batch_size]
+
+        for emp in batch:
+            try:
+                parent_folder = f"Home/Employee Documents/{emp}"
+        
+                # Ensure Employee folder exists
+                if not frappe.db.exists("File", {"file_name": emp, "folder": "Home/Employee Documents", "is_folder": 1}):
+                    frappe.get_doc({
+                        "doctype": "File",
+                        "file_name": emp,
+                        "folder": "Home/Employee Documents",
+                        "is_folder": 1,
+                        "is_private": 1
+                    }).insert(ignore_permissions=True)
+        
+                # Create subfolders under Employee folder
+                for subfolder in folders:
+                    if not frappe.db.exists("File", {"file_name": subfolder, "folder": parent_folder, "is_folder": 1}):
+                        frappe.get_doc({
+                            "doctype": "File",
+                            "file_name": subfolder,
+                            "folder": parent_folder,
+                            "is_folder": 1,
+                            "is_private": 1
+                        }).insert(ignore_permissions=True)
+        
+            except Exception as e:
+                frappe.log_error(title="Folder Creation Error", message=f"Employee: {emp} — {e}")
+        
+        frappe.db.commit()

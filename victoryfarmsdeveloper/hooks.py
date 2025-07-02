@@ -198,6 +198,9 @@ scheduler_events = {
         "0 7 * * *": [
             "victoryfarmsdeveloper.notifications.po_pending_approval.send_pending_po_notifications",
             "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check"
+        ],
+        "0 17 * * *": [
+            "victoryfarmsdeveloper.notifications.leave_balance_update_check.create_employee_folders"
         ]
     }
 }
