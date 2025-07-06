@@ -247,10 +247,10 @@ def get_columns(earning_types, ded_types):
 	]
 
 	for earning in earning_types:
-		if earning == "OT hours":
-			earning = "OT hours (KES)"
-		elif earning == "Holiday Hours":
-			earning = "Holiday Hours (KES)"
+		if earning == "OT hours (KES)":
+			earning = "OT hours"
+		elif earning == "Holiday Hours (KES)":
+			earning = "Holiday Hours"
 		# elif earning == "Overtime 1.5":
 		# 	earning = "Overtime 1.5 (KES)"
 		# elif earning == "Overtime 2.0":
