@@ -50,77 +50,69 @@ def leave_balance_update_check():
                 frappe.log_error(f"Error processing Leave Balance Notification {app['name']}: {app_err}", "Leave Balance Notification")
     except Exception as e:
         return e
-    
-def create_employee_folders():
-    batch_size = 5
+
+def create_folders_for_employees(employee_names):
     folders = ["Employment", "Disciplinary", "Performance Management", "Payroll Administration"]
-    employees = frappe.get_all(
-        "Employee",
-        filters={"status": "Active"},
-        fields=["name", "date_of_joining", "relieving_date"]
-    )
+    current_year = int(frappe.utils.nowdate()[:4])
 
-    current_year = frappe.utils.nowdate()[:4]
-    current_year = int(current_year)
+    for emp_name in employee_names:
+        try:
+            emp = frappe.get_doc("Employee", emp_name)
+            parent_folder = f"Home/Employee Documents/{emp.name}"
 
-    try:
-        for i in range(0, len(employees), batch_size):
-            batch = employees[i:i+batch_size]
+            # Ensure Employee folder exists
+            if not frappe.db.exists("File", {"file_name": emp.name, "folder": "Home/Employee Documents", "is_folder": 1}):
+                continue
 
-            for emp in batch:
-                try:
-                    emp_name = emp["name"]
-                    parent_folder = f"Home/Employee Documents/{emp_name}"
+            if not emp.date_of_joining:
+                continue
 
-                    # Ensure Employee folder exists
-                    if not frappe.db.exists("File", {"file_name": emp_name, "folder": "Home/Employee Documents", "is_folder": 1}):
+            start_year = emp.date_of_joining.year
+            end_year = current_year
+            if emp.relieving_date:
+                relieving_year = emp.relieving_date.year
+                end_year = min(current_year, relieving_year)
+
+            years = range(start_year, end_year + 1)
+
+            for subfolder in folders:
+                subfolder_path = f"{parent_folder}/{subfolder}"
+                if not frappe.db.exists("File", {"file_name": subfolder, "folder": parent_folder, "is_folder": 1}):
+                    frappe.get_doc({
+                        "doctype": "File",
+                        "file_name": subfolder,
+                        "folder": parent_folder,
+                        "is_folder": 1,
+                        "is_private": 1
+                    }).insert(ignore_permissions=True)
+
+                for year in years:
+                    year_str = str(year)
+                    if not frappe.db.exists("File", {"file_name": year_str, "folder": subfolder_path, "is_folder": 1}):
                         frappe.get_doc({
                             "doctype": "File",
-                            "file_name": emp_name,
-                            "folder": "Home/Employee Documents",
+                            "file_name": year_str,
+                            "folder": subfolder_path,
                             "is_folder": 1,
                             "is_private": 1
                         }).insert(ignore_permissions=True)
-                        
-                    if not emp.get("date_of_joining"):
-                        continue
+        except Exception as e:
+            frappe.log_error(title="Folder Creation Error", message=f"Employee: {emp_name} — {e}")
 
-                    start_year = emp["date_of_joining"].year
-                    end_year = current_year
-                    if emp.get("relieving_date"):
-                        relieving_year = emp["relieving_date"].year
-                        end_year = min(current_year, relieving_year)
+    frappe.db.commit()
+    frappe.db.close()
 
-                    years = range(start_year, end_year + 1)
-
-                    # Create subfolders and year folders
-                    for subfolder in folders:
-                        subfolder_path = f"{parent_folder}/{subfolder}"
-                        if not frappe.db.exists("File", {"file_name": subfolder, "folder": parent_folder, "is_folder": 1}):
-                            frappe.get_doc({
-                                "doctype": "File",
-                                "file_name": subfolder,
-                                "folder": parent_folder,
-                                "is_folder": 1,
-                                "is_private": 1
-                            }).insert(ignore_permissions=True)
-                            
-                        for year in years:
-                            year_str = str(year)
-                            if not frappe.db.exists("File", {"file_name": year_str, "folder": subfolder_path, "is_folder": 1}):
-                                frappe.get_doc({
-                                    "doctype": "File",
-                                    "file_name": year_str,
-                                    "folder": subfolder_path,
-                                    "is_folder": 1,
-                                    "is_private": 1
-                                }).insert(ignore_permissions=True)
-
-                except Exception as e:
-                    frappe.db.rollback()
-                    frappe.log_error(title="Folder Creation Error", message=f"Employee: {emp.get('name', 'Unknown')} — {e}")
-
-        frappe.db.commit()
-    except Exception as e:
-        frappe.db.rollback()
-        frappe.log_error(title="Batch Folder Creation Error", message=str(e))
+def enqueue_employee_folder_jobs(batch_size=10):
+    employees = frappe.get_all(
+        "Employee",
+        filters={"status": "Active"},
+        pluck="name"
+    )
+    for i in range(0, len(employees), batch_size):
+        batch = employees[i:i+batch_size]
+        frappe.enqueue(
+            "victoryfarmsdeveloper.notifications.leave_balance_update_check.create_folders_for_employees",
+            queue='long',
+            employee_names=batch,
+            job_name=f"Create folders for employees {batch[0]} to {batch[-1]}"
+        )
