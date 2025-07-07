@@ -51,32 +51,39 @@ def leave_balance_update_check():
     except Exception as e:
         return e
 
-def create_folders_for_employees(employee_names):
+
+def create_employee_folders(employee_names):
     folders = ["Employment", "Disciplinary", "Performance Management", "Payroll Administration"]
     current_year = int(frappe.utils.nowdate()[:4])
 
     for emp_name in employee_names:
         try:
             emp = frappe.get_doc("Employee", emp_name)
-            parent_folder = f"Home/Employee Documents/{emp.name}"
-
-            # Ensure Employee folder exists
-            if not frappe.db.exists("File", {"file_name": emp.name, "folder": "Home/Employee Documents", "is_folder": 1}):
-                continue
-
             if not emp.date_of_joining:
                 continue
 
-            start_year = emp.date_of_joining.year
-            end_year = current_year
-            if emp.relieving_date:
-                relieving_year = emp.relieving_date.year
-                end_year = min(current_year, relieving_year)
+            parent_folder = f"Home/Employee Documents/{emp.name}"
 
+            # Step 1: Create the main Employee folder
+            if not frappe.db.exists("File", {"file_name": emp.name, "folder": "Home/Employee Documents", "is_folder": 1}):
+                frappe.get_doc({
+                    "doctype": "File",
+                    "file_name": emp.name,
+                    "folder": "Home/Employee Documents",
+                    "is_folder": 1,
+                    "is_private": 1
+                }).insert(ignore_permissions=True)
+
+            # Step 2: Determine year range
+            start_year = emp.date_of_joining.year
+            end_year = emp.relieving_date.year if emp.relieving_date else current_year
             years = range(start_year, end_year + 1)
 
+            # Step 3: Create subfolders and year folders
             for subfolder in folders:
                 subfolder_path = f"{parent_folder}/{subfolder}"
+                
+                # Create subfolder
                 if not frappe.db.exists("File", {"file_name": subfolder, "folder": parent_folder, "is_folder": 1}):
                     frappe.get_doc({
                         "doctype": "File",
@@ -86,33 +93,32 @@ def create_folders_for_employees(employee_names):
                         "is_private": 1
                     }).insert(ignore_permissions=True)
 
+                # Create year folders
                 for year in years:
-                    year_str = str(year)
-                    if not frappe.db.exists("File", {"file_name": year_str, "folder": subfolder_path, "is_folder": 1}):
+                    year_folder = str(year)
+                    if not frappe.db.exists("File", {"file_name": year_folder, "folder": subfolder_path, "is_folder": 1}):
                         frappe.get_doc({
                             "doctype": "File",
-                            "file_name": year_str,
+                            "file_name": year_folder,
                             "folder": subfolder_path,
                             "is_folder": 1,
                             "is_private": 1
                         }).insert(ignore_permissions=True)
+
         except Exception as e:
-            frappe.log_error(title="Folder Creation Error", message=f"Employee: {emp_name} — {e}")
+            frappe.log_error(title="Employee Folder Creation Error", message=f"{emp_name}: {e}")
 
     frappe.db.commit()
-    frappe.db.close()
 
-def enqueue_employee_folder_jobs(batch_size=10):
-    employees = frappe.get_all(
-        "Employee",
-        filters={"status": "Active"},
-        pluck="name"
-    )
+def enqueue_employee_folder_creation(batch_size=5):
+    employees = frappe.get_all("Employee", filters={"status": "Active"}, pluck="name")
     for i in range(0, len(employees), batch_size):
         batch = employees[i:i+batch_size]
         frappe.enqueue(
-            "victoryfarmsdeveloper.notifications.leave_balance_update_check.create_folders_for_employees",
-            queue='long',
+            method="victoryfarmsdeveloper.notifications.leave_balance_update_check.create_employee_folders",
+            queue="long",
+            timeout=None,
+            is_async=True,
             employee_names=batch,
-            job_name=f"Create folders for employees {batch[0]} to {batch[-1]}"
+            job_name=f"Create folders for employees [{batch[0]} - {batch[-1]}]"
         )
