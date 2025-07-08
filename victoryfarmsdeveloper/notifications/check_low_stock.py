@@ -174,7 +174,6 @@ def check_branch_low_stock():
                         frappe.sendmail(
                             recipients=branch_specific,
                             cc=ALWAYS_RECIPIENTS,
-                            bcc="christinek@victoryfarmskenya.com",
                             subject=subject,
                             message=message,
                             expose_recipients="header",
