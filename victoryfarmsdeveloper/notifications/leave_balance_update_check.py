@@ -1,6 +1,7 @@
 import datetime
 import frappe
 from hrms.hr.doctype.leave_application.leave_application import get_leave_balance_on
+from frappe.utils import today, get_first_day, get_last_day, add_months
 
 def leave_balance_update_check():
     """
@@ -50,6 +51,69 @@ def leave_balance_update_check():
                 frappe.log_error(f"Error processing Leave Balance Notification {app['name']}: {app_err}", "Leave Balance Notification")
     except Exception as e:
         return e
+
+def create_long_weekend_leave_allocation():
+    leave_type = "Long Weekend"
+    today_date = today()
+
+    try:
+        start_of_month = get_first_day(today_date)
+        end_of_month = get_last_day(today_date)
+
+        employees = frappe.get_all(
+            "Employee",
+            filters={
+                "status": "Active",
+                "custom_location": "Roo Bay Farm",
+                "grade": ("like", "M%")
+            },
+            fields=["name"]
+        )
+
+        created_count = 0
+
+        for emp in employees:
+            exists = frappe.db.exists(
+                "Leave Allocation",
+                {
+                    "employee": emp.name,
+                    "leave_type": leave_type,
+                    "from_date": start_of_month,
+                    "to_date": end_of_month,
+                    "docstatus": ["!=", 2]
+                }
+            )
+            if not exists:
+                try:
+                    doc = frappe.new_doc("Leave Allocation")
+                    doc.employee = emp.name
+                    doc.leave_type = leave_type
+                    doc.from_date = start_of_month
+                    doc.to_date = end_of_month
+                    doc.new_leaves_allocated = 2.0
+                    doc.total_leaves_allocated = 2.0
+                    doc.carry_forward = False
+                    doc.ignore_validate = True
+                    doc.save()
+                    doc.submit()
+                    frappe.db.commit()
+                    created_count += 1
+                except Exception as e:
+                    frappe.log_error(
+                        title="Leave Allocation Error",
+                        message=f"Failed for Employee: {emp.name}\nError: {frappe.get_traceback()}"
+                    )
+
+        frappe.log_error(
+            title="Long Weekend Leave Allocation Summary",
+            message=f"{created_count} leave allocations created on {today_date}."
+        )
+
+    except Exception as e:
+        frappe.log_error(
+            title="Leave Allocation Script Failure",
+            message=frappe.get_traceback()
+        )
 
 
 def create_employee_folders(employee_names):
