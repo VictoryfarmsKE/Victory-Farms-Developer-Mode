@@ -206,6 +206,9 @@ scheduler_events = {
         ],
         "0 12,15 * * *": [
             "victoryfarmsdeveloper.notifications.check_low_stock.check_branch_low_stock"
+        ],
+        "0 0 1 * *": [
+            "victoryfarmsdeveloper.notifications.leave_balance_update_check.create_long_weekend_leave_allocation"
         ]
         
     }
