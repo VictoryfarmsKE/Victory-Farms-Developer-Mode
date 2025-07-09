@@ -39,11 +39,13 @@ def check_low_stock():
         }
 
 def check_branch_low_stock():
-    frappe.log_error("check_branch_low_stock triggered", "Low Stock DEBUG")
+    frappe.log_error("Low Stock Automated Message", "running check_branch_low_stock triggered")
 
     try:
+        # Email recipients per region
         RECIPIENTS = {
             "South America - VFL": ["merving@victoryfarmskenya.com"],
+            # "South America - VFL": ["christinek@victoryfarmskenya.com"],
             "Antarctica - VFL": ["teresiak@victoryfarmskenya.com"],
             "North America - VFL": ["winniea@victoryfarmskenya.com"],
             "Europe - VFL": ["evans.otieno@victoryfarmskenya.com"],
@@ -79,8 +81,7 @@ def check_branch_low_stock():
         posting_date = now.strftime("%Y-%m-%d")
         posting_time = now.strftime("%H:%M:%S")
 
-        try:
-            allowed_parents = [
+        allowed_parents = [
                 "South America - VFL",
                 "Antarctica - VFL",
                 "North America - VFL",
@@ -88,8 +89,9 @@ def check_branch_low_stock():
                 "Asia - VFL",
                 "Africa - VFL",
                 "Victory Fresh - VFL"
-            ]
+        ]
 
+        try:
             branches = frappe.get_all(
                 "Warehouse",
                 filters={
@@ -98,9 +100,14 @@ def check_branch_low_stock():
                 },
                 fields=["name", "parent_warehouse"]
             )
-        except Exception as e:
-            frappe.log_error(frappe.get_traceback(), "Failed to fetch Branch Warehouses")
+        except Exception:
             return
+    
+        all_branch_messages = []
+        all_email_recipients = set(ALWAYS_RECIPIENTS)
+        all_sms_recipients = set(SMS_ALWAYS_RECIPIENTS)
+
+        branch_index = 1
 
         for branch in branches:
             try:
@@ -109,7 +116,7 @@ def check_branch_low_stock():
 
                 if parent_warehouse not in allowed_parents:
                     continue
-                
+
                 low_stock_items = []
 
                 for item_code in ITEM_CODES:
@@ -117,77 +124,85 @@ def check_branch_low_stock():
                         stock_balance = get_stock_balance_for(item_code, branch_name, posting_date, posting_time)
                         qty = stock_balance.get("qty", 0)
 
-                        if qty <= MIN_STOCK_THRESHOLD:
+                        if 0 < qty <= MIN_STOCK_THRESHOLD:
                             low_stock_items.append(f"{item_code} (Qty: {qty})")
-                    except Exception as e:
-                        frappe.log_error(
-                            frappe.get_traceback(),
-                            f"Stock fetch failed for Item: {item_code} in Branch: {branch_name}"
-                        )
+                        else:
+                            continue
+                    except Exception:
+                        return
+                        # frappe.log_error(
+                        #     frappe.get_traceback(),
+                        #     f"Stock fetch failed for Item: {item_code} in Branch: {branch_name}"
+                        # )
 
                 if low_stock_items:
-                    subject = f"⚠️ Low Stock Alert at {branch_name}"
-                    message = (
-                        f"Hello,<br><br>Be informed that branch {branch_name} is below the minimum stock 50 Kg stock for size:<br><br>"
-                        f"Please submit an order for a stock up from VLC as soon as possible<br>" 
-                        + "<br>".join(low_stock_items)
-                    ) 
-                    parent_key = parent_warehouse.strip()
-                    branch_specific = RECIPIENTS.get(parent_key, [])
-                    recipients = list(ALWAYS_RECIPIENTS)
-                    recipients.extend(branch_specific)
-                    recipients = list(set(recipients)) 
-                    
-                    sms_message = f"Be informed that branch {branch_name} is below the 50kg minimum stock. Please submit an order for a stock up from VLC as soon as possible. <br/> " + ", ".join(low_stock_items)
+                    items_str = ", ".join(low_stock_items)
+                    branch_message = f"{branch_name} #{branch_index} is short on: {items_str}"
+                    all_branch_messages.append(branch_message)
+                    branch_index += 1
 
-                    # Get SMS recipients
-                    sms_recipients = list(SMS_ALWAYS_RECIPIENTS)
-                    sms_branch_recipient = SMS_RECIPIENTS.get(parent_key)
-                    if sms_branch_recipient:
-                        sms_recipients.append(sms_branch_recipient)
+                    all_email_recipients.update(RECIPIENTS.get(parent_warehouse, []))
+                    if SMS_RECIPIENTS.get(parent_warehouse):
+                        all_sms_recipients.add(SMS_RECIPIENTS[parent_warehouse])
 
-                    # Deduplicate
-                    sms_recipients = list(set(sms_recipients))
+            except Exception:
+                return
+        if all_branch_messages:
+            try:
+                subject = "⚠️ Low Stock Alert: Nairobi Region Branches"
 
-                    # Send SMS to each number
-                    for mobile_no in sms_recipients:
-                        try:
-                            response = frappe.call(
-                                "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.sms_settings.sms_settings.send_sms",
-                                receiver_list=json.dumps([mobile_no]),
-                                msg=sms_message
-                            )
-                            if response:
-                                try:
-                                    response_json = json.loads(response)
-                                    frappe.log_error(str(response_json), f"SMS Sent to {mobile_no}")
-                                except json.JSONDecodeError as e:
-                                    frappe.log_error(f"Invalid JSON response for {mobile_no}: {e}", "SMS Sending Error")
-                        except Exception:
-                            frappe.log_error(
-                                frappe.get_traceback(),
-                                f"Failed to send SMS to {mobile_no} for branch {branch_name}"
-                            )
-
-
-                    try:
-                        frappe.sendmail(
-                            recipients=branch_specific,
-                            cc=ALWAYS_RECIPIENTS,
-                            subject=subject,
-                            message=message,
-                            expose_recipients="header",
-                            now=True
-                        )
-                    except Exception as e:
-                        frappe.log_error(
-                            frappe.get_traceback(),
-                            f"Failed to send email for branch {branch_name}"
-                        )
-            except Exception as e:
+                email_message = (
+                    f"Hello,<br><br>"
+                    f"Be informed that the following branches are below the minimum stock size of 50kgs for different sizes:<br><br>"
+                    + "<hr>".join(all_branch_messages)
+                    + "<br><br>Please ensure the branches submit an order for stock up from VLC as soon as possible."
+                )
+                frappe.sendmail(
+                    recipients=list(all_email_recipients),
+                    bcc="christinek@victoryfarmskenya.com",
+                    subject=subject,
+                    message=email_message,
+                    now=True
+                )
+            except Exception:
                 frappe.log_error(
                     frappe.get_traceback(),
-                    f"Error processing branch {branch.get('name', 'unknown')}"
+                    "Failed to send low stock summary email"
                 )
-    except Exception as e:
+
+            try:
+                sms_message = (
+                    "Hello, Be informed that the following branches are below the minimum stock size of 50kgs for different sizes:\n\n"
+                    + "\n".join(all_branch_messages)
+                    + "\n\nPlease ensure the branches submit an order for stock up from VLC as soon as possible."
+                )
+
+                for mobile_no in all_sms_recipients:
+                    try:
+                        response = frappe.call(
+                            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.sms_settings.sms_settings.send_sms",
+                            receiver_list=json.dumps([mobile_no]),
+                            msg=sms_message
+                        )
+                        if response:
+                            try:
+                                response_json = json.loads(response)
+                                frappe.log_error(str(response_json), f"SMS Sent to {mobile_no}")
+                            except json.JSONDecodeError as e:
+                                frappe.log_error(f"Invalid JSON response for {mobile_no}: {e}", "SMS Sending Error")
+                    except Exception:
+                        frappe.log_error(
+                            frappe.get_traceback(),
+                            f"Failed to send SMS to {mobile_no}"
+                        )
+            except Exception:
+                frappe.log_error(
+                    frappe.get_traceback(),
+                    "SMS preparation failed"
+                )
+
+        else:
+            frappe.log_error("No branches had low stock. No email or SMS sent.", "Low Stock Check")
+
+    except Exception:
         frappe.log_error(frappe.get_traceback(), "Unexpected error in check_branch_low_stock")
