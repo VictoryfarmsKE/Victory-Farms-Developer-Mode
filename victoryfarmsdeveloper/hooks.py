@@ -194,6 +194,9 @@ scheduler_events = {
     "daily": [
         "victoryfarmsdeveloper.notifications.check_low_stock.check_low_stock"
     ],
+    # "hourly": [
+    #         "victoryfarmsdeveloper.notifications.leave_balance_update_check.create_employee_folders"
+    # ],
     "cron": {
         "0 7 * * *": [
             "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check"
@@ -204,6 +207,7 @@ scheduler_events = {
         "0 12,15 * * *": [
             "victoryfarmsdeveloper.notifications.check_low_stock.check_branch_low_stock"
         ]
+        
     }
 }
 
