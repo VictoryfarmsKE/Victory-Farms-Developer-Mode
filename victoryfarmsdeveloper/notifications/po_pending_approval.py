@@ -1,6 +1,6 @@
 import frappe
 
-def send_pending_po_notifications(batch_size=20):
+def send_pending_po_notifications(batch_size=10):
     try:
         pending_pos = frappe.get_all(
             "Purchase Order",
@@ -78,7 +78,8 @@ def send_po_approved_notification(doc, method):
                 frappe.sendmail(
                     recipients=[supplier_email, owner_email],
                     cc =[owner_email],
-                    # bcc=["christinek@victoryfarmskenya.com"],
+                    expose_recipients="header",
+                    now=True,
                     subject=f"Purchase Order {doc.name} from Victory Farms Limited for {doc.supplier}",
                     message=(
                         f"Hello,<br><br>Please find attached a Purchase Order <b>{doc.name} for {doc.grand_total}{doc.currency}</b>.<br>"
@@ -87,6 +88,7 @@ def send_po_approved_notification(doc, method):
                         f"<br>Best Regards,<br>Victory Farms Limited<br>"
                     ),
                     attachments=[pdf_attachment]
+                    
                 )
             except Exception as e:
                     frappe.log_error(
