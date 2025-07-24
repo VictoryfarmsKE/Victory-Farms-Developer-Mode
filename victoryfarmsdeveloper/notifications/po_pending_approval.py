@@ -77,7 +77,7 @@ def send_po_approved_notification(doc, method):
                 )
                 frappe.sendmail(
                     recipients=[supplier_email, owner_email],
-                    cc =[owner_email],
+                    # cc =[owner_email],
                     expose_recipients="header",
                     now=True,
                     subject=f"Purchase Order {doc.name} from Victory Farms Limited for {doc.supplier}",
