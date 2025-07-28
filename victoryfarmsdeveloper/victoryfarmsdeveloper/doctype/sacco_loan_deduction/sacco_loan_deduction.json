@@ -1,0 +1,107 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "VF-SLD-.####",
+ "creation": "2025-07-24 15:57:25.793740",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_9a6a",
+  "employee",
+  "employee_name",
+  "period_of_payment",
+  "remaining_payments",
+  "column_break_bjsa",
+  "posting_date",
+  "loan_amount",
+  "amended_from",
+  "additional_salary"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_9a6a",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Sacco Loan Deduction",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name"
+  },
+  {
+   "fieldname": "period_of_payment",
+   "fieldtype": "Int",
+   "label": "Period of Payment"
+  },
+  {
+   "fieldname": "column_break_bjsa",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "remaining_payments",
+   "fieldtype": "Int",
+   "label": "Remaining Payments"
+  },
+  {
+   "fieldname": "loan_amount",
+   "fieldtype": "Data",
+   "label": "Loan Amount"
+  },
+  {
+   "fieldname": "additional_salary",
+   "fieldtype": "Link",
+   "label": "Additional Salary",
+   "options": "Additional Salary"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-07-25 08:42:40.522200",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Sacco Loan Deduction",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
