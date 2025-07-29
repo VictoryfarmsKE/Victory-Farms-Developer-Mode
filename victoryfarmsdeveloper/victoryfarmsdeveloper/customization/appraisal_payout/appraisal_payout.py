@@ -1,3 +1,6 @@
+# Copyright (c) 2023, Navari Limited and contributors
+# For license information, please see license.txt
+
 import frappe
 from frappe import _
 from frappe.model.document import Document
@@ -90,20 +93,9 @@ class CustomAppraisalPayout(Document):
 		return individual_score
 
 	def get_department_appraisal_score(self, department, employee=None):
-		"""
-		Returns department appraisal score.
-		If employee is provided and their date_of_joining is within the payout period,
-		only consider department scores from their joining month onwards.
-		"""
 		department_appraisal = DocType('Department Appraisal')
 		appraisal_cycle = DocType('Appraisal Cycle')
-
 		start_date = self.start_date
-		if employee:
-			date_of_joining = frappe.db.get_value("Employee", employee, "date_of_joining")
-			if date_of_joining and str(date_of_joining) > str(self.start_date):
-				# Use the later of start_date or date_of_joining
-				start_date = str(date_of_joining)
 
 		department_score = (
 			frappe.qb.from_(department_appraisal)
