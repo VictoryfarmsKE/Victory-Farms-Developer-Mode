@@ -380,7 +380,7 @@ def check_branch_low_stock():
 
                     # SMS
                     sms_msg = (
-                        f"Be informed that {branch_name} is below the minimum stock size of 50kgs on: \n{items_str}. \n\nPlease submit an order for stock up from VLC as soon as possible."
+                        f"Be informed that {branch_name} is below the minimum stock size of 50kgs on: \n{items_str}. \n\nPlease submit an order for stock up from VLC as soon as possible.\n"
                     )
                     frappe.call(
                         "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.sms_settings.sms_settings.send_sms",
