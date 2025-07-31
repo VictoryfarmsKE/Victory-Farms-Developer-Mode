@@ -97,11 +97,12 @@ class CustomAppraisalPayout(Document):
 		appraisal_cycle = DocType('Appraisal Cycle')
 		start_date = self.start_date
 
-		department_score = (
+		# Fetch all department appraisal scores in the relevant period
+		department_scores = (
 			frappe.qb.from_(department_appraisal)
 			.inner_join(appraisal_cycle)
 			.on(department_appraisal.appraisal_cycle == appraisal_cycle.name)
-			.select(department_appraisal.total_goal_score_percentage)
+			.select(department_appraisal.total_goal_score_percentage, appraisal_cycle.start_date, appraisal_cycle.end_date)
 			.where(
 				(department_appraisal.department == department)
 				& (department_appraisal.docstatus == 1)
@@ -109,8 +110,25 @@ class CustomAppraisalPayout(Document):
 				& (appraisal_cycle.end_date[start_date:self.end_date])
 			)
 		).run(as_list=True)
-		department_score = [item for sublist in department_score for item in sublist] if department_score else department_score
-		department_score = flt(sum(department_score) / len(department_score), 2) if department_score else 0
+
+		# Only count months the employee actually worked
+		if employee:
+			date_of_joining = frappe.db.get_value("Employee", employee, "date_of_joining")
+			if date_of_joining:
+				date_of_joining = frappe.utils.getdate(date_of_joining)
+				filtered_scores = []
+				for score, cycle_start, cycle_end in department_scores:
+					cycle_end_date = frappe.utils.getdate(cycle_end)
+					# Include if cycle's end date is on or after joining date
+					if cycle_end_date >= date_of_joining:
+						filtered_scores.append(score)
+				department_scores = filtered_scores
+			else:
+				department_scores = [score for score, _, _ in department_scores]
+		else:
+			department_scores = [score for score, _, _ in department_scores]
+
+		department_score = flt(sum(department_scores) / len(department_scores), 3) if department_scores else 0
 
 		return department_score
 
@@ -191,8 +209,9 @@ class CustomAppraisalPayout(Document):
 			entry.individual_score_value = (individual_score * 5) / 100
 			matrix_percent = self.get_matrix_percent(entry.individual_score)
 			individual_bonus_percent = self.get_bonus_percent(entry.bonus_potential, matrix_percent)
+   
 
-			department_score = self.get_department_appraisal_score(entry.department)
+			department_score = self.get_department_appraisal_score(entry.department, entry.employee)
 			entry.department_score = department_score
 			entry.department_score_value = (department_score * 5) / 100
 			matrix_percent = self.get_matrix_percent(entry.department_score)
