@@ -34,12 +34,12 @@ class SaccoLoanDeduction(Document):
 				ads_doc.amount = loan_amount
 				ads_doc.overwrite_salary_structure_amount = 1
 
-			if i == 0:
-				if not self.period_of_payment:
-					self.period_of_payment = 5 if self.loan_amount > 1000 else 1
-				self.db_set("remaining_payments", self.period_of_payment - 1)
-			else:
-				self.db_set("remaining_payments", self.remaining_payments - 1)
+			# if i == 0:
+			# 	if not self.period_of_payment:
+			# 		self.period_of_payment = 5 if self.loan_amount > 1000 else 1
+			# 	self.db_set("remaining_payments", self.period_of_payment - 1)
+			# else:
+			# 	self.db_set("remaining_payments", self.remaining_payments - 1)
 
 			opening_balance = (self.remaining_payments + 1) * loan_amount
 			closing_balance = self.remaining_payments * loan_amount
@@ -61,10 +61,10 @@ def create_remaining_payments():
 	if str(get_last_day(todays_date)) != str(todays_date):
 		return
 
-	ads_list = frappe.db.get_all("Store Deduction", {"remaining_payments": [">", 0], "docstatus": 1}, pluck = "name")
-	salary_component = frappe.db.get_value("Salary Component", {"is_for_store_deduction": 1})
+	ads_list = frappe.db.get_all("Sacco Loan Deduction", {"remaining_payments": [">", 0], "docstatus": 1}, pluck = "name")
+	salary_component = frappe.db.get_value("Salary Component", {"is_for_sacco_loan_deduction": 1})
 	for row in ads_list:
-		sd_doc = frappe.get_doc("Store Deduction", row)
+		sd_doc = frappe.get_doc("Sacco Loan Deduction", row)
 		emp_data = frappe.db.get_value("Employee", sd_doc.employee, ["salary_currency", "relieving_date", "status"], as_dict = 1)
 		if emp_data.status == "Inactive":
 			continue
