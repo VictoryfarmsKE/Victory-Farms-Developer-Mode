@@ -1,6 +1,7 @@
 import frappe
 from datetime import datetime
-from erpnext.stock.doctype.stock_reconciliation.stock_reconciliation import get_stock_balance_for
+# from erpnext.stock.doctype.stock_reconciliation.stock_reconciliation import get_stock_balance_for
+# from erpnext.stock.doctype.stock_reconciliation.stock_reconciliation import get_stock_balance
 import json
 
 @frappe.whitelist()
@@ -13,10 +14,11 @@ def check_low_stock():
     posting_date = now.strftime("%Y-%m-%d")
     posting_time = now.strftime("%H:%M:%S")
 
-    # Fetch stock balance
-    stock_data = get_stock_balance_for(item_code, warehouse, posting_date, posting_time)
-    
-    stock_qty = stock_data.get("qty", 0)
+    # Fetch stock balance using bin
+    stock_qty = frappe.db.get_value("Bin", 
+        {"item_code": item_code, "warehouse": warehouse},
+        "actual_qty"
+    ) or 0
 
     if stock_qty <= 300:
         # Notify users if stock is low
@@ -43,33 +45,35 @@ def check_branch_low_stock():
 
     try:
         RECIPIENTS = {
-            "South America - VFL": ["merving@victoryfarmskenya.com"],
-            "Antarctica - VFL": ["teresiak@victoryfarmskenya.com"],
-            "North America - VFL": ["winniea@victoryfarmskenya.com"],
-            "Europe - VFL": ["evans.otieno@victoryfarmskenya.com"],
-            "Asia - VFL": ["jemutair@victoryfarmskenya.com"],
-            "Africa - VFL": ["perezk@victoryfarmskenya.com"],
-            "Victory Fresh": ["josephw@victoryfarmskenya.com"],
+            # "South America - VFL": ["merving@victoryfarmskenya.com"],
+            # "Antarctica - VFL": ["teresiak@victoryfarmskenya.com"],
+            # "North America - VFL": ["winniea@victoryfarmskenya.com"],
+            # "Europe - VFL": ["evans.otieno@victoryfarmskenya.com"],
+            # "Asia - VFL": ["jemutair@victoryfarmskenya.com"],
+            # "Africa - VFL": ["perezk@victoryfarmskenya.com"],
+            # "Victory Fresh": ["josephw@victoryfarmskenya.com"],
         }
         
         ALWAYS_RECIPIENTS = [
-            "cynthiar@victoryfarmskenya.com",  # Sales Director
-            "stephennj@victoryfarmskenya.com"  # Regional Sales Manager
+            # "cynthiar@victoryfarmskenya.com",  # Sales Director
+            # "stephennj@victoryfarmskenya.com"  # Regional Sales Manager
+            "christinek@victoryfarmskenya.com"
         ]
         
         SMS_RECIPIENTS = {
-            "South America - VFL": "+254704926558",
-            "Antarctica - VFL": "+254799416393",
-            "North America - VFL": "+254795959395",
-            "Europe - VFL": "+254111996178",
-            "Asia - VFL": "+254113789815",
-            "Africa - VFL": "+254793453554",
-            "Victory Fresh - VFL": "+254746760913"
+            # "South America - VFL": "+254704926558",
+            # "Antarctica - VFL": "+254799416393",
+            # "North America - VFL": "+254795959395",
+            # "Europe - VFL": "+254111996178",
+            # "Asia - VFL": "+254113789815",
+            # "Africa - VFL": "+254793453554",
+            # "Victory Fresh - VFL": "+254746760913"
         }
 
         SMS_ALWAYS_RECIPIENTS = [
-            "+254113574233",  # Sales Director
-            "+254 711810457",  # Regional Sales Manager
+            # "+254113574233",  # Sales Director
+            # "+254 711810457",  # Regional Sales Manager
+            "+254710899291"
         ]
 
         ITEM_CODES = ["Large Size", "Medium Size", "Small Size"]
@@ -114,8 +118,10 @@ def check_branch_low_stock():
 
                 for item_code in ITEM_CODES:
                     try:
-                        stock_balance = get_stock_balance_for(item_code, branch_name, posting_date, posting_time)
-                        qty = stock_balance.get("qty", 0)
+                        qty = frappe.db.get_value("Bin",
+                            {"item_code": item_code, "warehouse": branch_name},
+                            "actual_qty"
+                        ) or 0
 
                         if qty <= MIN_STOCK_THRESHOLD:
                             low_stock_items.append(f"{item_code} (Qty: {qty})")
@@ -138,7 +144,7 @@ def check_branch_low_stock():
                     recipients.extend(branch_specific)
                     recipients = list(set(recipients)) 
                     
-                    sms_message = f"Be informed that branch {branch_name} is below the 50kg minimum stock. Please submit an order for a stock up from VLC as soon as possible. <br/> " + ", ".join(low_stock_items)
+                    sms_message = f"Be informed that branch {branch_name} is below the 50kg minimum stock. Please submit an order for a stock up from VLC as soon as possible. \n " + ", ".join(low_stock_items)
 
                     # Get SMS recipients
                     sms_recipients = list(SMS_ALWAYS_RECIPIENTS)
