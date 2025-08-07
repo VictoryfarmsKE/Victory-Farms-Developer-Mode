@@ -1,6 +1,5 @@
 import frappe
 from datetime import datetime
-from erpnext.stock.doctype.stock_reconciliation.stock_reconciliation import get_stock_balance_for
 import json
 
 @frappe.whitelist()
@@ -13,10 +12,11 @@ def check_low_stock():
     posting_date = now.strftime("%Y-%m-%d")
     posting_time = now.strftime("%H:%M:%S")
 
-    # Fetch stock balance
-    stock_data = get_stock_balance_for(item_code, warehouse, posting_date, posting_time)
-    
-    stock_qty = stock_data.get("qty", 0)
+    # Fetch stock balance using bin
+    stock_qty = frappe.db.get_value("Bin", 
+        {"item_code": item_code, "warehouse": warehouse},
+        "actual_qty"
+    ) or 0
 
     if stock_qty <= 300:
         # Notify users if stock is low
@@ -302,12 +302,13 @@ def check_branch_low_stock():
         ALWAYS_RECIPIENTS = [
             "cynthiar@victoryfarmskenya.com",
             "stephennj@victoryfarmskenya.com"
+            # "christinek@victoryfarmskenya.com"
         ]
 
         SMS_ALWAYS_RECIPIENTS = [
             "+254113574233",
-            "+254711810457"
-            # "+254710899291"
+            "+254711810457",
+            "+254710899291"
         ]
 
         ITEM_CODES = ["Large Size", "Medium Size", "Small Size"]
@@ -342,8 +343,10 @@ def check_branch_low_stock():
             low_stock_items = []
             for item_code in ITEM_CODES:
                 try:
-                    stock_balance = get_stock_balance_for(item_code, branch_name, posting_date, posting_time)
-                    qty = stock_balance.get("qty", 0)
+                    qty = frappe.db.get_value("Bin",
+                        {"item_code": item_code, "warehouse": branch_name},
+                        "actual_qty"
+                    ) or 0
                     if 0 < qty <= MIN_STOCK_THRESHOLD:
                         low_stock_items.append(f"{item_code} (Qty: {qty})")
                 except Exception:
