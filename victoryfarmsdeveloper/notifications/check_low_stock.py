@@ -306,9 +306,9 @@ def check_branch_low_stock():
         ]
 
         SMS_ALWAYS_RECIPIENTS = [
-            "+254113574233",
-            "+254711810457",
-            "+254710899291"
+            # "+254113574233",
+            "+254711810457"
+            # "+254710899291"
         ]
 
         ITEM_CODES = ["Large Size", "Medium Size", "Small Size"]
