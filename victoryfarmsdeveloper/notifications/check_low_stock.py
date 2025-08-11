@@ -415,29 +415,29 @@ def check_branch_low_stock():
             except Exception:
                 frappe.log_error(frappe.get_traceback(), "Failed to send region summary email")
 
-            try:
-                sms_message = (
-                    "Hello, Be informed that the following branches are below the minimum stock size of 50kgs for different sizes:\n\n" +
-                    "\n".join(all_branch_messages) +
-                    "\n\nPlease ensure the branches submit an order for stock up from VLC as soon as possible."
-                )
-                for mobile_no in all_sms_recipients:
-                    try:
-                        response = frappe.call(
-                            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.sms_settings.sms_settings.send_sms",
-                            receiver_list=json.dumps([mobile_no]),
-                            msg=sms_message
-                        )
-                        if response:
-                            try:
-                                response_json = json.loads(response)
-                                frappe.log_error(str(response_json), f"SMS Sent to {mobile_no}")
-                            except json.JSONDecodeError:
-                                pass
-                    except Exception:
-                        frappe.log_error(frappe.get_traceback(), f"Failed SMS to {mobile_no}")
-            except Exception:
-                frappe.log_error(frappe.get_traceback(), "SMS summary failed")
+            # try:
+            #     sms_message = (
+            #         "Hello, Be informed that the following branches are below the minimum stock size of 50kgs for different sizes:\n\n" +
+            #         "\n".join(all_branch_messages) +
+            #         "\n\nPlease ensure the branches submit an order for stock up from VLC as soon as possible."
+            #     )
+            #     for mobile_no in all_sms_recipients:
+            #         try:
+            #             response = frappe.call(
+            #                 "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.sms_settings.sms_settings.send_sms",
+            #                 receiver_list=json.dumps([mobile_no]),
+            #                 msg=sms_message
+            #             )
+            #             if response:
+            #                 try:
+            #                     response_json = json.loads(response)
+            #                     frappe.log_error(str(response_json), f"SMS Sent to {mobile_no}")
+            #                 except json.JSONDecodeError:
+            #                     pass
+            #         except Exception:
+            #             frappe.log_error(frappe.get_traceback(), f"Failed SMS to {mobile_no}")
+            # except Exception:
+            #     frappe.log_error(frappe.get_traceback(), "SMS summary failed")
 
         else:
             frappe.log_error("No branches with low stock. No email/SMS sent.", "Low Stock Summary")
