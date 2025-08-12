@@ -307,7 +307,7 @@ def check_branch_low_stock():
 
         SMS_ALWAYS_RECIPIENTS = [
             # "+254113574233",
-            "+254711810457"
+            # "+254711810457"
             # "+254710899291"
         ]
 
@@ -334,64 +334,64 @@ def check_branch_low_stock():
         all_sms_recipients = set(SMS_ALWAYS_RECIPIENTS)
         branch_index = 1
 
-        # for branch in branches:
-        #     branch_name = branch["name"]
-        #     parent_warehouse = branch.get("parent_warehouse", "").strip()
-        #     if parent_warehouse not in allowed_parents:
-        #         continue
+        for branch in branches:
+            branch_name = branch["name"]
+            parent_warehouse = branch.get("parent_warehouse", "").strip()
+            if parent_warehouse not in allowed_parents:
+                continue
 
-        #     low_stock_items = []
-        #     for item_code in ITEM_CODES:
-        #         try:
-        #             qty = frappe.db.get_value("Bin",
-        #                 {"item_code": item_code, "warehouse": branch_name},
-        #                 "actual_qty"
-        #             ) or 0
-        #             if 0 < qty <= MIN_STOCK_THRESHOLD:
-        #                 low_stock_items.append(f"{item_code} (Qty: {qty})")
-        #         except Exception:
-        #             continue  # Ignore failed fetch
+            low_stock_items = []
+            for item_code in ITEM_CODES:
+                try:
+                    qty = frappe.db.get_value("Bin",
+                        {"item_code": item_code, "warehouse": branch_name},
+                        "actual_qty"
+                    ) or 0
+                    if 0 < qty <= MIN_STOCK_THRESHOLD:
+                        low_stock_items.append(f"{item_code} (Qty: {qty})")
+                except Exception:
+                    continue
 
-        #     if not low_stock_items:
-        #         continue
+            if not low_stock_items:
+                continue
 
-        #     items_str = ", ".join(low_stock_items)
-        #     branch_message = f"{branch_name} #{branch_index} is short on: {items_str}"
-        #     all_branch_messages.append(branch_message)
-        #     branch_index += 1
+            items_str = ", ".join(low_stock_items)
+            branch_message = f"{branch_name} #{branch_index} is short on: {items_str}"
+            all_branch_messages.append(branch_message)
+            branch_index += 1
 
-        #     # Add region contacts
-        #     all_email_recipients.update(RECIPIENTS.get(parent_warehouse, []))
-        #     if SMS_RECIPIENTS.get(parent_warehouse):
-        #         all_sms_recipients.add(SMS_RECIPIENTS[parent_warehouse])
+            # Add region contacts
+            all_email_recipients.update(RECIPIENTS.get(parent_warehouse, []))
+            if SMS_RECIPIENTS.get(parent_warehouse):
+                all_sms_recipients.add(SMS_RECIPIENTS[parent_warehouse])
 
-        #     # Send to individual branch contacts
-        #     contact = next((c for c in BRANCH_CONTACTS if c["branch_name"] == branch_name), None)
-        #     if contact:
-        #         try:
-        #             # Email
-        #             branch_email_msg = (
-        #                 f"Hello,<br><br>Be informed that {branch_name} is below the minimum stock size of 50kgs for different sizes<br><b>{items_str}</b><br><br>"
-        #                 "Please submit an order for stock up from VLC as soon as possible."
-        #             )
-        #             frappe.sendmail(
-        #                 recipients=[contact["email_address"]],
-        #                 subject=f"⚠️ Low Stock Alert - {branch_name}",
-        #                 message=branch_email_msg,
-        #                 now=True
-        #             )
+            # Send to individual branch contacts
+            # contact = next((c for c in BRANCH_CONTACTS if c["branch_name"] == branch_name), None)
+            # if contact:
+                # try:
+                #     # Email
+                #     branch_email_msg = (
+                #         f"Hello,<br><br>Be informed that {branch_name} is below the minimum stock size of 50kgs for different sizes<br><b>{items_str}</b><br><br>"
+                #         "Please submit an order for stock up from VLC as soon as possible."
+                #     )
+                #     frappe.sendmail(
+                #         recipients=[contact["email_address"]],
+                #         subject=f"⚠️ Low Stock Alert - {branch_name}",
+                #         message=branch_email_msg,
+                #         now=True
+                #     )
 
-        #             # SMS
-        #             sms_msg = (
-        #                 f"Be informed that {branch_name} is below the minimum stock size of 50kgs on: \n{items_str}. \n\nPlease submit an order for stock up from VLC as soon as possible.\n"
-        #             )
-        #             frappe.call(
-        #                 "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.sms_settings.sms_settings.send_sms",
-        #                 receiver_list=json.dumps([contact["mobile_number"]]),
-        #                 msg=sms_msg
-        #             )
-        #         except Exception:
-        #             frappe.log_error(frappe.get_traceback(), f"Failed to notify {branch_name} contacts")
+                #     # SMS
+                #     sms_msg = (
+                #         f"Be informed that {branch_name} is below the minimum stock size of 50kgs on: \n{items_str}. \n\nPlease submit an order for stock up from VLC as soon as possible.\n"
+                #     )
+                #     frappe.call(
+                #         "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.sms_settings.sms_settings.send_sms",
+                #         receiver_list=json.dumps([contact["mobile_number"]]),
+                #         msg=sms_msg
+                #     )
+                # except Exception:
+                #     frappe.log_error(frappe.get_traceback(), f"Failed to notify {branch_name} contacts")
 
         # Send regional summary
         if all_branch_messages:
