@@ -57,7 +57,7 @@ def check_branch_low_stock():
         ALWAYS_RECIPIENTS = [
             # "cynthiar@victoryfarmskenya.com",  # Sales Director
             # "stephennj@victoryfarmskenya.com"  # Regional Sales Manager
-            "christinek@victoryfarmskenya.com"
+            # "christinek@victoryfarmskenya.com"
         ]
         
         SMS_RECIPIENTS = {
@@ -73,7 +73,7 @@ def check_branch_low_stock():
         SMS_ALWAYS_RECIPIENTS = [
             # "+254113574233",  # Sales Director
             # "+254 711810457",  # Regional Sales Manager
-            "+254710899291"
+            # "+254710899291"
         ]
 
         ITEM_CODES = ["Large Size", "Medium Size", "Small Size"]
