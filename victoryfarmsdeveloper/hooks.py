@@ -207,7 +207,7 @@ scheduler_events = {
         "0 0 1 * *": [
             "victoryfarmsdeveloper.notifications.leave_balance_update_check.create_long_weekend_leave_allocation"
         ],
-        "30 8 20-31 * *": [
+        "30 8 25-31 * *": [
             "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal.send_pending_appraisal_notifications"
         ]
     }
