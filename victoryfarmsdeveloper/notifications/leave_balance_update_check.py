@@ -187,7 +187,7 @@ def enqueue_employee_folder_creation(batch_size=5):
             job_name=f"Create folders for employees [{batch[0]} - {batch[-1]}]"
         )
         
-def process_checkins_without_shift(batch_size=100, start=0):
+def process_checkins_without_shift(batch_size=250, start=0):
     checkins = frappe.get_all(
         "Employee Checkin",
         filters={"shift": ["is", "not set"]},
