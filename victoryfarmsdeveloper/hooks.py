@@ -199,7 +199,7 @@ scheduler_events = {
         "0 7 * * *": [
             "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check"
         ],
-        "0 22 * * *": [
+        "0 23 * * *": [
             "victoryfarmsdeveloper.notifications.po_pending_approval.send_pending_po_notifications"
         ],
         "0 12,15 * * *": [
@@ -207,7 +207,13 @@ scheduler_events = {
         ],
         "0 0 28-31 * *": [
             "victoryfarmsdeveloper.victoryfarmsdeveloper.doctype.sacco_loan_deduction.sacco_loan_deduction.create_remaining_payments"
-        ]   
+        ],
+        "0 0 1 * *": [
+            "victoryfarmsdeveloper.notifications.leave_balance_update_check.create_long_weekend_leave_allocation"
+        ],
+        "30 8 25-31 * *": [
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal.send_pending_appraisal_notifications"
+        ]
     }
 }
 
