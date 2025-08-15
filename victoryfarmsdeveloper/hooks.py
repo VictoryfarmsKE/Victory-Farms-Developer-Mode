@@ -193,9 +193,7 @@ override_doctype_class = {
 
 scheduler_events = {
     "daily": [
-        "victoryfarmsdeveloper.notifications.check_low_stock.check_low_stock"
-    ],
-    "hourly": [
+        "victoryfarmsdeveloper.notifications.check_low_stock.check_low_stock",
         "victoryfarmsdeveloper.notifications.leave_balance_update_check.process_checkins_without_shift"
     ],
     "cron": {
