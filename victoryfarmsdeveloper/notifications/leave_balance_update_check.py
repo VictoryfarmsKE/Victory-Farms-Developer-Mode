@@ -186,3 +186,37 @@ def enqueue_employee_folder_creation(batch_size=5):
             employee_names=batch,
             job_name=f"Create folders for employees [{batch[0]} - {batch[-1]}]"
         )
+        
+def process_checkins_without_shift(batch_size=100, start=0):
+    checkins = frappe.get_all(
+        "Employee Checkin",
+        filters={"shift": ["is", "not set"]},
+        fields=["name"],
+        start=start,
+        page_length=batch_size
+    )
+    checkin_names = [c.name for c in checkins]
+    if checkin_names:
+        # Your logic to update/fetch shift for these checkins
+        frappe.call("hrms.hr.doctype.employee_checkin.employee_checkin.bulk_fetch_shift", checkins=checkin_names)
+        # If batch was full, there may be more to process
+        if len(checkin_names) == batch_size:
+            frappe.enqueue(
+                "victoryfarmsdeveloper.notifications.leave_balance_update_check.process_checkins_without_shift",
+                batch_size=batch_size,
+                start=start + batch_size,
+                queue="long",
+                timeout=600,
+                is_async=True
+            )
+            
+@frappe.whitelist()
+def start_background_shift_update():
+    frappe.enqueue(
+        "victoryfarmsdeveloper.notifications.leave_balance_update_check.process_checkins_without_shift",
+        batch_size=100,
+        start=0,
+        queue="long",
+        timeout=600,
+        is_async=True
+    )
