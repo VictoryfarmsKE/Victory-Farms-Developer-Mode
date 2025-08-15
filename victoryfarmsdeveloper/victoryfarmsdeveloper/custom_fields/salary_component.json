@@ -1,0 +1,13 @@
+{
+ "Salary Component": [
+  {
+   "dt": "Salary Component",
+   "fieldname": "is_for_loan_deduction",
+   "fieldtype": "Check",
+   "insert_after": "ignore_for_jv",
+   "is_system_generated": 1,
+   "label": "Is for Loan Deduction",
+   "module": "VictoryFarmsDeveloper"
+  }
+ ]
+}
