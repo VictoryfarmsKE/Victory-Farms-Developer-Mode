@@ -220,11 +220,11 @@ doc_events = {
     },
     "Purchase Order": {
         "on_update": "victoryfarmsdeveloper.notifications.po_pending_approval.send_po_approved_notification"
+    },
+    "Stock Entry": {
+        "before_save": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_save_stock_entry",
+        "before_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_submit_stock_entry"
     }
-    # "Stock Entry": {
-    #     "before_save": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_save_stock_entry",
-    #     "before_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_submit_stock_entry"
-    # }
 }
 
 
