@@ -149,7 +149,8 @@ has_permission = {
 # }
 override_doctype_class = {
     "Stock Entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry",
-    "Appraisal Cycle": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_cycle.appraisal_cycle.CustomAppraisalCycle"
+    "Appraisal Cycle": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_cycle.appraisal_cycle.CustomAppraisalCycle",
+    "Appraisal Payout": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_payout.appraisal_payout.CustomAppraisalPayout"
     # "Leave Application": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.leave_application.leave_application.CustomLeaveApplication"
 }
 # Document Events
@@ -203,6 +204,9 @@ scheduler_events = {
         ],
         "0 12,15 * * *": [
             "victoryfarmsdeveloper.notifications.check_low_stock.check_branch_low_stock"
+        ],
+        "0 0 28-31 * *": [
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.doctype.sacco_loan_deduction.sacco_loan_deduction.create_remaining_payments"
         ],
         "0 0 1 * *": [
             "victoryfarmsdeveloper.notifications.leave_balance_update_check.create_long_weekend_leave_allocation"

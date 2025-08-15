@@ -1,0 +1,63 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "prompt",
+ "creation": "2025-08-06 09:11:37.262600",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_mzql",
+  "sacco_loan_deduction",
+  "loan_amount",
+  "opening_balance",
+  "closing_balance"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_mzql",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "opening_balance",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Opening Balance"
+  },
+  {
+   "fieldname": "closing_balance",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Closing Balance"
+  },
+  {
+   "fieldname": "sacco_loan_deduction",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Sacco Loan Deduction",
+   "options": "Sacco Loan Deduction"
+  },
+  {
+   "fieldname": "loan_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Loan Amount"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-08-06 09:12:43.012925",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Sacco Loan Details",
+ "naming_rule": "Set by user",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -207,7 +207,7 @@ def before_save_stock_entry(doc, method):
             and doc.destination_warehouse_type in ["Branch", "LC"]
             and doc.from_warehouse_type == "LC"
         ):
-            if previous_state != "Transfer Pending Confirmation-Driver" and doc.workflow_state == "Transfer Pending Confirmation-Driver":
+          if previous_state != "Transfer Pending Confirmation-Driver" and doc.workflow_state == "Transfer Pending Confirmation-Driver":
                 # Auto-create CoA if workflow state is "Transfer Pending Confirmation - Driver"
                 if not frappe.db.exists("Certificate of Analysis", {"stock_entry_reference": doc.name}):
                     coa = frappe.new_doc("Certificate of Analysis")
@@ -225,7 +225,6 @@ def before_submit_stock_entry(doc, method):
     #Get previous workflow state
     previous_doc = doc.get_doc_before_save()
     previous_state = previous_doc.workflow_state if previous_doc else None
-    
     if (
             doc.stock_entry_type == "Material Transfer"
             and doc.items
@@ -234,7 +233,6 @@ def before_submit_stock_entry(doc, method):
             and doc.destination_warehouse_type in ["Branch", "LC"]
             and doc.from_warehouse_type == "LC"
         ):
-    # :if doc.stock_entry_type == "Material Transfer" and doc.items and all(item.item_group in ["Gutted Fish-Tilapia", "Crates"] for item in doc.items) and doc.destination_warehouse_type in ["Branch", "LC"] and doc.from_warehouse_type == "LC":
         if previous_state != "Transfer Confirmed by Driver" and doc.workflow_state == "Transfer Confirmed by Driver":
         # Prevent final confirmation without submitted CoA
             submitted_coa = frappe.get_all("Certificate of Analysis", {
