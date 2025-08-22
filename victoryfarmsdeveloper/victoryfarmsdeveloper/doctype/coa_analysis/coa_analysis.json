@@ -13,6 +13,7 @@
  ],
  "fields": [
   {
+   "columns": 2,
    "fieldname": "physical_attributes",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -20,6 +21,7 @@
    "read_only": 1
   },
   {
+   "columns": 2,
    "fieldname": "specification",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -28,26 +30,31 @@
    "read_only": 1
   },
   {
+   "columns": 2,
    "fieldname": "test_results",
    "fieldtype": "Data",
    "label": "Test Results "
   },
   {
+   "columns": 2,
    "fieldname": "test_method",
-   "fieldtype": "Data",
+   "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Test Method  "
+   "label": "Test Method  ",
+   "options": "Physical Analysis\nLaboratory Analysis"
   }
  ],
+ "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-16 21:13:03.862402",
+ "modified": "2025-08-22 13:12:41.665517",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "CoA Analysis",
  "owner": "Administrator",
  "permissions": [],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

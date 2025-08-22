@@ -23,12 +23,13 @@ frappe.ui.form.on('Certificate of Analysis', {
 		// Add attributes to analysis table
 		frm.clear_table('analysis');
 		const attributes = [
-			{ physical_attribute: "Appearance", specification: "Shiny, Bright, Iridescent" },
-			{ physical_attribute: "Odor", specification: "Natural Seaweed" },
+			{ physical_attribute: "General Appearance", specification: "Shiny, Bright, Iridescent" },
+			{ physical_attribute: "Odor (Gills)", specification: "Natural Seaweed" },
 			{ physical_attribute: "Color of Gills", specification: "Bright, red" },
-			{ physical_attribute: "Body Texture", specification: "Firm and elastic" },
+			{ physical_attribute: "Slime", specification: "Clear, Transparent" },
 			{ physical_attribute: "Eye", specification: "Clear and bulging" },
-			{ physical_attribute: "Slime", specification: "Clear, Transparent" }
+			{ physical_attribute: "Body Texture", specification: "Firm and elastic" }
+			
 		];
 
 		attributes.forEach(attr => {
