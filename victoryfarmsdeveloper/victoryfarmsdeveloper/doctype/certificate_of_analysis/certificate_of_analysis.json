@@ -14,7 +14,6 @@
   "column_break_w4mb7",
   "allergen_information",
   "column_break_8t26a",
-  "qc_personnel",
   "section_break_a3vso",
   "batch_number",
   "column_break_zzved",
@@ -98,13 +97,15 @@
   },
   {
    "fieldname": "packaging_type",
-   "fieldtype": "Data",
-   "label": "Packaging Type"
+   "fieldtype": "Select",
+   "label": "Packaging Type",
+   "options": "Crates\nGrease proof paper\nCartons\nRotogals"
   },
   {
    "fieldname": "storage_condition",
-   "fieldtype": "Data",
-   "label": "Storage Condition"
+   "fieldtype": "Select",
+   "label": "Storage Condition",
+   "options": "Below 4\nBelow 0\nBelow 18"
   },
   {
    "fieldname": "destination",
@@ -191,13 +192,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "qc_personnel",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "QC Personnel",
-   "options": "Employee"
-  },
-  {
    "fieldname": "column_break_8t26a",
    "fieldtype": "Column Break"
   },
@@ -206,6 +200,7 @@
    "fieldtype": "Section Break"
   },
   {
+   "columns": 4,
    "fieldname": "analysis",
    "fieldtype": "Table",
    "label": "Analysis",
@@ -233,10 +228,11 @@
    "search_index": 1
   }
  ],
+ "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-17 12:44:41.229080",
+ "modified": "2025-08-22 13:10:38.768153",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Certificate of Analysis",
@@ -256,6 +252,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
