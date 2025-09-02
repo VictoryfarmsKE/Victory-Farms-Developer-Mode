@@ -202,7 +202,7 @@ def before_save_stock_entry(doc, method):
         if (
             doc.stock_entry_type == "Material Transfer"
             and doc.items
-            and all(item.item_group in ["Gutted Fish-Tilapia", "Crates"] for item in doc.items)
+            and all(item.item_group in ["Gutted Fish-Tilapia", "Crates", "Packaging"] for item in doc.items)
             and any(item.item_group == "Gutted Fish-Tilapia" for item in doc.items)
             and doc.destination_warehouse_type in ["Branch", "LC"]
             and doc.from_warehouse_type == "LC"
@@ -228,7 +228,7 @@ def before_submit_stock_entry(doc, method):
     if (
             doc.stock_entry_type == "Material Transfer"
             and doc.items
-            and all(item.item_group in ["Gutted Fish-Tilapia", "Crates"] for item in doc.items)
+            and all(item.item_group in ["Gutted Fish-Tilapia", "Crates", "Packaging"] for item in doc.items)
             and any(item.item_group == "Gutted Fish-Tilapia" for item in doc.items)
             and doc.destination_warehouse_type in ["Branch", "LC"]
             and doc.from_warehouse_type == "LC"
