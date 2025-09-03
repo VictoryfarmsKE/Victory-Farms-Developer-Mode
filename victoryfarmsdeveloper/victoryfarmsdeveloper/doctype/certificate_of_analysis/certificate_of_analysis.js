@@ -37,8 +37,7 @@ frappe.ui.form.on('Certificate of Analysis', {
                 test_results: [
                     "Clear, transparent and uniformly spread",
                     "Becoming turbid, opaque and milky",
-                    "Thick, yellowish or green color",
-                    "Convex (Bulging) with protruding lens, transparent eye cap"
+                    "Thick, yellowish or green color"
                 ]
             },
             {
