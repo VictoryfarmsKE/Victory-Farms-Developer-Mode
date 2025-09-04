@@ -44,6 +44,7 @@ frappe.ui.form.on('Certificate of Analysis', {
                 physical_attribute: "Eye",
                 specification: "Clear and bulging",
                 test_results: [
+                    "Convex (Bulging) with protruding lens, transparent eye cap",
                     "Slightly cloudy of lens and sunken",
                     "Dull, sunken, cloudy",
                     "Sunken eyes covered with yellow slime",
