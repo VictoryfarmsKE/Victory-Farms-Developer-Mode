@@ -54,7 +54,7 @@ def get_columns() -> list[dict]:
         },
         {
             "label": _("Daily CTC"),
-            "fieldtype": "Currency",
+            "fieldtype": "Data",
             "fieldname": "ctc",
             "width": 180,
         },
