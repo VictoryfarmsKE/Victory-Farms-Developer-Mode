@@ -1,15 +1,5 @@
 # Copyright (c) 2025, Christine K and contributors
 # For license information, please see license.txt
-
-import frappe
-from frappe import _
-from frappe.utils import flt
-# Copyright (c) 2013, Frappe Technologies Pvt. Ltd. and contributors
-# For license information, please see license.txt
-
-
-from itertools import groupby
-
 import frappe
 from frappe import _
 from frappe.utils import add_days, cint, flt, getdate
@@ -87,7 +77,7 @@ def get_columns() -> list[dict]:
     ]
 
 def get_data(filters: Filters) -> list:
-    leave_types = ["Annual Leave C&D"]
+    leave_types = ["Annual Leave C&D Level"]
     active_employees = get_employees(filters)
 
     precision = cint(frappe.db.get_single_value("System Settings", "float_precision"))
