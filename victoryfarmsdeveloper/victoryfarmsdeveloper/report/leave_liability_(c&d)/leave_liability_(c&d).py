@@ -87,7 +87,7 @@ def get_columns() -> list[dict]:
     ]
 
 def get_data(filters: Filters) -> list:
-    leave_types = ["Annual Leave"]
+    leave_types = ["Annual Leave C&D"]
     active_employees = get_employees(filters)
 
     precision = cint(frappe.db.get_single_value("System Settings", "float_precision"))
