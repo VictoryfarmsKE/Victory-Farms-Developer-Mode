@@ -80,14 +80,14 @@ def get_columns() -> list[dict]:
         },
         {
             "label": _("Leave Liability"),
-            "fieldtype": "Currency",
+            "fieldtype": "Data",
             "fieldname": "leave_liability",
             "width": 180,
         },
     ]
 
 def get_data(filters: Filters) -> list:
-    leave_types = ["Annual Leave", "Annual Leave C&D Level"]
+    leave_types = ["Annual Leave C&D Level","Annual Leave"]
     active_employees = get_employees(filters)
 
     precision = cint(frappe.db.get_single_value("System Settings", "float_precision"))
@@ -103,8 +103,8 @@ def get_data(filters: Filters) -> list:
             row.employee_name = employee.employee_name
             row.employee_number = employee.employee_number
             row.department = employee.department
-            row.ctc = employee.ctc / 31
-            daily_ctc = row.ctc
+            daily_ctc = round(employee.ctc / 31, 2)
+            row.ctc = "{:.2f}".format(daily_ctc)
             row.salary_currency = employee.salary_currency
 
             leaves_taken = (
@@ -126,7 +126,8 @@ def get_data(filters: Filters) -> list:
                 closing = new_allocation + opening - (row.leaves_expired + leaves_taken)
                 row.closing_balance = flt(closing, precision)
                 closing_balance = row.closing_balance
-                row.leave_liability = closing_balance * daily_ctc
+                leave_liability = round(closing_balance * daily_ctc, 2)
+                row.leave_liability = "{:.2f}".format(leave_liability)
                 row.indent = 1
                 data.append(row)
 
@@ -149,9 +150,8 @@ def get_employees(filters: Filters) -> list[dict]:
 
     if filters.get("employee"):
         query = query.where(Employee.name == filters.get("employee"))
-
-    if filters.get("employee_status"):
-        query = query.where(Employee.status == filters.get("employee_status"))
+        
+    query = query.where(Employee.status == "Active")
 
     return query.run(as_dict=True)
 
