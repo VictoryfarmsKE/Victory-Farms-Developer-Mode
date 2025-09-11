@@ -105,7 +105,7 @@
    "fieldname": "storage_condition",
    "fieldtype": "Select",
    "label": "Storage Condition",
-   "options": "Below 4\nBelow 0\nBelow 18"
+   "options": "Below 4\nBelow 0\nBelow -18"
   },
   {
    "fieldname": "destination",
@@ -232,7 +232,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-08-22 13:10:38.768153",
+ "modified": "2025-09-02 14:08:35.654777",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Certificate of Analysis",

@@ -1,9 +1,8 @@
 // Copyright (c) 2025, Christine K and contributors
 // For license information, please see license.txt
-/* eslint-disable */
 
-frappe.query_reports["Leave Liability Report"] = {
-	"filters": [
+frappe.query_reports["Leave Liability (C&D)"] = {
+    "filters": [
         {
             "fieldname": "from_date",
             "label": __("From Date"),
@@ -27,4 +26,3 @@ frappe.query_reports["Leave Liability Report"] = {
         }
     ]
 };
-
