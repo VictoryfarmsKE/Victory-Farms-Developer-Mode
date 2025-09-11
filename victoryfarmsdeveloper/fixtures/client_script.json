@@ -69,7 +69,7 @@
   "docstatus": 0,
   "doctype": "Client Script",
   "dt": "Sales Invoice",
-  "enabled": 1,
+  "enabled": 0,
   "modified": "2025-05-27 16:38:09.744581",
   "module": "VictoryFarmsDeveloper",
   "name": "Redeem Points",
