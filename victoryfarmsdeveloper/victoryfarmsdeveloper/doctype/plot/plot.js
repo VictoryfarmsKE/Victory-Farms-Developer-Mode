@@ -6,9 +6,6 @@ frappe.ui.form.on('Plot', {
     google_map_link: function(frm) {
         const link = frm.doc.google_map_link;
         if (!link) return;
-
-        // Try to match Google Maps coordinates pattern
-        // Example: https://www.google.com/maps/place/.../@-0.1234567,34.5678901,17z/
         const match = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
         
         if (match) {
