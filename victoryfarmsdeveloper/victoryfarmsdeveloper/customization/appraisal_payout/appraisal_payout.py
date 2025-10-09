@@ -223,8 +223,14 @@ class CustomAppraisalPayout(Document):
 
 			# total_goal_score = ((entry.individual_score_value * entry.bonus_potential) + (entry.department_score_value * entry.bonus_potential_department)) / ((entry.bonus_potential + entry.bonus_potential_department)/100)
 
-			if entry.department_score_value > nv_setting_doc.min_avg_score_for_bonus and entry.individual_score_value > nv_setting_doc.min_individual_score_for_bonus:
-
+			# if entry.department_score_value > nv_setting_doc.min_avg_score_for_bonus and entry.individual_score_value > nv_setting_doc.min_individual_score_for_bonus:
+			if (
+				entry.department_score_value > nv_setting_doc.min_avg_score_for_bonus 
+				and (
+					entry.bonus_potential == 0
+					or entry.individual_score_value > nv_setting_doc.min_individual_score_for_bonus
+				)
+			):
 				if bonus_calculation_amount and individual_bonus_percent:
 					entry.individual_bonus = (individual_bonus_percent / 100) * bonus_calculation_amount
 
