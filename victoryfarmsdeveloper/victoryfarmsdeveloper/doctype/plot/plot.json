@@ -11,15 +11,31 @@
   "region",
   "perimeter",
   "proposed_crop",
+  "variety",
   "long_location",
   "lat_location",
   "column_break_eoge",
   "contract_holder",
   "contract_offtaker",
+  "plot_owner",
+  "contract_signing_date",
   "acreage",
   "section_break_nsvx",
   "google_map_link",
-  "comments"
+  "comments",
+  "tab_break_psym",
+  "section_break_c9sq",
+  "land_cleared",
+  "land_fenced",
+  "column_break_ztoa",
+  "land_ploughed",
+  "land_planted",
+  "planting_date",
+  "tab_3_tab",
+  "water_required",
+  "column_break_coqd",
+  "water_connected",
+  "drip_installed"
  ],
  "fields": [
   {
@@ -33,7 +49,8 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Contract Holder",
-   "options": "\nVictory Farms\nSeritech"
+   "options": "\nVictory Farms\nSeritech",
+   "reqd": 1
   },
   {
    "fieldname": "contract_offtaker",
@@ -45,13 +62,15 @@
    "fieldname": "region",
    "fieldtype": "Select",
    "label": "Region",
-   "options": "\nHEAP I\nHEAP II\nRoo\nMwirendia\nKanyuongo"
+   "options": "\nHEAP I\nHEAP II\nRoo\nMwirendia\nKanyuongo",
+   "reqd": 1
   },
   {
    "fieldname": "acreage",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Acreage"
+   "label": "Acreage",
+   "reqd": 1
   },
   {
    "fieldname": "lat_location",
@@ -81,10 +100,12 @@
    "label": "Perimeter"
   },
   {
+   "description": "Crop Type",
    "fieldname": "proposed_crop",
-   "fieldtype": "Data",
+   "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Proposed Crop"
+   "label": "Proposed Crop",
+   "options": "\nMoringa\nMulberry\nSesbania\nSpinach"
   },
   {
    "fieldname": "comments",
@@ -92,15 +113,107 @@
    "label": "Comments"
   },
   {
+   "description": "Google Map Link",
    "fieldname": "google_map_link",
    "fieldtype": "Small Text",
-   "label": "Google Map Link"
+   "label": "Geolocation"
+  },
+  {
+   "fieldname": "variety",
+   "fieldtype": "Select",
+   "label": "Variety",
+   "options": "\nMulberry (V1; Embu; Local)"
+  },
+  {
+   "fieldname": "plot_owner",
+   "fieldtype": "Data",
+   "label": "Plot Owner",
+   "reqd": 1
+  },
+  {
+   "fieldname": "contract_signing_date",
+   "fieldtype": "Date",
+   "label": "Contract Signing Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "water_required",
+   "fieldtype": "Select",
+   "label": "Water Required?",
+   "options": "\nYes\nNo",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.water_required == 'Yes'",
+   "fieldname": "water_connected",
+   "fieldtype": "Select",
+   "label": "Water Connected?",
+   "options": "\nYes\nNo"
+  },
+  {
+   "depends_on": "eval:doc.water_required == 'Yes'",
+   "fieldname": "drip_installed",
+   "fieldtype": "Select",
+   "label": "Drip Installed?",
+   "options": "\nYes\nNo\nN/A"
+  },
+  {
+   "fieldname": "tab_break_psym",
+   "fieldtype": "Tab Break",
+   "label": "Land Details"
+  },
+  {
+   "fieldname": "section_break_c9sq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "land_cleared",
+   "fieldtype": "Select",
+   "label": "Land Cleared?",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "land_fenced",
+   "fieldtype": "Select",
+   "label": "Land Fenced?",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "column_break_ztoa",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "land_ploughed",
+   "fieldtype": "Select",
+   "label": "Land Ploughed?",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "land_planted",
+   "fieldtype": "Select",
+   "label": "Land Planted?",
+   "options": "\nYes\nNot Planted"
+  },
+  {
+   "depends_on": "eval:doc.land_planted == 'Yes'",
+   "fieldname": "planting_date",
+   "fieldtype": "Date",
+   "label": "Planting Date"
+  },
+  {
+   "fieldname": "tab_3_tab",
+   "fieldtype": "Tab Break",
+   "label": "Water Details"
+  },
+  {
+   "fieldname": "column_break_coqd",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-07 22:25:35.834873",
+ "modified": "2025-10-13 10:21:53.036646",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Plot",
