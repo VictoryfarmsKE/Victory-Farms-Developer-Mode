@@ -62,7 +62,7 @@
    "fieldname": "region",
    "fieldtype": "Select",
    "label": "Region",
-   "options": "\nHEAP I\nHEAP II\nRoo\nMwirendia\nKanyuongo",
+   "options": "\nRagwe\nRoo\nKanyuongo\nMwirendia",
    "reqd": 1
   },
   {
@@ -213,7 +213,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-13 10:21:53.036646",
+ "modified": "2025-10-13 10:25:01.286559",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Plot",

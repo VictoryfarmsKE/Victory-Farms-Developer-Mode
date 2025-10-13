@@ -3,27 +3,48 @@
 
 
 frappe.ui.form.on('Plot', {
-    google_map_link: function(frm) {
+    async google_map_link(frm) {
         const link = frm.doc.google_map_link;
         if (!link) return;
-        const match = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-        
-        if (match) {
-            const lat = match[1];
-            const lng = match[2];
-            frm.set_value('lat_location', lat);
-            frm.set_value('long_location', lng);
-            frappe.show_alert({
-                message: __('Latitude and Longitude extracted from Google Maps link.'),
-                indicator: 'green'
+        if (link.includes('maps.app.goo.gl')) {
+            frappe.call({
+                method: 'victoryfarmsdeveloper.victoryfarmsdeveloper.doctype.plot.plot.resolve_google_maps_link',
+                args: { short_url: link },
+                callback: function(r) {
+                    if (r.message && r.message.lat && r.message.lng) {
+                        frm.set_value('lat_location', r.message.lat);
+                        frm.set_value('long_location', r.message.lng);
+                        frappe.show_alert({
+                            message: __('Coordinates extracted successfully.'),
+                            indicator: 'green'
+                        });
+                    } else {
+                        frappe.show_alert({
+                            message: __('Unable to resolve short Google Maps link.'),
+                            indicator: 'red'
+                        });
+                    }
+                }
             });
         } else {
-            frappe.show_alert({
-                message: __('Could not extract coordinates. Check link format.'),
-                indicator: 'red'
-            });
+            // Handle standard full URLs
+            const match = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+            if (match) {
+                frm.set_value('lat_location', match[1]);
+                frm.set_value('long_location', match[2]);
+                frappe.show_alert({
+                    message: __('Coordinates extracted from Google Maps link.'),
+                    indicator: 'green'
+                });
+            } else {
+                frappe.show_alert({
+                    message: __('Invalid Google Maps link format.'),
+                    indicator: 'red'
+                });
+            }
         }
     },
+
 
     refresh(frm) {
         if (frm.doc.lat_location && frm.doc.long_location) {
