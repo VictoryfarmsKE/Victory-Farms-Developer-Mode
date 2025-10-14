@@ -339,7 +339,6 @@ def get_pr_items(purchase_receipt):
 			pr_item.name,
 			pr_item.cost_center,
 			pr_item.is_fixed_asset,
-			pr_item.custom_volume,
 			ConstantColumn(purchase_receipt.receipt_document_type).as_("receipt_document_type"),
 			ConstantColumn(purchase_receipt.receipt_document).as_("receipt_document"),
 		)
