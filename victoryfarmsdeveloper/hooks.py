@@ -44,7 +44,8 @@ app_include_js = [
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 doctype_js = {
-    "Stock Entry": "victoryfarmsdeveloper/customization/stock_entry_item_break_down/stock_entry_item_break_down.js"
+    "Stock Entry": "victoryfarmsdeveloper/customization/stock_entry_item_break_down/stock_entry_item_break_down.js",
+    "Landed Cost Voucher": "victoryfarmsdeveloper/public/js/landed_cost_voucher.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 doctype_list_js = {
@@ -150,7 +151,8 @@ has_permission = {
 override_doctype_class = {
     "Stock Entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry",
     "Appraisal Cycle": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_cycle.appraisal_cycle.CustomAppraisalCycle",
-    "Appraisal Payout": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_payout.appraisal_payout.CustomAppraisalPayout"
+    "Appraisal Payout": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_payout.appraisal_payout.CustomAppraisalPayout",
+    "Landed Cost Voucher": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.landed_cost_voucher.landed_cost_voucher.CustomLandedCostVoucher"
     # "Leave Application": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.leave_application.leave_application.CustomLeaveApplication"
 }
 # Document Events
