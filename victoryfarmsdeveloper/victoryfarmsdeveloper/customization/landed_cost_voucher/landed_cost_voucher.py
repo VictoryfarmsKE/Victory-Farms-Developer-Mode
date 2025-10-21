@@ -65,6 +65,55 @@ class CustomLandedCostVoucher(Document):
 					if hasattr(item, 'custom_volume') and d.get('custom_volume'):
 						item.custom_volume = d.custom_volume
 
+	def before_validate(self):
+		"""
+		Calculate tax amounts on the Taxes and Charges table from tax rates and
+		the total amount of items, so the document can be saved without manual entry.
+		"""
+		try:
+			# Validate items and taxes
+			items = self.get("items") or []
+			taxes = self.get("taxes") or []
+			if not items or not taxes:
+				return
+
+			total_item_amount = sum(flt(d.amount or 0) for d in items)
+			# Nothing to compute
+			if total_item_amount <= 0:
+				return
+
+			# Cache for account tax_rate lookups
+			rate_by_account_cache = {}
+
+			for tax in taxes:
+				# Get tax rate
+				rate = flt(getattr(tax, "custom_tax_rate", None) or 0)
+				if not rate and getattr(tax, "expense_account", None):
+					acc = tax.expense_account
+					if acc in rate_by_account_cache:
+						rate = rate_by_account_cache[acc]
+					else:
+						rate = flt(frappe.db.get_value("Account", acc, "tax_rate") or 0)
+						rate_by_account_cache[acc] = rate
+
+				# Compute and populate amounts
+				if rate > 0:
+					calculated_base = flt(total_item_amount * (rate / 100.0))
+					tax.base_amount = calculated_base
+		
+					ex_rate = flt(getattr(tax, "exchange_rate", None) or 0)
+					if ex_rate > 0:
+						tax.amount = flt(calculated_base / ex_rate)
+					else:
+						tax.amount = calculated_base
+				else:
+					# If no rate
+					tax.base_amount = flt(tax.base_amount or 0)
+					tax.amount = flt(tax.amount or 0)
+			self.set_total_taxes_and_charges()
+		except Exception:
+			pass
+
 	def validate(self):
 		self.check_mandatory()
 		self.validate_receipt_documents()
@@ -150,7 +199,7 @@ class CustomLandedCostVoucher(Document):
 			item_count = 0
 			based_on_field = frappe.scrub(self.distribute_charges_based_on)
 			
-			# Handle volume field mapping - "Volume" scrubs to "volume" but field is "custom_volume"
+			# Handle volume field mapping
 			if based_on_field == "volume":
 				based_on_field = "custom_volume"
 
@@ -158,7 +207,7 @@ class CustomLandedCostVoucher(Document):
 				field_value = flt(item.get(based_on_field) or 0)
 				total_item_cost += field_value
 
-			# Check if total_item_cost is zero to prevent division by zero (which causes NaN)
+			# Check if total_item_cost is zero
 			if total_item_cost == 0:
 				frappe.throw(
 					_(
@@ -190,14 +239,13 @@ class CustomLandedCostVoucher(Document):
 		based_on = self.distribute_charges_based_on.lower()
 
 		if based_on != "distribute manually":
-			# Handle volume field mapping - "volume" should map to "custom_volume"
+			# Handle volume field mapping
 			field_name = based_on
 			if based_on == "volume":
 				field_name = "custom_volume"
 			
 			total = sum(flt(d.get(field_name) or 0) for d in self.get("items"))
 		else:
-			# consider for proportion while distributing manually
 			total = sum(flt(d.get("applicable_charges") or 0) for d in self.get("items"))
 
 		if not total:
