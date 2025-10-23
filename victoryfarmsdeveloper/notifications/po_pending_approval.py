@@ -1,4 +1,5 @@
 import frappe
+from frappe.utils import add_days, getdate, nowdate
 
 def send_pending_po_notifications(batch_size=10):
     try:
@@ -103,3 +104,50 @@ def send_po_approved_notification(doc, method):
             title="PO Approved Email Notification",
             message=f"Fatal error in notification handler for PO {doc.name}: {e}"
         )
+
+# Automatically move documents from Draft/Amend to Frozen aged by 7 days old
+@frappe.whitelist()
+def auto_freeze_old_pos():
+    try:
+        cutoff_date = add_days(getdate(nowdate()), -7)
+        pos_to_freeze = frappe.get_all(
+            "Purchase Order",
+            filters={
+                "workflow_state": ["in", ["Draft", "To Amend"]],
+                "creation": ["<=", cutoff_date]
+            },
+            fields=["name"]
+        )
+
+        errored = []
+        # try to freeze each PO, collect failed ones
+        for po in pos_to_freeze:
+            try:
+                doc = frappe.get_doc("Purchase Order", po.name)
+                doc.workflow_state = "Frozen"
+                doc.save(ignore_permissions=True)
+                frappe.db.commit()
+            except Exception as e:
+                frappe.log_error(f"Auto-freeze error for {po.name}: {e}", "PO Auto-Freeze Debug")
+                errored.append(po.name)
+
+        # try errored ones again, leaving them last
+        if errored:
+            for name in errored[:]:
+                try:
+                    doc = frappe.get_doc("Purchase Order", name)
+                    doc.workflow_state = "Frozen"
+                    doc.save(ignore_permissions=True)
+                    frappe.db.commit()
+                    errored.remove(name)
+                except Exception as e:
+                    frappe.log_error(f"Retry auto-freeze failed for {name}: {e}", "PO Auto-Freeze Debug")
+
+        # If any still failed, log a summary
+        if errored:
+            frappe.log_error(
+                f"Auto-freeze: could not freeze {len(errored)} PO(s): {', '.join(errored)}",
+                "PO Auto-Freeze Debug"
+            )
+    except Exception as e:
+        frappe.log_error(f"Auto-freeze error: {e}", "PO Auto-Freeze Debug")
