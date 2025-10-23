@@ -216,7 +216,8 @@ scheduler_events = {
         ],
         "30 8 25-31 * *": [
             "victoryfarmsdeveloper.notifications.scorecard.send_pending_appraisal_notifications"
-        ]
+        ],
+        
     }
 }
 
