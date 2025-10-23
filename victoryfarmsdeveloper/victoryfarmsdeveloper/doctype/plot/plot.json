@@ -105,7 +105,9 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Proposed Crop",
-   "options": "\nMoringa\nMulberry\nSesbania\nSpinach"
+   "mandatory_depends_on": "doc.proposed_crop=='Mulberry'",
+   "options": "\nMoringa\nMulberry\nSesbania\nSpinach",
+   "read_only_depends_on": "doc.proposed_crop=='Mulberry'"
   },
   {
    "fieldname": "comments",
@@ -119,10 +121,11 @@
    "label": "Geolocation"
   },
   {
+   "depends_on": "eval:doc.proposed_crop=='Mulberry'",
    "fieldname": "variety",
    "fieldtype": "Select",
    "label": "Variety",
-   "options": "\nMulberry (V1; Embu; Local)"
+   "options": "\nV1\nEmbu\nLocal"
   },
   {
    "fieldname": "plot_owner",
@@ -133,8 +136,7 @@
   {
    "fieldname": "contract_signing_date",
    "fieldtype": "Date",
-   "label": "Contract Signing Date",
-   "reqd": 1
+   "label": "Contract Signing Date"
   },
   {
    "fieldname": "water_required",
@@ -213,7 +215,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-13 10:25:01.286559",
+ "modified": "2025-10-23 09:59:24.464937",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Plot",
