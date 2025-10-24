@@ -13,7 +13,7 @@ def execute(filters=None):
 	harvest_qty = get_harvest_qty(from_date, to_date)
 
 	cost_per_kg = (casual_costs / harvest_qty) if harvest_qty else 0
-	score = _score(cost_per_kg)
+	score_val = score(cost_per_kg)
 
 	columns = get_columns()
 	data = [
@@ -21,7 +21,7 @@ def execute(filters=None):
 			"casual_costs_kes": round(casual_costs, 2),
 			"total_harvest_kg": round(harvest_qty, 3),
 			"casual_costs_per_kg": round(cost_per_kg, 3),
-			"score": score,
+			"score": score_val,
 		}
 	]
 
@@ -148,7 +148,7 @@ def get_harvest_qty(from_date, to_date):
 	)
 
 
-def _score(value):
+def score(value):
 	"""Map cost/kg to score based on provided criteria.
 
 	Criteria:
