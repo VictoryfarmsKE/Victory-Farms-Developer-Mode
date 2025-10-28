@@ -105,7 +105,38 @@ def send_po_approved_notification(doc, method):
             message=f"Fatal error in notification handler for PO {doc.name}: {e}"
         )
 
-
+# POs > 90 days (with status draft, pending approval, to amend, to receive) to notify the PO owner to action the PO  
+def notify_old_pos():
+    try:
+        cutoff_date = add_days(getdate(nowdate()), -90)
+        old_pos = frappe.get_all(
+            "Purchase Order",
+            filters={
+                "workflow_state": [["not in", ["Approved", "Cancelled", "Frozen"]]],
+                "creation": ["<=", cutoff_date]
+            },
+            fields=["name", "owner", "modified", "creation"]
+        )
+        #log old_pos (number)
+        frappe.log_info(f"Found {len(old_pos)} old Purchase Orders")
+        for po in old_pos:
+            owner_email = frappe.db.get_value("User", po.owner, "email")
+            #log list of owners
+            frappe.log_info(f"Notifying owner {owner_email} for PO {po.name}")
+            if owner_email:
+                try:
+                    url = frappe.utils.get_url_to_form("Purchase Order", po.name)
+                    frappe.sendmail(
+                        recipients=[owner_email],
+                        subject="Reminder: Action Required on Old Purchase Order",
+                        message = f"Hello,<br><br>This is a reminder that Purchase Order <b><a href=\"{url}\">{po.name}</a></b> has been pending action since {po.modified}.<br>Please review and take the necessary steps to process this PO.<br>",
+                        now=True
+                    )
+                except Exception as e:
+                    frappe.log_error(f"Email error for {owner_email}: {e}", "Old PO Notification Debug")
+    except Exception as e:
+        frappe.log_error(f"General error: {e}", "Old PO Notification Debug")
+        
 # Automatically move documents from Draft/Amend to Frozen aged by 7 days old
 def auto_freeze_old_pos():
     try:
