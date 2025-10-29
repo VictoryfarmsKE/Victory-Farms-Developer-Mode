@@ -5,7 +5,7 @@ def send_pending_po_notifications(batch_size=10):
     try:
         pending_pos = frappe.get_all(
             "Purchase Order",
-            filters={"workflow_state": ["not in", ["Draft", "Approved", "To Amend", "Cancelled"]]},
+            filters={"workflow_state": ["not in", ["Draft", "Frozen", "Approved", "To Amend", "Cancelled"]]},
             fields=["name", "workflow_state"]
         )
         total = len(pending_pos)
