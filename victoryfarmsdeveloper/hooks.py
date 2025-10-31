@@ -220,6 +220,9 @@ scheduler_events = {
         "0 17 * * 0": [
             "victoryfarmsdeveloper.notifications.po_pending_approval.notify_old_pos"
         ],
+        "59 23 28-31 * *": [
+            "victoryfarmsdeveloper.notifications.po_pending_approval.auto_freeze_old_pos"
+        ],
     }
 }
 
