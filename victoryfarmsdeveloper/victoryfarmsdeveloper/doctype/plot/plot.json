@@ -102,11 +102,10 @@
   {
    "description": "Crop Type",
    "fieldname": "proposed_crop",
-   "fieldtype": "Select",
-   "in_list_view": 1,
+   "fieldtype": "Table MultiSelect",
    "label": "Proposed Crop",
    "mandatory_depends_on": "doc.proposed_crop=='Mulberry'",
-   "options": "\nMoringa\nMulberry\nSesbania\nSpinach",
+   "options": "Crop Type",
    "read_only_depends_on": "doc.proposed_crop=='Mulberry'"
   },
   {
@@ -215,7 +214,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-05 12:37:33.798160",
+ "modified": "2025-11-05 16:30:21.489816",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Plot",
