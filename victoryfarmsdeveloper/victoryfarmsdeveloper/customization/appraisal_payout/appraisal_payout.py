@@ -223,7 +223,10 @@ class CustomAppraisalPayout(Document):
 
 			# total_goal_score = ((entry.individual_score_value * entry.bonus_potential) + (entry.department_score_value * entry.bonus_potential_department)) / ((entry.bonus_potential + entry.bonus_potential_department)/100)
 
-			# if entry.department_score_value > nv_setting_doc.min_avg_score_for_bonus and entry.individual_score_value > nv_setting_doc.min_individual_score_for_bonus:
+			# Rule: Scenario 1 (primary eligibility)
+			# - Require BOTH department_score_value > min_avg_score_for_bonus AND individual_score_value > min_individual_score_for_bonus
+			# - If bonus_potential == 0, still eligible; otherwise individual score must exceed the minimum
+			# - Awards individual/department/company bonuses proportionally when amounts/percents are present
 			if (
 				entry.department_score_value > nv_setting_doc.min_avg_score_for_bonus and entry.individual_score_value > nv_setting_doc.min_individual_score_for_bonus
 				and (
@@ -240,12 +243,18 @@ class CustomAppraisalPayout(Document):
 				if bonus_calculation_amount and company_bonus_percent:
 					entry.company_bonus = (company_bonus_percent / 100) * bonus_calculation_amount
 
-			elif entry.individual_score_value > nv_setting_doc.consider_poor_performance and entry.department_score_value > nv_setting_doc.min_avg_score_for_bonus:
+			# Rule: Scenario 2 (department-only path)
+			# - Award DEPARTMENT bonus ONLY when individual bonus_potential == 0 and department_score_value > min_avg_score_for_bonus
+			# - This path does not require individual_score_value to exceed the minimum and does not award individual/company bonuses here
+			elif entry.bonus_potential == 0 and entry.department_score_value > nv_setting_doc.min_avg_score_for_bonus:
+			# elif entry.individual_score_value > nv_setting_doc.consider_poor_performance and entry.department_score_value > nv_setting_doc.min_avg_score_for_bonus:
 				# if bonus_calculation_amount and individual_bonus_percent:
 				# 	entry.individual_bonus = (individual_bonus_percent / 100) * bonus_calculation_amount
 				if bonus_calculation_amount and department_bonus_percent:
 					entry.department_bonus = (department_bonus_percent / 100) * bonus_calculation_amount
 
+			# Rule: Individual-only path
+			# - Award ONLY INDIVIDUAL bonus when individual_score_value > min_individual_score_for_bonus and department_score_value < min_avg_score_for_bonus
 			elif entry.individual_score_value > nv_setting_doc.min_individual_score_for_bonus  and entry.department_score_value < nv_setting_doc.min_avg_score_for_bonus:
 				# if bonus_calculation_amount and department_bonus_percent:
 				# 	entry.department_bonus = (department_bonus_percent / 100) * bonus_calculation_amount
