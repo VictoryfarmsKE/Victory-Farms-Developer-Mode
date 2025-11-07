@@ -10,7 +10,7 @@
   "plot_name",
   "region",
   "perimeter",
-  "proposed_crop",
+  "proposed_crop_type",
   "variety",
   "long_location",
   "lat_location",
@@ -111,15 +111,6 @@
    "label": "Geolocation"
   },
   {
-   "description": "Crop Type",
-   "fieldname": "proposed_crop",
-   "fieldtype": "Table MultiSelect",
-   "label": "Proposed Crop",
-   "mandatory_depends_on": "doc.proposed_crop=='Mulberry'",
-   "options": "Crop Type",
-   "read_only_depends_on": "doc.proposed_crop=='Mulberry'"
-  },
-  {
    "depends_on": "eval:doc.proposed_crop=='Mulberry'",
    "fieldname": "variety",
    "fieldtype": "Select",
@@ -211,16 +202,16 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "proposed_crop",
+   "fieldname": "proposed_crop_type",
    "fieldtype": "Table MultiSelect",
-   "label": "Proposed Crop",
+   "label": "Proposed Crop Type",
    "options": "Crop Type"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-07 10:02:34.108170",
+ "modified": "2025-11-07 10:29:08.501516",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Plot",
