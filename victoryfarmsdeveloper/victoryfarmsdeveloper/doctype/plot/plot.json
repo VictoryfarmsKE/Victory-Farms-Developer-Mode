@@ -100,15 +100,6 @@
    "label": "Perimeter"
   },
   {
-   "description": "Crop Type",
-   "fieldname": "proposed_crop",
-   "fieldtype": "Table MultiSelect",
-   "label": "Proposed Crop",
-   "mandatory_depends_on": "doc.proposed_crop=='Mulberry'",
-   "options": "Crop Type",
-   "read_only_depends_on": "doc.proposed_crop=='Mulberry'"
-  },
-  {
    "fieldname": "comments",
    "fieldtype": "Text",
    "label": "Comments"
@@ -118,6 +109,15 @@
    "fieldname": "google_map_link",
    "fieldtype": "Small Text",
    "label": "Geolocation"
+  },
+  {
+   "description": "Crop Type",
+   "fieldname": "proposed_crop",
+   "fieldtype": "Table MultiSelect",
+   "label": "Proposed Crop",
+   "mandatory_depends_on": "doc.proposed_crop=='Mulberry'",
+   "options": "Crop Type",
+   "read_only_depends_on": "doc.proposed_crop=='Mulberry'"
   },
   {
    "depends_on": "eval:doc.proposed_crop=='Mulberry'",
@@ -209,12 +209,18 @@
   {
    "fieldname": "column_break_coqd",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "proposed_crop",
+   "fieldtype": "Table MultiSelect",
+   "label": "Proposed Crop",
+   "options": "Crop Type"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-05 16:30:21.489816",
+ "modified": "2025-11-07 10:02:34.108170",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Plot",
