@@ -112,17 +112,17 @@ def notify_old_pos():
         old_pos = frappe.get_all(
             "Purchase Order",
             filters={
-                "workflow_state": [["not in", ["Approved", "Cancelled", "Frozen"]]],
+                "workflow_state": ["not in", ["Approved", "Cancelled", "Frozen"]],
                 "creation": ["<=", cutoff_date]
             },
             fields=["name", "owner", "modified", "creation"]
         )
         #log old_pos (number)
-        frappe.log_info(f"Found {len(old_pos)} old Purchase Orders")
+        frappe.log_error(f"Found {len(old_pos)} old Purchase Orders")
         for po in old_pos:
             owner_email = frappe.db.get_value("User", po.owner, "email")
             #log list of owners
-            frappe.log_info(f"Notifying owner {owner_email} for PO {po.name}")
+            # frappe.log_error(f"Notifying owner {owner_email} for PO {po.name}")
             if owner_email:
                 try:
                     url = frappe.utils.get_url_to_form("Purchase Order", po.name)
