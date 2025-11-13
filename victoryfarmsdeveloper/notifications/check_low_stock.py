@@ -23,7 +23,7 @@ def check_low_stock():
         recipients = [user.email for user in frappe.get_all("User", filters={"role": "Store Assistant"}, fields=["email"])]
 
         subject = "⚠️ Low Stock Alert: Cement in 50KG bags"
-        message = f"Item Cement in 50KG bags stock is at {stock_qty} units in Consumables Store - VFLupdate. Please restock!"
+        message = f"Item Cement in 50KG bags stock is at {stock_qty} units in Consumables Store - VFL. Please restock!"
      
         frappe.sendmail(
             recipients=recipients,
