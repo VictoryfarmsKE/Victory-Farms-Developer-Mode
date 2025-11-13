@@ -185,7 +185,7 @@
    "fieldname": "land_planted",
    "fieldtype": "Select",
    "label": "Land Planted?",
-   "options": "\nPlanted\nNot Planted\nOngooing\nTBD"
+   "options": "\nPlanted\nNot Planted\nOngoing\nTBD"
   },
   {
    "depends_on": "eval:doc.land_planted == 'Yes'",
@@ -220,7 +220,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-13 15:51:21.925806",
+ "modified": "2025-11-13 16:58:32.083396",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Plot",
