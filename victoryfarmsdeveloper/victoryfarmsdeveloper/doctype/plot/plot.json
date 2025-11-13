@@ -8,7 +8,6 @@
  "engine": "InnoDB",
  "field_order": [
   "plot_name",
-  "plot_number",
   "region",
   "perimeter",
   "proposed_crop_type",
@@ -207,20 +206,12 @@
    "fieldtype": "Table MultiSelect",
    "label": "Proposed Crop Type",
    "options": "Crop Type"
-  },
-  {
-   "fieldname": "plot_number",
-   "fieldtype": "Data",
-   "label": "Plot Number",
-   "reqd": 1,
-   "set_only_once": 1,
-   "unique": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-13 16:58:32.083396",
+ "modified": "2025-11-13 19:20:11.391234",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Plot",

@@ -29,9 +29,3 @@ def resolve_google_maps_link(short_url):
 
 def before_save(self):
     resolve_google_maps_link(self.google_map_link)
-
-    if self.plot_number:
-        digits = ''.join(ch for ch in str(self.plot_number) if ch.isdigit())
-        if digits == '':
-            frappe.throw("Plot Number must contain digits.")
-        self.plot_number = digits.zfill(5)
