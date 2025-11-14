@@ -4,7 +4,7 @@ import json
 
 @frappe.whitelist()
 def check_low_stock():
-    item_code = "Cement in 50KG bags"
+    item_code = "STO-ITEM-2025-01421"
     warehouse = "Consumables Store - VFL"
     
     # Get the current date & time
