@@ -2,7 +2,7 @@
  "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
- "autoname": "format:{contract_holder}-{region}-{####}",
+ "autoname": "format:{contract_holder}-{region}-{plot_number}",
  "creation": "2025-10-07 21:12:40.025376",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -10,7 +10,7 @@
   "plot_name",
   "region",
   "perimeter",
-  "proposed_crop",
+  "proposed_crop_type",
   "variety",
   "long_location",
   "lat_location",
@@ -62,7 +62,7 @@
    "fieldname": "region",
    "fieldtype": "Select",
    "label": "Region",
-   "options": "\nHEAP I\nHEAP II\nRagwe\nRoo\nKanyuongo\nMwirendia",
+   "options": "\nHEAP 0\nHEAP I\nHEAP II\nHEAP III\nMwirendia",
    "reqd": 1
   },
   {
@@ -98,16 +98,6 @@
    "fieldname": "perimeter",
    "fieldtype": "Float",
    "label": "Perimeter"
-  },
-  {
-   "description": "Crop Type",
-   "fieldname": "proposed_crop",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "label": "Proposed Crop",
-   "mandatory_depends_on": "doc.proposed_crop=='Mulberry'",
-   "options": "\nMoringa\nMulberry\nSesbania\nSpinach",
-   "read_only_depends_on": "doc.proposed_crop=='Mulberry'"
   },
   {
    "fieldname": "comments",
@@ -150,14 +140,14 @@
    "fieldname": "water_connected",
    "fieldtype": "Select",
    "label": "Water Connected?",
-   "options": "\nYes\nNo"
+   "options": "\nYes\nNo\nN/A"
   },
   {
    "depends_on": "eval:doc.water_required == 'Yes'",
    "fieldname": "drip_installed",
    "fieldtype": "Select",
    "label": "Drip Installed?",
-   "options": "\nYes\nNo\nN/A"
+   "options": "\nYes\nNone\nDrip\nFurrow\nN/A"
   },
   {
    "fieldname": "tab_break_psym",
@@ -194,7 +184,7 @@
    "fieldname": "land_planted",
    "fieldtype": "Select",
    "label": "Land Planted?",
-   "options": "\nYes\nNot Planted"
+   "options": "\nPlanted\nNot Planted\nOngoing\nTBD"
   },
   {
    "depends_on": "eval:doc.land_planted == 'Yes'",
@@ -210,12 +200,18 @@
   {
    "fieldname": "column_break_coqd",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "proposed_crop_type",
+   "fieldtype": "Table MultiSelect",
+   "label": "Proposed Crop Type",
+   "options": "Crop Type"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-05 12:14:50.280196",
+ "modified": "2025-11-13 19:20:11.391234",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Plot",

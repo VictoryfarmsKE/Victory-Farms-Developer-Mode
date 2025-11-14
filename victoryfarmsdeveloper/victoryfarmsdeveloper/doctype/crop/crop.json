@@ -1,26 +1,91 @@
 {
  "actions": [],
- "allow_import": 1,
- "allow_rename": 1,
- "creation": "2025-11-07 08:44:49.019932",
+ "autoname": "field:title",
+ "creation": "2017-10-20 01:16:17.606174",
  "doctype": "DocType",
+ "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "section_break_ytpl"
+  "title",
+  "section_break_2",
+  "crop_name",
+  "column_break_4",
+  "scientific_name",
+  "section_break_4",
+  "type",
+  "column_break_6",
+  "category",
+  "section_break_12",
+  "planting_area",
+  "column_break_14"
  ],
  "fields": [
   {
-   "fieldname": "section_break_ytpl",
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Title",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "section_break_2",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "crop_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Crop Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "scientific_name",
+   "fieldtype": "Data",
+   "label": "Scientific Name"
+  },
+  {
+   "fieldname": "section_break_4",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Annual\nPerennial\nBiennial"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Data",
+   "label": "Category"
+  },
+  {
+   "fieldname": "section_break_12",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "planting_area",
+   "fieldtype": "Data",
+   "label": "Planting Area"
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
   }
  ],
- "grid_page_length": 50,
- "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-07 08:49:43.950248",
+ "modified": "2025-11-07 09:46:09.152191",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Crop",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
@@ -31,14 +96,24 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "System Manager",
+   "role": "Project Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Project User",
    "share": 1,
    "write": 1
   }
  ],
  "row_format": "Dynamic",
- "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }
