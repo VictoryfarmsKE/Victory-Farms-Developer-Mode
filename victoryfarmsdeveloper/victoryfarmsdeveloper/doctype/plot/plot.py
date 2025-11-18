@@ -9,8 +9,32 @@ import re
 
 
 class Plot(Document):
-    def validate(self):
-        pass
+	def validate(self):
+		pass
+
+	def before_save(self):
+		link = getattr(self, "google_map_link", None)
+		if not link:
+			return
+		try:
+			coords = resolve_google_maps_link(link)
+			if not coords:
+				return
+			lat, lng = coords.get("lat"), coords.get("lng")
+			if not (lat and lng):
+				return
+
+			# Populate known coordinate fields if they exist on the DocType
+			if hasattr(self, "latitude") and hasattr(self, "longitude"):
+				self.latitude = lat
+				self.longitude = lng
+			else:
+				if hasattr(self, "lat"):
+					self.lat = lat
+				if hasattr(self, "lng"):
+					self.lng = lng
+		except Exception:
+			frappe.log_error(frappe.get_traceback(), "Plot before_save map resolve failed")
 
 @frappe.whitelist()  
 def resolve_google_maps_link(short_url):
@@ -26,6 +50,3 @@ def resolve_google_maps_link(short_url):
 		frappe.log_error(frappe.get_traceback(), "Google Maps Resolve Error")
 		return {}
 
-
-def before_save(self):
-    resolve_google_maps_link(self.google_map_link)
