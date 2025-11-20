@@ -6,6 +6,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+<<<<<<< HEAD
   "tab_basic_info",
   "employee",
   "employee_name",
@@ -90,15 +91,29 @@
   "hr_approved_on",
   "section_break_hr_remarks",
   "hr_remarks",
+=======
+  "employee",
+  "employee_name",
+  "department",
+  "designation",
+  "reports_to",
+  "column_break_indg",
+  "date_of_joining",
+  "exit_date",
+>>>>>>> 4bc8a13 (test)
   "amended_from"
  ],
  "fields": [
   {
+<<<<<<< HEAD
    "fieldname": "tab_basic_info",
    "fieldtype": "Tab Break",
    "label": "Basic Information"
   },
   {
+=======
+   "fetch_if_empty": 1,
+>>>>>>> 4bc8a13 (test)
    "fieldname": "employee",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -107,6 +122,7 @@
    "reqd": 1
   },
   {
+<<<<<<< HEAD
    "fetch_from": "employee.employee_name",
    "fieldname": "employee_name",
    "fieldtype": "Data",
@@ -587,6 +603,8 @@
    "permlevel": 1
   },
   {
+=======
+>>>>>>> 4bc8a13 (test)
    "fieldname": "amended_from",
    "fieldtype": "Link",
    "label": "Amended From",
@@ -595,13 +613,60 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+<<<<<<< HEAD
+=======
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name"
+  },
+  {
+   "fetch_from": "employee.department",
+   "fieldname": "department",
+   "fieldtype": "Data",
+   "label": "Department"
+  },
+  {
+   "fetch_from": "employee.designation",
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "label": "Designation"
+  },
+  {
+   "fetch_from": "employee.reports_to",
+   "fieldname": "reports_to",
+   "fieldtype": "Data",
+   "label": "Reports To"
+  },
+  {
+   "fieldname": "column_break_indg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee.date_of_joining",
+   "fieldname": "date_of_joining",
+   "fieldtype": "Data",
+   "label": "Date of Joining"
+  },
+  {
+   "fetch_from": "employee.relieving_date",
+   "fieldname": "exit_date",
+   "fieldtype": "Data",
+   "label": "Exit Date"
+>>>>>>> 4bc8a13 (test)
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
+<<<<<<< HEAD
  "modified": "2025-11-24 11:07:14.390744",
+=======
+ "modified": "2025-11-18 11:05:11.069374",
+>>>>>>> 4bc8a13 (test)
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Employee Clearance",
@@ -619,6 +684,46 @@
    "role": "System Manager",
    "share": 1,
    "submit": 1,
+<<<<<<< HEAD
+=======
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Executive",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
+>>>>>>> 4bc8a13 (test)
    "write": 1
   },
   {
