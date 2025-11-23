@@ -1,23 +1,115 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:EMP-CLR-{employee}-{####}",
  "creation": "2025-10-24 09:24:18.813591",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "tab_basic_info",
   "employee",
   "employee_name",
   "department",
-  "designation",
-  "reports_to",
-  "column_break_indg",
-  "date_of_joining",
+  "position",
+  "employment_date",
+  "column_break_basic",
   "exit_date",
-  "amended_from"
+  "exit_reason",
+  "current_workflow_state",
+  "section_break_documents",
+  "handover_report",
+  "overall_remarks",
+  "tab_line_manager",
+  "line_manager_section",
+  "dept_access_revoked",
+  "handover_done",
+  "handover_written",
+  "column_break_lm",
+  "line_manager",
+  "line_manager_approved",
+  "line_manager_approved_on",
+  "section_break_lm_remarks",
+  "line_manager_remarks",
+  "tab_finance",
+  "finance_section",
+  "finance_no_pending_receipts",
+  "finance_card_accounted",
+  "finance_vf_store_debts",
+  "column_break_fin",
+  "finance_manager",
+  "finance_approved",
+  "finance_approved_on",
+  "section_break_fin_remarks",
+  "finance_remarks",
+  "tab_administration",
+  "admin_section",
+  "admin_ppe_received",
+  "column_break_admin",
+  "admin_approver",
+  "admin_approved",
+  "admin_approved_on",
+  "section_break_admin_remarks",
+  "admin_remarks",
+  "tab_procurement",
+  "procurement_section",
+  "procurement_vf_store_debt",
+  "column_break_proc",
+  "procurement_approver",
+  "procurement_approved",
+  "procurement_approved_on",
+  "section_break_proc_remarks",
+  "procurement_remarks",
+  "tab_it",
+  "it_section",
+  "it_computer_serial",
+  "it_computer_returned",
+  "it_phone_serial",
+  "it_phone_returned",
+  "it_sim_returned",
+  "column_break_it1",
+  "it_door_access_revoked",
+  "it_whatsapp_revoked",
+  "it_email_revoked",
+  "it_erp_deactivated",
+  "it_transfer_virtual_file_ownership",
+  "column_break_it2",
+  "it_staff_badge_returned",
+  "it_access_cards_returned",
+  "it_uber_access_revoked",
+  "it_approvalmax_revoked",
+  "column_break_it3",
+  "it_approver",
+  "it_approved",
+  "it_approved_on",
+  "section_break_it_remarks",
+  "it_remarks",
+  "tab_hr",
+  "hr_section",
+  "hr_portal_terminated",
+  "hr_medical_insurance_actioned",
+  "hr_exit_interview_done",
+  "column_break_hr",
+  "hr_exit_interview_record",
+  "column_break_hr2",
+  "hr_approver",
+  "hr_approved",
+  "hr_approved_on",
+  "section_break_hr_remarks",
+  "hr_remarks",
+  "tab_audit",
+  "audit_section",
+  "created_by",
+  "created_on",
+  "column_break_audit",
+  "last_updated_by"
  ],
  "fields": [
   {
-   "fetch_if_empty": 1,
+   "fieldname": "tab_basic_info",
+   "fieldtype": "Tab Break",
+   "label": "Basic Information"
+  },
+  {
    "fieldname": "employee",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -26,64 +118,521 @@
    "reqd": 1
   },
   {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Employee Clearance",
-   "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
-  },
-  {
    "fetch_from": "employee.employee_name",
    "fieldname": "employee_name",
    "fieldtype": "Data",
-   "label": "Employee Name"
+   "in_list_view": 1,
+   "label": "Employee Name",
+   "reqd": 1
   },
   {
    "fetch_from": "employee.department",
    "fieldname": "department",
-   "fieldtype": "Data",
-   "label": "Department"
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department",
+   "reqd": 1
   },
   {
    "fetch_from": "employee.designation",
-   "fieldname": "designation",
+   "fieldname": "position",
    "fieldtype": "Data",
-   "label": "Designation"
-  },
-  {
-   "fetch_from": "employee.reports_to",
-   "fieldname": "reports_to",
-   "fieldtype": "Data",
-   "label": "Reports To"
-  },
-  {
-   "fieldname": "column_break_indg",
-   "fieldtype": "Column Break"
+   "label": "Position"
   },
   {
    "fetch_from": "employee.date_of_joining",
-   "fieldname": "date_of_joining",
-   "fieldtype": "Data",
-   "label": "Date of Joining"
+   "fieldname": "employment_date",
+   "fieldtype": "Date",
+   "label": "Employment Date"
+  },
+  {
+   "fieldname": "column_break_basic",
+   "fieldtype": "Column Break"
   },
   {
    "fetch_from": "employee.relieving_date",
    "fieldname": "exit_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Exit Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "exit_reason",
+   "fieldtype": "Select",
+   "label": "Exit Reason",
+   "options": "Resignation\nTermination\nEnd of Contract\nRetirement\nOther",
+   "reqd": 1
+  },
+  {
+   "fieldname": "current_workflow_state",
    "fieldtype": "Data",
-   "label": "Exit Date"
+   "hidden": 1,
+   "label": "Workflow State",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_documents",
+   "fieldtype": "Section Break",
+   "label": "Documents & Remarks"
+  },
+  {
+   "fieldname": "handover_report",
+   "fieldtype": "Attach",
+   "label": "Handover Report"
+  },
+  {
+   "fieldname": "overall_remarks",
+   "fieldtype": "Text",
+   "label": "Overall Remarks"
+  },
+  {
+   "fieldname": "tab_line_manager",
+   "fieldtype": "Tab Break",
+   "label": "Line Manager / HOD"
+  },
+  {
+   "fieldname": "line_manager_section",
+   "fieldtype": "Section Break",
+   "label": "Line Manager / HOD Clearance"
+  },
+  {
+   "default": "0",
+   "fieldname": "dept_access_revoked",
+   "fieldtype": "Check",
+   "label": "Dept. access revoked"
+  },
+  {
+   "default": "0",
+   "fieldname": "handover_done",
+   "fieldtype": "Check",
+   "label": "Comprehensive handover done"
+  },
+  {
+   "fieldname": "handover_written",
+   "fieldtype": "Select",
+   "label": "Written handover report given",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "column_break_lm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee.reports_to",
+   "fieldname": "line_manager",
+   "fieldtype": "Link",
+   "label": "Line Manager",
+   "options": "User"
+  },
+  {
+   "default": "0",
+   "fieldname": "line_manager_approved",
+   "fieldtype": "Check",
+   "label": "Line Manager Approved"
+  },
+  {
+   "fieldname": "line_manager_approved_on",
+   "fieldtype": "Datetime",
+   "label": "Line Manager Approval Date"
+  },
+  {
+   "fieldname": "section_break_lm_remarks",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "line_manager_remarks",
+   "fieldtype": "Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "tab_finance",
+   "fieldtype": "Tab Break",
+   "label": "Finance"
+  },
+  {
+   "fieldname": "finance_section",
+   "fieldtype": "Section Break",
+   "label": "Finance Clearance"
+  },
+  {
+   "default": "0",
+   "fieldname": "finance_no_pending_receipts",
+   "fieldtype": "Check",
+   "label": "No pending receipts"
+  },
+  {
+   "default": "0",
+   "fieldname": "finance_card_accounted",
+   "fieldtype": "Check",
+   "label": "Company debit card accounted/returned"
+  },
+  {
+   "fieldname": "finance_vf_store_debts",
+   "fieldtype": "Text",
+   "label": "Pending VF Store debts"
+  },
+  {
+   "fieldname": "column_break_fin",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "finance_manager",
+   "fieldtype": "Link",
+   "label": "Finance Manager",
+   "options": "User"
+  },
+  {
+   "default": "0",
+   "fieldname": "finance_approved",
+   "fieldtype": "Check",
+   "label": "Finance Approved"
+  },
+  {
+   "fieldname": "finance_approved_on",
+   "fieldtype": "Datetime",
+   "label": "Date"
+  },
+  {
+   "fieldname": "section_break_fin_remarks",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "finance_remarks",
+   "fieldtype": "Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "tab_administration",
+   "fieldtype": "Tab Break",
+   "label": "Administration"
+  },
+  {
+   "fieldname": "admin_section",
+   "fieldtype": "Section Break",
+   "label": "Administration Clearance"
+  },
+  {
+   "default": "0",
+   "fieldname": "admin_ppe_received",
+   "fieldtype": "Check",
+   "label": "PPEs received (if applicable)"
+  },
+  {
+   "fieldname": "column_break_admin",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "admin_approver",
+   "fieldtype": "Link",
+   "label": "Admin Supervisor",
+   "options": "User"
+  },
+  {
+   "default": "0",
+   "fieldname": "admin_approved",
+   "fieldtype": "Check",
+   "label": "Admin Approved"
+  },
+  {
+   "fieldname": "admin_approved_on",
+   "fieldtype": "Datetime",
+   "label": "Date"
+  },
+  {
+   "fieldname": "section_break_admin_remarks",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "admin_remarks",
+   "fieldtype": "Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "tab_procurement",
+   "fieldtype": "Tab Break",
+   "label": "Procurement"
+  },
+  {
+   "fieldname": "procurement_section",
+   "fieldtype": "Section Break",
+   "label": "Procurement Clearance"
+  },
+  {
+   "fieldname": "procurement_vf_store_debt",
+   "fieldtype": "Text",
+   "label": "VF Store pending debts"
+  },
+  {
+   "fieldname": "column_break_proc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "procurement_approver",
+   "fieldtype": "Link",
+   "label": "Procurement Manager",
+   "options": "User"
+  },
+  {
+   "default": "0",
+   "fieldname": "procurement_approved",
+   "fieldtype": "Check",
+   "label": "Procurement Approved"
+  },
+  {
+   "fieldname": "procurement_approved_on",
+   "fieldtype": "Datetime",
+   "label": "Date"
+  },
+  {
+   "fieldname": "section_break_proc_remarks",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "procurement_remarks",
+   "fieldtype": "Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "tab_it",
+   "fieldtype": "Tab Break",
+   "label": "IT"
+  },
+  {
+   "fieldname": "it_section",
+   "fieldtype": "Section Break",
+   "label": "IT Clearance"
+  },
+  {
+   "fieldname": "it_computer_serial",
+   "fieldtype": "Data",
+   "label": "Computer Serial Number"
+  },
+  {
+   "default": "0",
+   "fieldname": "it_computer_returned",
+   "fieldtype": "Check",
+   "label": "Computer Returned"
+  },
+  {
+   "fieldname": "it_phone_serial",
+   "fieldtype": "Data",
+   "label": "Phone Serial Number"
+  },
+  {
+   "default": "0",
+   "fieldname": "it_phone_returned",
+   "fieldtype": "Check",
+   "label": "Phone Returned"
+  },
+  {
+   "default": "0",
+   "fieldname": "it_sim_returned",
+   "fieldtype": "Check",
+   "label": "Sim Card Returned"
+  },
+  {
+   "fieldname": "column_break_it1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "it_door_access_revoked",
+   "fieldtype": "Check",
+   "label": "Door Access Revoked"
+  },
+  {
+   "default": "0",
+   "fieldname": "it_whatsapp_revoked",
+   "fieldtype": "Check",
+   "label": "WhatsApp Access Revoked"
+  },
+  {
+   "default": "0",
+   "fieldname": "it_email_revoked",
+   "fieldtype": "Check",
+   "label": "Email Access Revoked"
+  },
+  {
+   "default": "0",
+   "fieldname": "it_erp_deactivated",
+   "fieldtype": "Check",
+   "label": "ERP Deactivation"
+  },
+  {
+   "default": "0",
+   "fieldname": "it_transfer_virtual_file_ownership",
+   "fieldtype": "Check",
+   "label": "Transfer ownership of email/virtual files"
+  },
+  {
+   "fieldname": "column_break_it2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "it_staff_badge_returned",
+   "fieldtype": "Check",
+   "label": "Staff Badge Returned"
+  },
+  {
+   "default": "0",
+   "fieldname": "it_access_cards_returned",
+   "fieldtype": "Check",
+   "label": "Access Cards Returned"
+  },
+  {
+   "default": "0",
+   "fieldname": "it_uber_access_revoked",
+   "fieldtype": "Check",
+   "label": "Uber / Ride accounts"
+  },
+  {
+   "default": "0",
+   "fieldname": "it_approvalmax_revoked",
+   "fieldtype": "Check",
+   "label": "Approval Max / 3rd party"
+  },
+  {
+   "fieldname": "column_break_it3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "it_approver",
+   "fieldtype": "Link",
+   "label": "IT Manager",
+   "options": "User"
+  },
+  {
+   "default": "0",
+   "fieldname": "it_approved",
+   "fieldtype": "Check",
+   "label": "IT Approved"
+  },
+  {
+   "fieldname": "it_approved_on",
+   "fieldtype": "Datetime",
+   "label": "Datetime"
+  },
+  {
+   "fieldname": "section_break_it_remarks",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "it_remarks",
+   "fieldtype": "Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "tab_hr",
+   "fieldtype": "Tab Break",
+   "label": "HR"
+  },
+  {
+   "fieldname": "hr_section",
+   "fieldtype": "Section Break",
+   "label": "HR Clearance"
+  },
+  {
+   "default": "0",
+   "fieldname": "hr_portal_terminated",
+   "fieldtype": "Check",
+   "label": "Staff Portal access terminated"
+  },
+  {
+   "default": "0",
+   "fieldname": "hr_medical_insurance_actioned",
+   "fieldtype": "Check",
+   "label": "Medical insurance actioned"
+  },
+  {
+   "default": "0",
+   "fieldname": "hr_exit_interview_done",
+   "fieldtype": "Check",
+   "label": "Exit interview recorded"
+  },
+  {
+   "fieldname": "column_break_hr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "hr_exit_interview_record",
+   "fieldtype": "Attach",
+   "label": "Exit Interview Document"
+  },
+  {
+   "fieldname": "column_break_hr2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "hr_approver",
+   "fieldtype": "Link",
+   "label": "HR Manager",
+   "options": "User"
+  },
+  {
+   "default": "0",
+   "fieldname": "hr_approved",
+   "fieldtype": "Check",
+   "label": "HR Approved / Cleared"
+  },
+  {
+   "fieldname": "hr_approved_on",
+   "fieldtype": "Datetime",
+   "label": "Datetime"
+  },
+  {
+   "fieldname": "section_break_hr_remarks",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "hr_remarks",
+   "fieldtype": "Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "tab_audit",
+   "fieldtype": "Tab Break",
+   "label": "Audit Information"
+  },
+  {
+   "fieldname": "audit_section",
+   "fieldtype": "Section Break",
+   "label": "Audit Information"
+  },
+  {
+   "fieldname": "created_by",
+   "fieldtype": "Link",
+   "label": "Created By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "created_on",
+   "fieldtype": "Datetime",
+   "label": "Created On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_audit",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_updated_by",
+   "fieldtype": "Link",
+   "label": "Last Updated By",
+   "options": "User",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
- "is_submittable": 1,
  "links": [],
- "modified": "2025-11-18 11:05:11.069374",
+ "modified": "2025-11-21 19:24:45.789666",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Employee Clearance",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
@@ -96,7 +645,6 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
-   "submit": 1,
    "write": 1
   },
   {
@@ -109,7 +657,6 @@
    "report": 1,
    "role": "HR Executive",
    "share": 1,
-   "submit": 1,
    "write": 1
   },
   {
@@ -122,7 +669,6 @@
    "report": 1,
    "role": "HR Manager",
    "share": 1,
-   "submit": 1,
    "write": 1
   },
   {
@@ -141,5 +687,6 @@
  "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }
