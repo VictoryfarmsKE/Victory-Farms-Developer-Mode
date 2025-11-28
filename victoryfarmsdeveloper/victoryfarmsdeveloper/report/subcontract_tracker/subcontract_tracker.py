@@ -8,30 +8,28 @@ from frappe.utils import flt
 
 
 def execute(filters=None):
-	"""Return columns and data for SubContract Tracker report.
-
-	Filters supported: purchase_order (Link to Purchase Order), project (Link to Project),
-	work_status (Data / Select) -- the work status column is currently a placeholder.
+	"""Return columns and data for SubContract Tracker report
+ 
 	"""
 	filters = filters or {}
 
 	columns = [
-		"PO Number:Link/Purchase Order:130",
-		"Supplier:Link/Supplier:150",
-		"Project:Data:140",
+        "Contracts:Data:140",
+		"Contractor Name:Data:160",
+		"Contractor Contact:Data:140",
+		# "Project:Data:140",
 		"Capex ID:Data:80",
 		"Project Name:Data:220",
 		"Total Amount:Currency:120",
+  		"PO Number:Link/Purchase Order:130",
+		# "Supplier:Link/Supplier:150",
 		"Receipted:Currency:120",
 		"To Pay:Currency:120",
 		"Amount Paid:Currency:120",
 		"Balance:Currency:120",
 		"Percentage Paid:Percent:100",
-		"Contracts:Data:140",
-		"Contractor Name:Data:160",
-		"Contractor Contact:Data:140",
-		"Work Status:Data:120",
-		"Date Signed:Date:100",
+		# "Work Status:Data:120",
+		# "Date Signed:Date:100",
 	]
 
 	data = []
@@ -40,8 +38,8 @@ def execute(filters=None):
 	params = []
 
 	# Only consider Purchase Orders for contractor payments
-	conditions.append("po.supplier = %s")
-	params.append("VF CONTRACTOR PAYMENTS")
+	conditions.append("po.custom_supplier_group = %s")
+	params.append("Contractors")
 
 	if filters.get("purchase_order"):
 		conditions.append("po.name = %s")
@@ -59,6 +57,8 @@ def execute(filters=None):
 			po.name as name,
 			po.supplier as supplier,
 			po.project as project,
+			po.contact_display as contact_display,
+			po.contact_mobile as contact_mobile,
 			IFNULL(po.grand_total, 0) as grand_total
 		FROM `tabPurchase Order` po
 		WHERE {where}
@@ -128,30 +128,39 @@ def execute(filters=None):
 				else:
 					project_name = project_display
 
-		# Work-related columns are placeholders (empty) as requested
+		# Contracts: first row 'description' from Purchase Order Item child table
 		contracts = ""
-		contractor_name = ""
-		contractor_contact = ""
+		po_item = frappe.db.sql(
+			"SELECT description FROM `tabPurchase Order Item` WHERE parent = %s AND IFNULL(description, '') != '' ORDER BY idx ASC LIMIT 1",
+			(po_name,),
+			as_dict=True,
+		)
+		if po_item and po_item[0].get("description"):
+			contracts = po_item[0].get("description")
+
+		# Contractor details from Purchase Order fields
+		contractor_name = po.get("contact_display") or ""
+		contractor_contact = po.get("contact_mobile") or ""
 		work_status = filters.get("work_status") or ""
 		date_signed = None
 
 		row = [
-			po_name,
-			po.get("supplier"),
-			project_display,
+			contracts,
+			contractor_name,
+			contractor_contact,
+			# po.get("supplier"),
+			# project_display,
 			capex_id,
 			project_name,
-			total_amount,
+			total_amount,	
+			po_name,
 			receipted,
 			to_pay,
 			amount_paid,
 			balance,
 			percentage_paid,
-			contracts,
-			contractor_name,
-			contractor_contact,
-			work_status,
-			date_signed,
+			# work_status,
+			# date_signed,
 		]
 
 		data.append(row)
