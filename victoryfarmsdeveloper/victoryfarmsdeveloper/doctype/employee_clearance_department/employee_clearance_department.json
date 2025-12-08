@@ -7,10 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "department",
-<<<<<<< HEAD
   "department_personnel",
-=======
->>>>>>> 4bc8a13 (test)
   "column_break_nmxd",
   "status"
  ],
@@ -18,30 +15,21 @@
   {
    "fieldname": "department",
    "fieldtype": "Select",
-<<<<<<< HEAD
    "in_list_view": 1,
    "label": "Department",
    "options": "\nFinance\nAdministration\nProcurement\nInformation Technology\nHuman Resource"
-=======
-   "label": "Department",
-   "options": "Finance"
->>>>>>> 4bc8a13 (test)
   },
   {
    "default": "Open",
    "fieldname": "status",
    "fieldtype": "Select",
-<<<<<<< HEAD
    "in_list_view": 1,
-=======
->>>>>>> 4bc8a13 (test)
    "label": "Status",
    "options": "Open\nInvited\nCompleted\nFeedback Submitted"
   },
   {
    "fieldname": "column_break_nmxd",
    "fieldtype": "Column Break"
-<<<<<<< HEAD
   },
   {
    "fieldname": "department_personnel",
@@ -49,19 +37,13 @@
    "in_list_view": 1,
    "label": "Department Personnel",
    "options": "User"
-=======
->>>>>>> 4bc8a13 (test)
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
-<<<<<<< HEAD
  "modified": "2025-11-20 14:35:36.047767",
-=======
- "modified": "2025-11-18 11:46:48.658836",
->>>>>>> 4bc8a13 (test)
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Employee Clearance Department",
