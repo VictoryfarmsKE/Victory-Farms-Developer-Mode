@@ -225,18 +225,17 @@ class CustomAppraisalPayout(Document):
 
 			# Rule: Scenario 1 (primary eligibility)
 			# - Require BOTH department_score_value > min_avg_score_for_bonus AND individual_score_value > min_individual_score_for_bonus
-			# - If bonus_potential == 0, still eligible; otherwise individual score must exceed the minimum
-			# - Awards individual/department/company bonuses proportionally when amounts/percents are present
+			# - Do NOT award individual bonus if bonus_potential == 0 (no individual eligibility when potential is zero)
+			# - Awards department/company bonuses proportionally when amounts/percents are present
 			if (
-				entry.department_score_value > nv_setting_doc.min_avg_score_for_bonus and entry.individual_score_value > nv_setting_doc.min_individual_score_for_bonus
-				and (
-					entry.bonus_potential == 0
-					or entry.individual_score_value > nv_setting_doc.min_individual_score_for_bonus
-				)
+				entry.department_score_value > nv_setting_doc.min_avg_score_for_bonus
+				and entry.individual_score_value > nv_setting_doc.min_individual_score_for_bonus
 			):
-				if bonus_calculation_amount and individual_bonus_percent:
+				# award individual bonus only when there is a positive individual bonus potential
+				if bonus_calculation_amount and individual_bonus_percent and entry.bonus_potential:
 					entry.individual_bonus = (individual_bonus_percent / 100) * bonus_calculation_amount
 
+				# department and company bonuses are independent of individual bonus potential here
 				if bonus_calculation_amount and department_bonus_percent:
 					entry.department_bonus = (department_bonus_percent / 100) * bonus_calculation_amount
 
