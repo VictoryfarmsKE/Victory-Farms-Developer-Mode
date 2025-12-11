@@ -16,8 +16,22 @@ def has_permission(doc, ptype, user):
     if has_common(user_roles, full_access_roles):
         return True
 
-    # Allow employees to see their own completed appraisals
+    # Allow employees to see their own completed appraisals, except for certain cycles/templates
     employee = frappe.get_value("Employee", {"user_id": user}, "name")
+
+    EXCLUDED_CYCLES = ["October 2025", "November 2025", "December 2025"]
+    EXCLUDED_TEMPLATES = [
+        "M/D/C Appraisal Scorecard Template",
+        "M/D/C Appraisal Scorecard Template(new joiners)"
+    ]
+
+    appraisal_cycle = getattr(doc, "appraisal_cycle", None)
+    appraisal_template = getattr(doc, "appraisal_template", None)
+
+    # If this is one of the excluded cycles/templates, employees (non-full-access) cannot view it
+    if employee and doc.employee == employee and appraisal_cycle in EXCLUDED_CYCLES and appraisal_template in EXCLUDED_TEMPLATES:
+        return False
+
     if employee and doc.employee == employee and doc.docstatus == 1 and doc.workflow_state == "Approved":
         return True
 
@@ -47,9 +61,20 @@ def get_permission_query_conditions(user):
 
     # If the user is an "normal" employee, show only their completed appraisals
     if employee:
+        EXCLUDED_CYCLES = ["October 2025", "November 2025", "December 2025"]
+        EXCLUDED_TEMPLATES = [
+            "M/D/C Appraisal Scorecard Template",
+            "M/D/C Appraisal Scorecard Template(new joiners)"
+        ]
+
+        cycles_list = "','".join(EXCLUDED_CYCLES)
+        templates_list = "','".join(EXCLUDED_TEMPLATES)
+
         return f"""(`tabAppraisal`.employee = '{employee}' 
                   and `tabAppraisal`.docstatus = 1 
-                  and `tabAppraisal`.workflow_state = 'Approved')"""
+                  and `tabAppraisal`.workflow_state = 'Approved' 
+                  and NOT (`tabAppraisal`.appraisal_cycle IN ('{cycles_list}') 
+                           AND `tabAppraisal`.appraisal_template IN ('{templates_list}')))"""
 
     # If no employee record is found, show nothing
     return "1=0"
