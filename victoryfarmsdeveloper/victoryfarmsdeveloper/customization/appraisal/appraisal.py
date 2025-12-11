@@ -32,7 +32,7 @@ def has_permission(doc, ptype, user):
     if employee and doc.employee == employee and appraisal_cycle in EXCLUDED_CYCLES and appraisal_template in EXCLUDED_TEMPLATES:
         return False
 
-    if employee and doc.employee == employee and doc.docstatus == 1 and doc.workflow_state == "Approved":
+    if employee and doc.employee == employee and doc.docstatus == 0 and doc.workflow_state == "Approved":
         return True
 
     return False
