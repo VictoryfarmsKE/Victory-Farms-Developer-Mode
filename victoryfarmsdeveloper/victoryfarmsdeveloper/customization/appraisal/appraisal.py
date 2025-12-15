@@ -8,7 +8,6 @@ def has_permission(doc, ptype, user):
     # Allow full access to specific roles
     full_access_roles = [
         "HR Manager",
-        "HR User",
         "Payroll Officer"
     ]
 
@@ -43,7 +42,6 @@ def get_permission_query_conditions(user):
 
     full_access_roles = [
         "HR Manager",
-        "HR User",
         "Payroll Officer"
     ]
 
