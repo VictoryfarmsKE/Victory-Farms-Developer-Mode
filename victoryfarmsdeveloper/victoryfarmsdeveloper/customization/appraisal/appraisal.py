@@ -2,6 +2,21 @@ import frappe
 from frappe.utils import has_common
 
 
+def get_all_reports(employee, visited=None):
+    """Recursively get all employees reporting to this employee (full hierarchy)."""
+    if visited is None:
+        visited = set()
+    if employee in visited:
+        return []
+    visited.add(employee)
+
+    direct_reports = frappe.get_all("Employee", filters={"reports_to": employee}, pluck="name") or []
+    all_reports = list(direct_reports)
+    for report in direct_reports:
+        all_reports.extend(get_all_reports(report, visited))
+    return all_reports
+
+
 def has_permission(doc, ptype, user):
     if ptype != "read":
         return None
@@ -24,14 +39,13 @@ def has_permission(doc, ptype, user):
     appraisal_cycle = getattr(doc, "appraisal_cycle", "") or ""
     appraisal_template = getattr(doc, "appraisal_template", "") or ""
 
-    # Direct reports (single level)
-    direct_reports = []
+    # All downstream reports (full hierarchy)
+    all_reports = []
     if employee:
-        reports = frappe.get_all("Employee", filters={"reports_to": employee}, fields=["name"]) or []
-        direct_reports = [r.get("name") for r in reports]
+        all_reports = get_all_reports(employee)
 
-    # Managers can see draft or approved appraisals of direct reports
-    if employee and doc.employee in direct_reports and doc.docstatus in (0, 1):
+    # Managers can see draft or approved appraisals of all downstream reports
+    if employee and doc.employee in all_reports and doc.docstatus in (0, 1):
         return True
 
     # Helper: case-insensitive contains check
@@ -90,10 +104,10 @@ def get_permission_query_conditions(user):
         f"AND NOT (({cycles_like}) AND `tabAppraisal`.appraisal_template IN ('{templates_list}')))"
     )
 
-    # Include direct reports (single level) with drafts and approved (docstatus 0 or 1)
-    reports = frappe.get_all("Employee", filters={"reports_to": employee}, fields=["name"]) or []
-    if reports:
-        reports_list = "','".join(r.get("name") for r in reports)
+    # Include all downstream reports (full hierarchy) with drafts and approved (docstatus 0 or 1)
+    all_reports = get_all_reports(employee)
+    if all_reports:
+        reports_list = "','".join(all_reports)
         reports_clause = f"(`tabAppraisal`.employee IN ('{reports_list}') AND `tabAppraisal`.docstatus IN (0,1))"
         return f"({self_clause} OR {reports_clause})"
 
