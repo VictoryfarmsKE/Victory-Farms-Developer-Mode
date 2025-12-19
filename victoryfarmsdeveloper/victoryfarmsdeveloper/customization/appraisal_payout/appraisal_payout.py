@@ -186,6 +186,7 @@ class CustomAppraisalPayout(Document):
 				.where(
 				(salary_slip.employee == employee)
 				& (salary_slip.start_date[self.start_date:self.end_date])
+				& (salary_slip.end_date[self.start_date:self.end_date])
 				& (salary_slip.docstatus == 1)
 				& (salary_details.salary_component.isin(["Basic Salary", "Basic Pay"]))
 				)
