@@ -227,7 +227,8 @@ scheduler_events = {
 
 doc_events = {
     "Asset": {
-        "autoname": "victoryfarmsdeveloper.custom_scripts.server_scripts.asset.autoname"
+        "autoname": "victoryfarmsdeveloper.custom_scripts.server_scripts.asset.autoname",
+        "validate": "victoryfarmsdeveloper.custom_scripts.server_scripts.asset.calculate_asset_value_from_purchase_receipt"
     },
     "Sales Invoice": {
         "on_change": "victoryfarmsdeveloper.notifications.sales_invoice_status_change.sales_invoice_status_change"
