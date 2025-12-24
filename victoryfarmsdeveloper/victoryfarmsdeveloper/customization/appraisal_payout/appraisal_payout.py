@@ -223,53 +223,53 @@ class CustomAppraisalPayout(Document):
 			company_bonus_percent = self.get_bonus_percent(company_bonus_potential, appraisal_score=company_score)
 
 			# Log all calculation data for debugging
-			frappe.log_error(
-				title=f"Appraisal Payout Calculation - {entry.employee}",
-				message=f"""
-=== EMPLOYEE DETAILS ===
-Employee: {entry.employee}
-Employee Name: {entry.employee_name}
-Department: {entry.department}
-Designation: {entry.designation}
+			# frappe.log_error(
+			# 	title=f"Appraisal Payout Calculation - {entry.employee}",
+			# 	message=f"""
+			# 	=== EMPLOYEE DETAILS ===
+			# 	Employee: {entry.employee}
+			# 	Employee Name: {entry.employee_name}
+			# 	Department: {entry.department}
+			# 	Designation: {entry.designation}
 
 
-=== PAYOUT PERIOD ===
-Payout Frequency: {self.payout_frequency}
-Start Date: {self.start_date}
-End Date: {self.end_date}
+			# 	=== PAYOUT PERIOD ===
+			# 	Payout Frequency: {self.payout_frequency}
+			# 	Start Date: {self.start_date}
+			# 	End Date: {self.end_date}
 
-=== SALARY / BONUS CALCULATION AMOUNT ===
-Bonus Calculation Amount (Base Salary): {bonus_calculation_amount}
+			# 	=== SALARY / BONUS CALCULATION AMOUNT ===
+			# 	Bonus Calculation Amount (Base Salary): {bonus_calculation_amount}
 
-=== INDIVIDUAL SCORE CALCULATION ===
-Individual Score (Raw Average): {individual_score}
-Individual Score Value (score * 5 / 100): {entry.individual_score_value}
-Individual Matrix Percent (from lookup table): {individual_matrix_percent}
-Individual Bonus Potential: {entry.bonus_potential}
-Individual Bonus Percent (matrix_percent * bonus_potential / 100): {individual_bonus_percent}
+			# 	=== INDIVIDUAL SCORE CALCULATION ===
+			# 	Individual Score (Raw Average): {individual_score}
+			# 	Individual Score Value (score * 5 / 100): {entry.individual_score_value}
+			# 	Individual Matrix Percent (from lookup table): {individual_matrix_percent}
+			# 	Individual Bonus Potential: {entry.bonus_potential}
+			# 	Individual Bonus Percent (matrix_percent * bonus_potential / 100): {individual_bonus_percent}
 
-=== DEPARTMENT SCORE CALCULATION ===
-Department Score (Raw Average): {department_score}
-Department Score Value (score * 5 / 100): {entry.department_score_value}
-Department Matrix Percent (from lookup table): {department_matrix_percent}
-Department Bonus Potential: {entry.bonus_potential_department}
-Department Bonus Percent (matrix_percent * bonus_potential / 100): {department_bonus_percent}
+			# 	=== DEPARTMENT SCORE CALCULATION ===
+			# 	Department Score (Raw Average): {department_score}
+			# 	Department Score Value (score * 5 / 100): {entry.department_score_value}
+			# 	Department Matrix Percent (from lookup table): {department_matrix_percent}
+			# 	Department Bonus Potential: {entry.bonus_potential_department}
+			# 	Department Bonus Percent (matrix_percent * bonus_potential / 100): {department_bonus_percent}
 
-=== COMPANY SCORE CALCULATION ===
-Company Score: {company_score}
-Company Bonus Potential: {company_bonus_potential}
-Company Bonus Percent: {company_bonus_percent}
+			# 	=== COMPANY SCORE CALCULATION ===
+			# 	Company Score: {company_score}
+			# 	Company Bonus Potential: {company_bonus_potential}
+			# 	Company Bonus Percent: {company_bonus_percent}
 
-=== ELIGIBILITY THRESHOLDS (from Navari Custom Payroll Settings) ===
-Min Avg Score for Bonus: {nv_setting_doc.min_avg_score_for_bonus}
-Min Individual Score for Bonus: {nv_setting_doc.min_individual_score_for_bonus}
+			# 	=== ELIGIBILITY THRESHOLDS (from Navari Custom Payroll Settings) ===
+			# 	Min Avg Score for Bonus: {nv_setting_doc.min_avg_score_for_bonus}
+			# 	Min Individual Score for Bonus: {nv_setting_doc.min_individual_score_for_bonus}
 
-=== ELIGIBILITY CHECK ===
-Department Score Value ({entry.department_score_value}) > Min Avg ({nv_setting_doc.min_avg_score_for_bonus}): {entry.department_score_value > nv_setting_doc.min_avg_score_for_bonus}
-Individual Score Value ({entry.individual_score_value}) > Min Individual ({nv_setting_doc.min_individual_score_for_bonus}): {entry.individual_score_value > nv_setting_doc.min_individual_score_for_bonus}
-Bonus Potential == 0: {entry.bonus_potential == 0}
-"""
-			)
+			# 	=== ELIGIBILITY CHECK ===
+			# 	Department Score Value ({entry.department_score_value}) > Min Avg ({nv_setting_doc.min_avg_score_for_bonus}): {entry.department_score_value > nv_setting_doc.min_avg_score_for_bonus}
+			# 	Individual Score Value ({entry.individual_score_value}) > Min Individual ({nv_setting_doc.min_individual_score_for_bonus}): {entry.individual_score_value > nv_setting_doc.min_individual_score_for_bonus}
+			# 	Bonus Potential == 0: {entry.bonus_potential == 0}
+			# 	"""
+			# )
 
 			# total_goal_score = ((entry.individual_score_value * entry.bonus_potential) + (entry.department_score_value * entry.bonus_potential_department)) / ((entry.bonus_potential + entry.bonus_potential_department)/100)
 
@@ -292,15 +292,15 @@ Bonus Potential == 0: {entry.bonus_potential == 0}
 				if bonus_calculation_amount and company_bonus_percent:
 					entry.company_bonus = (company_bonus_percent / 100) * bonus_calculation_amount
 
-				frappe.log_error(
-					title=f"Appraisal Payout SCENARIO 1 - {entry.employee}",
-					message=f"""
-=== SCENARIO 1: PRIMARY ELIGIBILITY (Both thresholds met) ===
-Individual Bonus = ({individual_bonus_percent} / 100) * {bonus_calculation_amount} = {entry.individual_bonus}
-Department Bonus = ({department_bonus_percent} / 100) * {bonus_calculation_amount} = {entry.department_bonus}
-Company Bonus = ({company_bonus_percent} / 100) * {bonus_calculation_amount} = {entry.company_bonus}
-"""
-				)
+				# frappe.log_error(
+				# 	title=f"Appraisal Payout SCENARIO 1 - {entry.employee}",
+				# 	message=f"""
+				# 	=== SCENARIO 1: PRIMARY ELIGIBILITY (Both thresholds met) ===
+				# 	Individual Bonus = ({individual_bonus_percent} / 100) * {bonus_calculation_amount} = {entry.individual_bonus}
+				# 	Department Bonus = ({department_bonus_percent} / 100) * {bonus_calculation_amount} = {entry.department_bonus}
+				# 	Company Bonus = ({company_bonus_percent} / 100) * {bonus_calculation_amount} = {entry.company_bonus}
+				# 	"""
+				# )
 
 			# Rule: Scenario 2 (department-only path)
 			# - Award DEPARTMENT bonus ONLY when individual bonus_potential == 0 and department_score_value > min_avg_score_for_bonus
@@ -312,15 +312,15 @@ Company Bonus = ({company_bonus_percent} / 100) * {bonus_calculation_amount} = {
 				if bonus_calculation_amount and department_bonus_percent:
 					entry.department_bonus = (department_bonus_percent / 100) * bonus_calculation_amount
 
-				frappe.log_error(
-					title=f"Appraisal Payout SCENARIO 2 - {entry.employee}",
-					message=f"""
-=== SCENARIO 2: DEPARTMENT-ONLY PATH (bonus_potential=0, dept threshold met) ===
-Individual Bonus = {entry.individual_bonus} (not awarded in this scenario)
-Department Bonus = ({department_bonus_percent} / 100) * {bonus_calculation_amount} = {entry.department_bonus}
-Company Bonus = {entry.company_bonus} (not awarded in this scenario)
-"""
-				)
+				# frappe.log_error(
+				# 	title=f"Appraisal Payout SCENARIO 2 - {entry.employee}",
+				# 	message=f"""
+				# 	=== SCENARIO 2: DEPARTMENT-ONLY PATH (bonus_potential=0, dept threshold met) ===
+				# 	Individual Bonus = {entry.individual_bonus} (not awarded in this scenario)
+				# 	Department Bonus = ({department_bonus_percent} / 100) * {bonus_calculation_amount} = {entry.department_bonus}
+				# 	Company Bonus = {entry.company_bonus} (not awarded in this scenario)
+				# 	"""
+				# )
 
 			# Rule: Individual-only path
 			# - Award ONLY INDIVIDUAL bonus when individual_score_value > min_individual_score_for_bonus and department_score_value < min_avg_score_for_bonus
@@ -330,40 +330,40 @@ Company Bonus = {entry.company_bonus} (not awarded in this scenario)
 				if bonus_calculation_amount and individual_bonus_percent:
 					entry.individual_bonus = (individual_bonus_percent / 100) * bonus_calculation_amount
 
-				frappe.log_error(
-					title=f"Appraisal Payout SCENARIO 3 - {entry.employee}",
-					message=f"""
-=== SCENARIO 3: INDIVIDUAL-ONLY PATH (individual threshold met, dept threshold NOT met) ===
-Individual Bonus = ({individual_bonus_percent} / 100) * {bonus_calculation_amount} = {entry.individual_bonus}
-Department Bonus = {entry.department_bonus} (not awarded in this scenario)
-Company Bonus = {entry.company_bonus} (not awarded in this scenario)
-"""
-				)
-			else:
-				frappe.log_error(
-					title=f"Appraisal Payout NO SCENARIO MET - {entry.employee}",
-					message=f"""
-=== NO ELIGIBILITY SCENARIO MET ===
-Individual Bonus = {entry.individual_bonus}
-Department Bonus = {entry.department_bonus}
-Company Bonus = {entry.company_bonus}
-Reason: None of the eligibility conditions were satisfied.
-"""
-				)
+				# frappe.log_error(
+				# 	title=f"Appraisal Payout SCENARIO 3 - {entry.employee}",
+				# 	message=f"""
+				# 	=== SCENARIO 3: INDIVIDUAL-ONLY PATH (individual threshold met, dept threshold NOT met) ===
+				# 	Individual Bonus = ({individual_bonus_percent} / 100) * {bonus_calculation_amount} = {entry.individual_bonus}
+				# 	Department Bonus = {entry.department_bonus} (not awarded in this scenario)
+				# 	Company Bonus = {entry.company_bonus} (not awarded in this scenario)
+				# 	"""
+				# )
+			# else:
+				# frappe.log_error(
+				# 	title=f"Appraisal Payout NO SCENARIO MET - {entry.employee}",
+				# 	message=f"""
+				# 	=== NO ELIGIBILITY SCENARIO MET ===
+				# 	Individual Bonus = {entry.individual_bonus}
+				# 	Department Bonus = {entry.department_bonus}
+				# 	Company Bonus = {entry.company_bonus}
+				# 	Reason: None of the eligibility conditions were satisfied.
+				# 	"""
+				# )
 
 			entry.total_bonus = entry.individual_bonus + entry.department_bonus + entry.company_bonus
 
-			frappe.log_error(
-				title=f"Appraisal Payout FINAL TOTALS - {entry.employee}",
-				message=f"""
-=== FINAL BONUS TOTALS ===
-Employee: {entry.employee}
-Individual Bonus: {entry.individual_bonus}
-Department Bonus: {entry.department_bonus}
-Company Bonus: {entry.company_bonus}
-TOTAL BONUS: {entry.total_bonus}
-"""
-			)
+			# frappe.log_error(
+			# 	title=f"Appraisal Payout FINAL TOTALS - {entry.employee}",
+			# 	message=f"""
+			# 	=== FINAL BONUS TOTALS ===
+			# 	Employee: {entry.employee}
+			# 	Individual Bonus: {entry.individual_bonus}
+			# 	Department Bonus: {entry.department_bonus}
+			# 	Company Bonus: {entry.company_bonus}
+			# 	TOTAL BONUS: {entry.total_bonus}
+			# 	"""
+			# )
 
 	def on_submit(self):
 		self.create_additional_salaries()
