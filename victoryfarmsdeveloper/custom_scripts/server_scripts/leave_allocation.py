@@ -24,7 +24,7 @@ def create_leave_allocation_for_new_employee(doc, method):
     try:
         # Get the current leave period dates (typically calendar year)
         today = getdate()
-        from_date = get_year_start(today)
+        from_date = doc.date_of_joining
         to_date = get_year_ending(today)
         
         employee_name = doc.name
