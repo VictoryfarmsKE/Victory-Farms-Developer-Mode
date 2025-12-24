@@ -152,7 +152,8 @@ override_doctype_class = {
     "Stock Entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry",
     "Appraisal Cycle": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_cycle.appraisal_cycle.CustomAppraisalCycle",
     "Appraisal Payout": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_payout.appraisal_payout.CustomAppraisalPayout",
-    "Landed Cost Voucher": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.landed_cost_voucher.landed_cost_voucher.CustomLandedCostVoucher"
+    "Landed Cost Voucher": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.landed_cost_voucher.landed_cost_voucher.CustomLandedCostVoucher",
+    "Employee Checkin": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.employee_checkin.employee_checkin.CustomEmployeeCheckin",
     # "Leave Application": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.leave_application.leave_application.CustomLeaveApplication"
 }
 # Document Events
