@@ -189,22 +189,19 @@
    "default": "0",
    "fieldname": "dept_access_revoked",
    "fieldtype": "Check",
-   "label": "Dept. access revoked",
-   "permlevel": 3
+   "label": "Dept. access revoked"
   },
   {
    "default": "0",
    "fieldname": "handover_done",
    "fieldtype": "Check",
-   "label": "Comprehensive handover done",
-   "permlevel": 3
+   "label": "Comprehensive handover done"
   },
   {
    "fieldname": "handover_written",
    "fieldtype": "Select",
    "label": "Written handover report given",
-   "options": "Yes\nNo",
-   "permlevel": 3
+   "options": "Yes\nNo"
   },
   {
    "fieldname": "column_break_lm",
@@ -214,14 +211,12 @@
    "fieldname": "line_manager",
    "fieldtype": "Link",
    "label": "Line Manager",
-   "options": "User",
-   "permlevel": 3
+   "options": "User"
   },
   {
    "fieldname": "line_manager_approved_on",
    "fieldtype": "Datetime",
-   "label": "Line Manager Approval Date",
-   "permlevel": 3
+   "label": "Line Manager Approval Date"
   },
   {
    "fieldname": "section_break_lm_remarks",
@@ -230,8 +225,7 @@
   {
    "fieldname": "line_manager_remarks",
    "fieldtype": "Text",
-   "label": "Remarks",
-   "permlevel": 3
+   "label": "Remarks"
   },
   {
    "fieldname": "tab_finance",
@@ -247,21 +241,18 @@
    "default": "0",
    "fieldname": "finance_no_pending_receipts",
    "fieldtype": "Check",
-   "label": "No pending receipts",
-   "permlevel": 2
+   "label": "No pending receipts"
   },
   {
    "default": "0",
    "fieldname": "finance_card_accounted",
    "fieldtype": "Check",
-   "label": "Company debit card accounted/returned",
-   "permlevel": 2
+   "label": "Company debit card accounted/returned"
   },
   {
    "fieldname": "finance_vf_store_debts",
    "fieldtype": "Text",
-   "label": "Pending VF Store debts",
-   "permlevel": 2
+   "label": "Pending VF Store debts"
   },
   {
    "fieldname": "column_break_fin",
@@ -271,14 +262,12 @@
    "fieldname": "finance_manager",
    "fieldtype": "Link",
    "label": "Finance Manager",
-   "options": "User",
-   "permlevel": 2
+   "options": "User"
   },
   {
    "fieldname": "finance_approved_on",
    "fieldtype": "Datetime",
-   "label": "Date",
-   "permlevel": 2
+   "label": "Date"
   },
   {
    "fieldname": "section_break_fin_remarks",
@@ -287,8 +276,7 @@
   {
    "fieldname": "finance_remarks",
    "fieldtype": "Text",
-   "label": "Remarks",
-   "permlevel": 2
+   "label": "Remarks"
   },
   {
    "fieldname": "tab_administration",
@@ -304,8 +292,7 @@
    "default": "0",
    "fieldname": "admin_ppe_received",
    "fieldtype": "Check",
-   "label": "PPEs received (if applicable)",
-   "permlevel": 4
+   "label": "PPEs received (if applicable)"
   },
   {
    "fieldname": "column_break_admin",
@@ -315,14 +302,12 @@
    "fieldname": "admin_approver",
    "fieldtype": "Link",
    "label": "Admin Supervisor",
-   "options": "User",
-   "permlevel": 4
+   "options": "User"
   },
   {
    "fieldname": "admin_approved_on",
    "fieldtype": "Datetime",
-   "label": "Date",
-   "permlevel": 4
+   "label": "Date"
   },
   {
    "fieldname": "section_break_admin_remarks",
@@ -331,8 +316,7 @@
   {
    "fieldname": "admin_remarks",
    "fieldtype": "Text",
-   "label": "Remarks",
-   "permlevel": 4
+   "label": "Remarks"
   },
   {
    "fieldname": "tab_procurement",
@@ -347,8 +331,7 @@
   {
    "fieldname": "procurement_vf_store_debt",
    "fieldtype": "Text",
-   "label": "VF Store pending debts",
-   "permlevel": 5
+   "label": "VF Store pending debts"
   },
   {
    "fieldname": "column_break_proc",
@@ -358,14 +341,12 @@
    "fieldname": "procurement_approver",
    "fieldtype": "Link",
    "label": "Procurement Manager",
-   "options": "User",
-   "permlevel": 5
+   "options": "User"
   },
   {
    "fieldname": "procurement_approved_on",
    "fieldtype": "Datetime",
-   "label": "Date",
-   "permlevel": 5
+   "label": "Date"
   },
   {
    "fieldname": "section_break_proc_remarks",
@@ -374,8 +355,7 @@
   {
    "fieldname": "procurement_remarks",
    "fieldtype": "Text",
-   "label": "Remarks",
-   "permlevel": 5
+   "label": "Remarks"
   },
   {
    "fieldname": "tab_it",
@@ -390,35 +370,30 @@
   {
    "fieldname": "it_computer_serial",
    "fieldtype": "Data",
-   "label": "Computer Serial Number",
-   "permlevel": 6
+   "label": "Computer Serial Number"
   },
   {
    "default": "0",
    "fieldname": "it_computer_returned",
    "fieldtype": "Check",
-   "label": "Computer Returned",
-   "permlevel": 6
+   "label": "Computer Returned"
   },
   {
    "fieldname": "it_phone_serial",
    "fieldtype": "Data",
-   "label": "Phone Serial Number",
-   "permlevel": 6
+   "label": "Phone Serial Number"
   },
   {
    "default": "0",
    "fieldname": "it_phone_returned",
    "fieldtype": "Check",
-   "label": "Phone Returned",
-   "permlevel": 6
+   "label": "Phone Returned"
   },
   {
    "default": "0",
    "fieldname": "it_sim_returned",
    "fieldtype": "Check",
-   "label": "Sim Card Returned",
-   "permlevel": 6
+   "label": "Sim Card Returned"
   },
   {
    "fieldname": "column_break_it1",
@@ -428,36 +403,31 @@
    "default": "0",
    "fieldname": "it_door_access_revoked",
    "fieldtype": "Check",
-   "label": "Door Access Revoked",
-   "permlevel": 6
+   "label": "Door Access Revoked"
   },
   {
    "default": "0",
    "fieldname": "it_whatsapp_revoked",
    "fieldtype": "Check",
-   "label": "WhatsApp Access Revoked",
-   "permlevel": 6
+   "label": "WhatsApp Access Revoked"
   },
   {
    "default": "0",
    "fieldname": "it_email_revoked",
    "fieldtype": "Check",
-   "label": "Email Access Revoked",
-   "permlevel": 6
+   "label": "Email Access Revoked"
   },
   {
    "default": "0",
    "fieldname": "it_erp_deactivated",
    "fieldtype": "Check",
-   "label": "ERP Deactivation",
-   "permlevel": 6
+   "label": "ERP Deactivation"
   },
   {
    "default": "0",
    "fieldname": "it_transfer_virtual_file_ownership",
    "fieldtype": "Check",
-   "label": "Transfer ownership of email/virtual files",
-   "permlevel": 6
+   "label": "Transfer ownership of email/virtual files"
   },
   {
    "fieldname": "column_break_it2",
@@ -467,29 +437,25 @@
    "default": "0",
    "fieldname": "it_staff_badge_returned",
    "fieldtype": "Check",
-   "label": "Staff Badge Returned",
-   "permlevel": 6
+   "label": "Staff Badge Returned"
   },
   {
    "default": "0",
    "fieldname": "it_access_cards_returned",
    "fieldtype": "Check",
-   "label": "Access Cards Returned",
-   "permlevel": 6
+   "label": "Access Cards Returned"
   },
   {
    "default": "0",
    "fieldname": "it_uber_access_revoked",
    "fieldtype": "Check",
-   "label": "Uber / Ride accounts",
-   "permlevel": 6
+   "label": "Uber / Ride accounts"
   },
   {
    "default": "0",
    "fieldname": "it_approvalmax_revoked",
    "fieldtype": "Check",
-   "label": "Approval Max / 3rd party",
-   "permlevel": 6
+   "label": "Approval Max / 3rd party"
   },
   {
    "fieldname": "column_break_it3",
@@ -499,14 +465,12 @@
    "fieldname": "it_approver",
    "fieldtype": "Link",
    "label": "IT Manager",
-   "options": "User",
-   "permlevel": 6
+   "options": "User"
   },
   {
    "fieldname": "it_approved_on",
    "fieldtype": "Datetime",
-   "label": "Datetime",
-   "permlevel": 6
+   "label": "Datetime"
   },
   {
    "fieldname": "section_break_it_remarks",
@@ -515,8 +479,7 @@
   {
    "fieldname": "it_remarks",
    "fieldtype": "Text",
-   "label": "Remarks",
-   "permlevel": 6
+   "label": "Remarks"
   },
   {
    "fieldname": "tab_hr",
@@ -532,22 +495,19 @@
    "default": "0",
    "fieldname": "hr_portal_terminated",
    "fieldtype": "Check",
-   "label": "Staff Portal access terminated",
-   "permlevel": 1
+   "label": "Staff Portal access terminated"
   },
   {
    "default": "0",
    "fieldname": "hr_medical_insurance_actioned",
    "fieldtype": "Check",
-   "label": "Medical insurance actioned",
-   "permlevel": 1
+   "label": "Medical insurance actioned"
   },
   {
    "default": "0",
    "fieldname": "hr_exit_interview_done",
    "fieldtype": "Check",
-   "label": "Exit interview recorded",
-   "permlevel": 1
+   "label": "Exit interview recorded"
   },
   {
    "fieldname": "column_break_hr",
@@ -556,8 +516,7 @@
   {
    "fieldname": "hr_exit_interview_record",
    "fieldtype": "Attach",
-   "label": "Exit Interview Document",
-   "permlevel": 1
+   "label": "Exit Interview Document"
   },
   {
    "fieldname": "column_break_hr2",
@@ -567,14 +526,12 @@
    "fieldname": "hr_approver",
    "fieldtype": "Link",
    "label": "HR Manager",
-   "options": "User",
-   "permlevel": 1
+   "options": "User"
   },
   {
    "fieldname": "hr_approved_on",
    "fieldtype": "Datetime",
-   "label": "Datetime",
-   "permlevel": 1
+   "label": "Datetime"
   },
   {
    "fieldname": "section_break_hr_remarks",
@@ -583,8 +540,7 @@
   {
    "fieldname": "hr_remarks",
    "fieldtype": "Text",
-   "label": "Remarks",
-   "permlevel": 1
+   "label": "Remarks"
   },
   {
    "fieldname": "amended_from",
@@ -620,204 +576,6 @@
    "share": 1,
    "submit": 1,
    "write": 1
-  },
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HR Executive",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HR Manager",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "permlevel": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HR Manager",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Finance Manager",
-   "select": 1,
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "permlevel": 2,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Finance Manager",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HOD",
-   "select": 1,
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "permlevel": 3,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HOD",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Admin Manager",
-   "select": 1,
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "permlevel": 4,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Admin Manager",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Procurement Manager",
-   "select": 1,
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "permlevel": 5,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Procurement Manager",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "IT HOD - VF",
-   "select": 1,
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "permlevel": 6,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "IT HOD - VF",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "permlevel": 2,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HR Manager",
-   "share": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "permlevel": 3,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HR Manager",
-   "share": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "permlevel": 4,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HR Manager",
-   "share": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "permlevel": 5,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HR Manager",
-   "share": 1
-  },
-  {
-   "email": 1,
-   "export": 1,
-   "permlevel": 6,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "HR Manager",
-   "share": 1
   }
  ],
  "row_format": "Dynamic",
