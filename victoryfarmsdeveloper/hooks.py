@@ -265,9 +265,6 @@ override_whitelisted_methods = {
 # override_doctype_dashboards = {
 # 	"Task": "victoryfarmsdeveloper.task.get_dashboard_data"
 # }
-# override_doctype_dashboards = {
-#     "Purchase Order": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.purchase_order.purchase_order_dashboard.get_data"
-# }
 # exempt linked doctypes from being automatically cancelled
 #
 # auto_cancel_exempted_doctypes = ["Auto Repeat"]
