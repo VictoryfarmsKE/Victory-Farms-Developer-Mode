@@ -46,6 +46,7 @@ app_include_js = [
 doctype_js = {
     "Stock Entry": "victoryfarmsdeveloper/customization/stock_entry_item_break_down/stock_entry_item_break_down.js",
     "Landed Cost Voucher": "victoryfarmsdeveloper/public/js/landed_cost_voucher.js",
+    "Leave Application": "public/js/leave_application.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 doctype_list_js = {
@@ -266,9 +267,6 @@ override_whitelisted_methods = {
 # along with any modifications made in other Frappe apps
 # override_doctype_dashboards = {
 # 	"Task": "victoryfarmsdeveloper.task.get_dashboard_data"
-# }
-# override_doctype_dashboards = {
-#     "Purchase Order": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.purchase_order.purchase_order_dashboard.get_data"
 # }
 # exempt linked doctypes from being automatically cancelled
 #
