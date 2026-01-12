@@ -21,7 +21,7 @@ frappe.templates["leave_application_dashboard"] = `
 					"Annual Leave C&D Level": 28,
 					"Maternity Leave": 90,
 					"Paternity Leave": 14,
-					"Long Weekend": "2/month",
+					"Long Weekend": "2 days per month",
 					"Sick Leave - Full Days": 7,
 					"Sick Leave - Half Days": 7
 				};
