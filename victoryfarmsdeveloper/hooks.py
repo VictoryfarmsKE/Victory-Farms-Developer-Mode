@@ -45,7 +45,8 @@ app_include_js = [
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 doctype_js = {
     "Stock Entry": "victoryfarmsdeveloper/customization/stock_entry_item_break_down/stock_entry_item_break_down.js",
-    "Landed Cost Voucher": "victoryfarmsdeveloper/public/js/landed_cost_voucher.js"
+    "Landed Cost Voucher": "victoryfarmsdeveloper/public/js/landed_cost_voucher.js",
+    "Leave Application": "public/js/leave_application.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 doctype_list_js = {
