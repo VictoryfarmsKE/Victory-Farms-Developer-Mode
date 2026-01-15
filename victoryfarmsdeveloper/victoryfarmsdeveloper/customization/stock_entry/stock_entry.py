@@ -215,6 +215,7 @@ def before_save_stock_entry(doc, method):
                     coa.dispatch_date = nowdate()
                     coa.destination = doc.destination_warehouse
                     coa.truck_driver = doc.driver
+                    coa.to_warehouse = doc.to_warehouse
                     coa.insert()
                     frappe.msgprint(_("A Certificate of Analysis has been created. Please complete and submit it."))
                     coa.save()

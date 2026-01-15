@@ -1,6 +1,6 @@
 {
  "actions": [],
- "allow_rename": 1,
+ "allow_rename": 0,
  "creation": "2025-06-16 13:08:35.979169",
  "default_view": "List",
  "doctype": "DocType",
@@ -25,7 +25,7 @@
    "fieldname": "specification",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Specification\u00a0",
+   "label": "Specification",
    "print_hide": 1,
    "read_only": 1
   },

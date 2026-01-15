@@ -32,14 +32,18 @@
   "destination",
   "section_break_pffzk",
   "analysis",
+  "section_break_3lj9q",
+  "to_warehouse",
+  "truck_temperature",
+  "truck_driver",
+  "column_break_znxta",
+  "cleanliness",
+  "cleaning_detergent",
+  "sanitizer",
   "section_break_szfet",
   "conclusion",
   "column_break_vyis6",
   "product_temperatures",
-  "section_break_3lj9q",
-  "truck_temperature",
-  "column_break_znxta",
-  "truck_driver",
   "tab_break_obqke",
   "stock_entry_reference",
   "amended_from"
@@ -132,6 +136,7 @@
   {
    "fieldname": "truck_driver",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Truck Driver",
    "options": "Driver"
   },
@@ -185,7 +190,8 @@
   },
   {
    "fieldname": "section_break_3lj9q",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Vehicle Inspection Details"
   },
   {
    "fieldname": "column_break_znxta",
@@ -226,13 +232,37 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "to_warehouse",
+   "fieldtype": "Link",
+   "label": "Truck",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "cleanliness",
+   "fieldtype": "Select",
+   "label": "Cleanliness",
+   "options": "\nOK\nNot OK"
+  },
+  {
+   "fieldname": "cleaning_detergent",
+   "fieldtype": "Select",
+   "label": "Cleaning Detergent",
+   "options": "MPS - 1%"
+  },
+  {
+   "fieldname": "sanitizer",
+   "fieldtype": "Select",
+   "label": "Sanitizer",
+   "options": "STERBAC 0.2%"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-09-02 14:08:35.654777",
+ "modified": "2026-01-15 11:22:19.332010",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Certificate of Analysis",

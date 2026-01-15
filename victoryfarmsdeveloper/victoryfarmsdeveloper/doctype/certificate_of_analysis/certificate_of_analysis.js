@@ -1,5 +1,6 @@
 frappe.ui.form.on('Certificate of Analysis', {
     onload(frm) {
+
         frm.attributes = [
             {
                 physical_attribute: "General Appearance",
@@ -63,17 +64,20 @@ frappe.ui.form.on('Certificate of Analysis', {
             }
         ];
 
-        frm.clear_table('analysis');
-        frm.attributes.forEach(a => {
-            frm.add_child('analysis', {
-                physical_attributes: a.physical_attribute,
-                specification: a.specification,
-                test_results: a.test_results[0]
+        // ✅ Only build table if it's empty (new doc)
+        if (!frm.doc.analysis || frm.doc.analysis.length === 0) {
+            frm.attributes.forEach(a => {
+                frm.add_child('analysis', {
+                    physical_attributes: a.physical_attribute,
+                    specification: a.specification,
+                    test_results: a.test_results[0]
+                });
             });
-        });
-        frm.refresh_field('analysis');
+            frm.refresh_field('analysis');
+        }
     }
 });
+
 
 frappe.ui.form.on('CoA Analysis', {
     form_render(frm, cdt, cdn) {
