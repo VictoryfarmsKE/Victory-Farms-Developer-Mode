@@ -196,7 +196,7 @@ override_doctype_class = {
 
 scheduler_events = {
     "daily": [
-        "victoryfarmsdeveloper.notifications.check_low_stock.check_low_stock"
+        # "victoryfarmsdeveloper.notifications.check_low_stock.check_low_stock"
         # "victoryfarmsdeveloper.notifications.leave_balance_update_check.process_checkins_without_shift"
     ],
     "cron": {
@@ -206,9 +206,9 @@ scheduler_events = {
         "0 23 * * *": [
             "victoryfarmsdeveloper.notifications.po_pending_approval.send_pending_po_notifications"
         ],
-        "0 12,15 * * *": [
-            "victoryfarmsdeveloper.notifications.check_low_stock.check_branch_low_stock"
-        ],
+        # "0 12,15 * * *": [
+        #     "victoryfarmsdeveloper.notifications.check_low_stock.check_branch_low_stock"
+        # ],
         "0 0 28-31 * *": [
             "victoryfarmsdeveloper.victoryfarmsdeveloper.doctype.sacco_loan_deduction.sacco_loan_deduction.create_remaining_payments"
         ],
