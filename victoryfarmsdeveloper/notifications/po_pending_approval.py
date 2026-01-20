@@ -106,7 +106,7 @@ def send_po_approved_notification(doc, method):
         )
 
 # Automatically move documents from Draft/Amend to Frozen aged by 7 days old
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def auto_freeze_old_pos():
     try:
         cutoff_date = add_days(getdate(nowdate()), -7)
