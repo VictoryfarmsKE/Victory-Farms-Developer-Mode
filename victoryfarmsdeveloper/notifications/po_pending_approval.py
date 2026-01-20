@@ -139,7 +139,6 @@ def notify_old_pos():
         frappe.log_error(f"General error: {e}", "Old PO Notification Debug")
         
 # Automatically move documents from Draft/Amend to Frozen aged by 7 days old
-@frappe.whitelist(allow_guest=True)
 def auto_freeze_old_pos():
     try:
         cutoff_date = add_days(getdate(nowdate()), -7)
@@ -155,6 +154,6 @@ def auto_freeze_old_pos():
             doc = frappe.get_doc("Purchase Order", po.name)
             doc.workflow_state = "Frozen"
             doc.save(ignore_permissions=True)
-            frappe.db.commit()
+        frappe.db.commit()
     except Exception as e:
         frappe.log_error(f"Auto-freeze error: {e}", "PO Auto-Freeze Debug")
