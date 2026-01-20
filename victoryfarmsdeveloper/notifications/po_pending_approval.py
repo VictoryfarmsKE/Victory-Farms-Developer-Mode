@@ -106,6 +106,7 @@ def send_po_approved_notification(doc, method):
         )
 
 # POs > 90 days (with status draft, pending approval, to amend, to receive) to notify the PO owner to action the PO  
+
 def notify_old_pos():
     try:
         cutoff_date = add_days(getdate(nowdate()), -90)
@@ -138,6 +139,7 @@ def notify_old_pos():
         frappe.log_error(f"General error: {e}", "Old PO Notification Debug")
         
 # Automatically move documents from Draft/Amend to Frozen aged by 7 days old
+@frappe.whitelist(allow_guest=True)
 def auto_freeze_old_pos():
     try:
         cutoff_date = add_days(getdate(nowdate()), -7)
