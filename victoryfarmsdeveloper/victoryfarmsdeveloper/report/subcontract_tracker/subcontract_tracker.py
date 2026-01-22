@@ -39,7 +39,7 @@ def execute(filters=None):
 
 	# Only consider Purchase Orders for contractor payments
 	conditions.append("po.custom_supplier_group = %s")
-	params.append("Contractors")
+	params.append("Construction contractors")
 
 	if filters.get("purchase_order"):
 		conditions.append("po.name = %s")
