@@ -150,6 +150,27 @@ def execute(filters=None):
                 e2_defined_contribution_retirement_scheme_amt,
                 e3_defined_contribution_retirement_scheme_amt,
             )
+            
+            housing_levy_amt = get_p9a_tax_deduction_card_amt(
+                filters,
+                emp.name,
+                month_start_date,
+                month_end_date,
+                p9a_tax_deduction_card_type[10],
+                currency,
+                company_currency,
+            )
+
+            shif_amt = get_p9a_tax_deduction_card_amt(
+                filters,
+                emp.name,
+                month_start_date,
+                month_end_date,
+                p9a_tax_deduction_card_type[11],
+                currency,
+                company_currency,
+            )
+            
             owner_occupied_interest_amt = get_p9a_tax_deduction_card_amt(
                 filters,
                 emp.name,
@@ -168,26 +189,6 @@ def execute(filters=None):
                 month_start_date,
                 month_end_date,
                 p9a_tax_deduction_card_type[9],
-                currency,
-                company_currency,
-            )
-
-            housing_levy_amt = get_p9a_tax_deduction_card_amt(
-                filters,
-                emp.name,
-                month_start_date,
-                month_end_date,
-                p9a_tax_deduction_card_type[10],
-                currency,
-                company_currency,
-            )
-
-            shif_amt = get_p9a_tax_deduction_card_amt(
-                filters,
-                emp.name,
-                month_start_date,
-                month_end_date,
-                p9a_tax_deduction_card_type[11],
                 currency,
                 company_currency,
             )
@@ -238,11 +239,12 @@ def execute(filters=None):
                 e1_defined_contribution_retirement_scheme_amt,
                 e2_defined_contribution_retirement_scheme_amt,
                 e3_defined_contribution_retirement_scheme_amt,
+                housing_levy_amt,
+                shif_amt,
+                0,  # PRMF placeholder
                 owner_occupied_interest_amt,
                 retirement_contribution_and_owner_occupied_interest_amt,
                 chargeable_pay_amt,
-                housing_levy_amt,
-                shif_amt,
                 tax_charged_amt,
                 personal_relief_amt,
                 insurance_relief_amt,
@@ -277,25 +279,25 @@ def get_columns():
         {"fieldname": "month", "label": _("Month"), "fieldtype": "Data", "width": 150},
         {
             "fieldname": "basic_salary",
-            "label": _("Basic Salary | A"),
+            "label": _("Basic Salary"),
             "fieldtype": "Currency",
             "width": 150,
         },
         {
             "fieldname": "benefits_non_cash",
-            "label": _("Benefits NonCash | B"),
+            "label": _("Benefits-NonCash"),
             "fieldtype": "Currency",
             "width": 150,
         },
         {
             "fieldname": "value_of_quarters",
-            "label": _("Value of Quarters | C"),
+            "label": _("Value of Quarters"),
             "fieldtype": "Currency",
             "width": 150,
         },
         {
             "fieldname": "total_gross_pay",
-            "label": _("Total Gross Pay | D"),
+            "label": _("Total Gross Pay"),
             "fieldtype": "Currency",
             "width": 150,
         },
@@ -318,44 +320,50 @@ def get_columns():
             "width": 150,
         },
         {
-            "fieldname": "owner_occupied_interest",
-            "label": _("Owner Occupied Interest | F"),
-            "fieldtype": "Currency",
-            "width": 150,
-        },
-        {
-            "fieldname": "retirement_contribution_and_owner_occupied_interest",
-            "label": _("Retirement Contribution and Owner Occupied Interest | G"),
-            "fieldtype": "Currency",
-            "width": 150,
-        },
-        {
-            "fieldname": "chargeable_pay",
-            "label": _("Chargeable Pay | H"),
-            "fieldtype": "Currency",
-            "width": 150,
-        },
-        {
-            "fieldname": "housing_levy",
-            "label": _("Affordable Housing Levy| N"),
+            "fieldname": "affordable_housing_levy",
+            "label": _("Affordable Housing Levy (AHL)"),
             "fieldtype": "Currency",
             "width": 150,
         },
         {
             "fieldname": "shif",
-            "label": _("Social Health Insurance Fund | J"),
+            "label": _("Social Health Insurance Fund (SHIF)"),
+            "fieldtype": "Currency",
+            "width": 150,
+        },
+        {
+            "fieldname": "post_retirement_medical_fund_prmf",
+            "label": _("Post Retirement Medical Fund (PRMF)"),
+            "fieldtype": "Currency",
+            "width": 150,
+        },
+        {
+            "fieldname": "owner_occupied_interest",
+            "label": _("Owner-Occupied Interest"),
+            "fieldtype": "Currency",
+            "width": 150,
+        },
+        {
+            "fieldname": "chargeable_pay",
+            "label": _("Total Deductions Lower of E F+G+H+I)"),
+            "fieldtype": "Currency",
+            "width": 150,
+        },
+        {
+            "fieldname": "chargeable_pay",
+            "label": _("Chargeable Pay (D-J)"),
             "fieldtype": "Currency",
             "width": 150,
         },
         {
             "fieldname": "tax_charged",
-            "label": _("Tax Charged | I"),
+            "label": _("Tax Charged"),
             "fieldtype": "Currency",
             "width": 150,
         },
         {
             "fieldname": "personal_relief",
-            "label": _("Personal Relief | K"),
+            "label": _("Personal Relief"),
             "fieldtype": "Currency",
             "width": 150,
         },
@@ -367,7 +375,7 @@ def get_columns():
         },
         {
             "fieldname": "paye_tax",
-            "label": _("PAYE Tax | L"),
+            "label": _("PAYE Tax (L-M-N)"),
             "fieldtype": "Currency",
             "width": 150,
         },

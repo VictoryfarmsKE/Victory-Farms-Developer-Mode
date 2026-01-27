@@ -1,47 +1,114 @@
 {%
 	var report_columns = report.get_columns_for_print();
 %}
-<h2 class="text-left">{%= __(report.report_name) %} {{ __("Year") }} {%= filters.fiscal_year %}</h2>
-<hr>
-<table class="table table-bordered">
-<tr>
-    <td class="text-left">{{ __("Employer's Name:") }} {%= filters.company %}</td>    
-    <td class="text-left">{{ __("Employer's PIN:") }} {%= filters.company_tax_id %}</td>
-</tr>
-<tr>
-    <td class="text-left">{{ __("Employee's Name:") }} {%= filters.employee_name %}</td>
-    <td class="text-left">{{ __("Employee's PIN:") }} {%= filters.employee_tax_id %}</td>
-</tr>
-</table>
-<hr>
-<table class="table table-bordered">
-	<thead>
+<style>
+	@page {
+		size: landscape;
+		margin: 0.25in;
+	}
+	body {
+		margin: 0;
+		padding: 0;
+	}
+	.p9a-report-container {
+		width: 100%;
+		margin: 0;
+		padding: 0;
+	}
+	.p9a-report-container h2 {
+		margin: 4px 0;
+		padding: 0;
+		font-size: 12px;
+	}
+	.p9a-report-container table {
+		width: 100%;
+		font-size: 8px;
+		border-collapse: collapse;
+		table-layout: fixed;
+	}
+	.p9a-report-container th, .p9a-report-container td {
+		padding: 2px 2px;
+		border: 0.5px solid #999;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.p9a-report-container th {
+		background-color: #e8e8e8;
+		text-align: center;
+		font-weight: bold;
+		line-height: 1.2;
+	}
+	.p9a-report-container td.text-right {
+		text-align: right;
+	}
+	.p9a-report-container td.text-left {
+		text-align: left;
+	}
+	.info-table {
+		margin-bottom: 5px;
+		width: 100%;
+		font-size: 9px;
+	}
+	.info-table td {
+		padding: 2px;
+		width: 50%;
+		border: 0.5px solid #999;
+	}
+	hr {
+		margin: 2px 0 !important;
+		padding: 0;
+		height: 1px;
+	}
+	.text-muted {
+		font-size: 8px !important;
+		margin-top: 5px !important;
+	}
+</style>
+
+<div class="p9a-report-container">
+	<h2 class="text-left">{%= __(report.report_name) %} {{ __("Year") }} {%= filters.fiscal_year %}</h2>
+	<hr style="margin: 10px 0;">
+	<table class="info-table">
 		<tr>
-			{% for(var i=0, l=report_columns.length; i<l; i++) { %}
-				<th class="text-right">{%= report_columns[i].label %}</th>
-			{% } %}
+			<td class="text-left"><strong>{{ __("Employer's Name:") }}</strong> {%= filters.company %}</td>    
+			<td class="text-left"><strong>{{ __("Employer's PIN:") }}</strong> {%= filters.company_tax_id %}</td>
 		</tr>
-	</thead>
-	<tbody>
-		{% for(var j=0, k=data.length; j<k; j++) { %}
-			{%
-				var row = data[j];
-			%}
+		<tr>
+			<td class="text-left"><strong>{{ __("Employee's Name:") }}</strong> {%= filters.employee_name %}</td>
+			<td class="text-left"><strong>{{ __("Employee's PIN:") }}</strong> {%= filters.employee_tax_id %}</td>
+		</tr>
+	</table>
+	<hr style="margin: 10px 0;">
+	<table>
+		<thead>
 			<tr>
 				{% for(var i=0, l=report_columns.length; i<l; i++) { %}
-					<td class="text-right">
-						{% var fieldname = report_columns[i].fieldname; %}
-						{% if (report_columns[i].fieldtype=='Currency' && !isNaN(row[fieldname])) { %}
-							{%= format_currency(row[fieldname]) %}
-						{% } else { %}
-							{% if (!is_null(row[fieldname])) { %}
-								{%= row[fieldname] %}
-							{% } %}
-						{% } %}
-					</td>
+					<th>{%= report_columns[i].label %}</th>
 				{% } %}
 			</tr>
-		{% } %}
-	</tbody>
-</table>
-<p class="text-right text-muted">{{ __("Printed On") }} {%= frappe.datetime.str_to_user(frappe.datetime.get_datetime_as_string()) %}</p>
+		</thead>
+		<tbody>
+			{% for(var j=0, k=data.length; j<k; j++) { %}
+				{%
+					var row = data[j];
+				%}
+				<tr>
+					{% for(var i=0, l=report_columns.length; i<l; i++) { %}
+						<td class="text-right">
+							{% var fieldname = report_columns[i].fieldname; %}
+							{% if (report_columns[i].fieldtype=='Currency' && !isNaN(row[fieldname])) { %}
+								{%= format_currency(row[fieldname]) %}
+							{% } else { %}
+								{% if (!is_null(row[fieldname])) { %}
+									{%= row[fieldname] %}
+								{% } %}
+							{% } %}
+						</td>
+					{% } %}
+				</tr>
+			{% } %}
+		</tbody>
+	</table>
+	<p class="text-right text-muted" style="margin-top: 15px; font-size: 10px;">{{ __("Printed On") }} {%= frappe.datetime.str_to_user(frappe.datetime.get_datetime_as_string()) %}</p>
+</div>
