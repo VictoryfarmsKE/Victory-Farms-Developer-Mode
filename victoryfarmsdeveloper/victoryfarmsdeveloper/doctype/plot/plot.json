@@ -20,6 +20,9 @@
   "plot_owner",
   "contract_signing_date",
   "acreage",
+  "parent_project",
+  "project",
+  "spending_code",
   "section_break_nsvx",
   "google_map_link",
   "comments",
@@ -206,12 +209,30 @@
    "fieldtype": "Table MultiSelect",
    "label": "Proposed Crop Type",
    "options": "Crop Type"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Project"
+  },
+  {
+   "fieldname": "parent_project",
+   "fieldtype": "Link",
+   "label": "Parent Project",
+   "options": "Project"
+  },
+  {
+   "fieldname": "spending_code",
+   "fieldtype": "Link",
+   "label": "Spending Code",
+   "options": "Spending Code"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-13 19:20:11.391234",
+ "modified": "2026-01-28 11:54:58.351174",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Plot",
