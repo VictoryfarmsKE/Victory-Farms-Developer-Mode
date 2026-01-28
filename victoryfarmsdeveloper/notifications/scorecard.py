@@ -1,3 +1,4 @@
+from email import message
 import frappe
 from datetime import datetime, timedelta
 
@@ -55,3 +56,101 @@ def send_pending_appraisal_notifications(batch_size=10):
     except Exception as e:
         frappe.log_error(f"General error: {e}", "Appraisals Notification Debug")
       
+#probation review notification
+def send_probation_review_notifications():
+    try:
+        today = frappe.utils.getdate()
+        target_date = today + timedelta(days=14)
+        if frappe.db.exists(
+            "Email Queue",
+            {
+                "subject": ["like", "Probation Review Reminder%"],
+                "creation": [">", today],
+            },
+        ):
+            return
+        employees = frappe.get_all(
+            "Employee",
+            filters={"probation_end_date": target_date},
+            fields=["name", "employee_name"],
+        )
+
+        if not employees:
+            return
+        hr_managers = frappe.db.sql(
+            """
+            SELECT u.name, u.first_name
+            FROM `tabUser` u
+            JOIN `tabHas Role` hr ON hr.parent = u.name
+            WHERE hr.role = 'HR Manager'
+              AND u.enabled = 1
+              AND u.name NOT IN (
+                  SELECT parent FROM `tabHas Role`
+                  WHERE role = 'System Manager'
+              )
+            """,
+            as_dict=True,
+        )
+
+        if not hr_managers:
+            return
+        rows = ""
+        for emp in employees:
+            url = frappe.utils.get_url_to_form("Employee", emp.name)
+            rows += f"""
+                <tr>
+                    <td style="padding:6px 10px;border:1px solid #ddd;">
+                        {emp.employee_name}
+                    </td>
+                    <td style="padding:6px 10px;border:1px solid #ddd;">
+                        <a href="{url}">Open Record</a>
+                    </td>
+                </tr>
+            """
+
+        message_table = f"""
+            <table style="border-collapse:collapse;font-family:Arial, sans-serif;font-size:13px;">
+                <thead>
+                    <tr style="background:#f2f2f2;">
+                        <th style="padding:6px 10px;border:1px solid #ddd;">Employee</th>
+                        <th style="padding:6px 10px;border:1px solid #ddd;">Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {rows}
+                </tbody>
+            </table>
+        """
+        for hr in hr_managers:
+            try:
+                frappe.sendmail(
+                    recipients=[hr["name"]],
+                    subject=f"Probation Review Reminder - Reviews Due on {target_date.strftime('%B %d, %Y')}",
+                    message=f"""
+                        Hello {hr['first_name']},<br><br>
+
+                        The following employees have probation reviews due on
+                        <b>{target_date.strftime('%B %d, %Y')}</b>.<br><br>
+
+                        Please initiate the probation review process.<br><br>
+
+                        {message_table}
+
+                        <br><br>
+                        Thank you.<br>
+                        <b>VF HR System</b>
+                    """,
+                    now=False,
+                )
+
+            except Exception as e:
+                frappe.log_error(
+                    f"Email error for {hr['name']}: {e}",
+                    "Probation Review Notification Error",
+                )
+
+    except Exception as e:
+        frappe.log_error(
+            f"General error: {e}",
+            "Probation Review Notification Failure",
+        )
