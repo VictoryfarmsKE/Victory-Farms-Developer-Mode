@@ -11,7 +11,7 @@
  "is_standard": "Yes",
  "json": "{}",
  "letter_head": null,
- "modified": "2026-01-27 13:45:21.244160",
+ "modified": "2026-02-05 10:43:43.679055",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "P9A Tax Deduction Card",
@@ -26,6 +26,12 @@
   },
   {
    "role": "HR Manager"
+  },
+  {
+   "role": "Employee"
+  },
+  {
+   "role": "Employee Self Service"
   }
  ],
  "timeout": 0
