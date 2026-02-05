@@ -2,10 +2,24 @@ import frappe
 from erpnext.stock.doctype.stock_entry.stock_entry import StockEntry
 from frappe import _
 from erpnext.stock.doctype.stock_entry.stock_entry import make_stock_in_entry as original_make_stock_in_entry
-from frappe.utils import nowdate
+from frappe.utils import nowdate, flt
 
 
 class CustomStockEntry(StockEntry):
+    def validate_repack_entry(self):
+       pass
+
+    def get_basic_rate_for_repacked_items(self, finished_item_qty, outgoing_items_cost):
+        finished_items = [d.item_code for d in self.get("items") if d.is_finished_item]
+        
+        if len(finished_items) == 1:
+            return flt(outgoing_items_cost / finished_item_qty)
+        
+        #distributing cost proportionally by quantity (fix for valuation rates)
+        total_fg_qty = sum([flt(d.transfer_qty) for d in self.items if d.is_finished_item])
+        if total_fg_qty:
+            return flt(outgoing_items_cost / total_fg_qty)
+
     @frappe.whitelist()
     def update_crates(self):
         self.custom_crates = []
