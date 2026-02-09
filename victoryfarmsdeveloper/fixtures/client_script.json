@@ -2,6 +2,28 @@
  {
   "docstatus": 0,
   "doctype": "Client Script",
+  "dt": "Purchase Order",
+  "enabled": 1,
+  "modified": "2025-10-23 12:28:05.683358",
+  "module": "VictoryFarmsDeveloper",
+  "name": "PO Freezing",
+  "script": "frappe.ui.form.on('Purchase Order', {\n\trefresh(frm) {\n        const protected_state = \"Frozen\";\n    \n        if (frm.doc.workflow_state === protected_state) {\n          frm.set_read_only();\n        }\n}\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Purchase Order",
+  "enabled": 1,
+  "modified": "2025-12-16 16:15:03.280526",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Disable Auto-Copy",
+  "script": "frappe.ui.form.on('Purchase Order', {\r\n    setup:  function(frm) {\r\n        // Override the cost_centre trigger to prevent auto-copy\r\n        cur_frm.cscript.cost_center = function(doc, cdt, cdn) {\r\n        };\r\n    }\r\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
   "dt": "Appraisal",
   "enabled": 1,
   "modified": "2025-04-28 20:16:55.839105",
