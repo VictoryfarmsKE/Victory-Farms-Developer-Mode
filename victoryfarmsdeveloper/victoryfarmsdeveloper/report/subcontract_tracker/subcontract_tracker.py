@@ -105,7 +105,7 @@ def execute(filters=None):
 		amount_paid = flt(sum([flt(inv.get("grand_total") or 0) - flt(inv.get("outstanding_amount") or 0) for inv in invoices]))
 
 		total_amount = flt(po.get("grand_total") or 0)
-  		to_pay = flt(total_amount - receipted)
+		to_pay = flt(total_amount - receipted)
 		balance = flt(total_amount - amount_paid)
 
 		percentage_paid = 0.0
