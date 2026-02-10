@@ -24,7 +24,6 @@ def execute(filters=None):
   		"PO Number:Link/Purchase Order:130",
 		# "Supplier:Link/Supplier:150",
 		"Receipted:Currency:120",
-		"To Pay:Currency:120",
 		"Amount Paid:Currency:120",
 		"Balance:Currency:120",
 		"Percentage Paid:Percent:100",
@@ -74,7 +73,13 @@ def execute(filters=None):
 		# Sum of linked Purchase Receipts (link is on Purchase Receipt Item.purchase_order)
 		receipted = flt(
 			frappe.db.sql(
-				"SELECT IFNULL(SUM(pr.grand_total), 0) FROM `tabPurchase Receipt` pr JOIN `tabPurchase Receipt Item` pri ON pri.parent = pr.name WHERE pr.docstatus = 1 AND pri.purchase_order = %s",
+				"""SELECT IFNULL(SUM(pr.grand_total), 0) 
+				FROM `tabPurchase Receipt` pr 
+				WHERE pr.docstatus = 1 AND pr.name IN (
+					SELECT DISTINCT pri.parent 
+					FROM `tabPurchase Receipt Item` pri 
+					WHERE pri.purchase_order = %s
+				)""",
 				(po_name,),
 			)[0][0]
 		)
@@ -94,8 +99,6 @@ def execute(filters=None):
 			po_name,
 			as_dict=True,
 		)
-
-		to_pay = flt(sum([flt(inv.get("outstanding_amount") or 0) for inv in invoices]))
 		amount_paid = flt(sum([flt(inv.get("grand_total") or 0) - flt(inv.get("outstanding_amount") or 0) for inv in invoices]))
 
 		total_amount = flt(po.get("grand_total") or 0)
