@@ -24,6 +24,7 @@ def execute(filters=None):
   		"PO Number:Link/Purchase Order:130",
 		# "Supplier:Link/Supplier:150",
 		"Receipted:Currency:120",
+		"To Pay:Currency:120",
 		"Amount Paid:Currency:120",
 		"Balance:Currency:120",
 		"Percentage Paid:Percent:100",
@@ -99,9 +100,12 @@ def execute(filters=None):
 			po_name,
 			as_dict=True,
 		)
+
+		
 		amount_paid = flt(sum([flt(inv.get("grand_total") or 0) - flt(inv.get("outstanding_amount") or 0) for inv in invoices]))
 
 		total_amount = flt(po.get("grand_total") or 0)
+  		to_pay = flt(total_amount - receipted)
 		balance = flt(total_amount - amount_paid)
 
 		percentage_paid = 0.0
