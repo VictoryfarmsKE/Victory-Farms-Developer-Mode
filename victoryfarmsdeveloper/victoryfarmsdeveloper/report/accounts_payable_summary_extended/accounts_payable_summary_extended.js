@@ -125,7 +125,8 @@ frappe.query_reports["Accounts Payable Summary Extended"] = {
             headerGroups: [
                 { html: '', colspan: 6 },  // Party Type, Party, Supplier Name, Credit Days, Credit Limit, Outstanding
                 { html: '<strong>Aged Balance</strong>', colspan: 5 },  // 5 not_due columns
-                { html: '<strong>Overdue Balance</strong>', colspan: 6 }  // 6 overdue columns
+                { html: '<strong>Overdue Balance</strong>', colspan: 6 },  // 6 overdue columns
+                { html: '', colspan: 2 }  // Supplier Group, Currency
             ]
         });
     },

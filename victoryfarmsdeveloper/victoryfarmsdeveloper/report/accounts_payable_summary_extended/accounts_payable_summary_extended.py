@@ -71,6 +71,22 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 		self.add_column(label=_("91-120"), fieldname="overdue_4", fieldtype="Currency", width=100)
 		self.add_column(label=_("121-Above"), fieldname="overdue_5", fieldtype="Currency", width=100)
 
+		#supplier group and currency
+		self.add_column(
+			label=_("Supplier Group"),
+			fieldname="supplier_group",
+			fieldtype="Link",
+			options="Supplier Group",
+			width=120
+		)
+		self.add_column(
+			label=_("Currency"),
+			fieldname="currency",
+			fieldtype="Link",
+			options="Currency",
+			width=80
+		)
+
 	def get_data(self, args):
 		"""Override to calculate custom aging"""
 		self.data = []
@@ -109,6 +125,12 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 				continue
 				
 			self.party_total[d.party].outstanding += outstanding
+			
+			#set supplier group and currency
+			if d.get("supplier_group"):
+				self.party_total[d.party].supplier_group = d.get("supplier_group")
+			if d.get("currency"):
+				self.party_total[d.party].currency = d.get("currency")
 			
 			#get due date or fallback to posting date
 			due_date = d.get("due_date")
@@ -162,6 +184,8 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 			"credit_days": "",
 			"credit_limit": 0.0,
 			"party_type": row.party_type,
+			"supplier_group": "",
+			"currency": "",
 		}
 		
 		#aged
