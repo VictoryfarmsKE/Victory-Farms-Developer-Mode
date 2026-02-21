@@ -139,7 +139,6 @@ def notify_old_pos():
         frappe.log_error(f"General error: {e}", "Old PO Notification Debug")
         
 # Automatically move documents from Draft/Amend to Frozen aged by 7 days old
-@frappe.whitelist()
 def auto_freeze_old_pos():
     try:
         cutoff_date = add_days(getdate(nowdate()), -7)
