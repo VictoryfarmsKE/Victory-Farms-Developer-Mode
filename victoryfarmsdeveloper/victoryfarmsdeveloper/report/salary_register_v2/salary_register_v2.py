@@ -63,6 +63,7 @@ def execute(filters=None):
 			"hourly_rate": ss.hourly_rate,
 			"currency": currency or company_currency,
 			"total_loan_repayment": ss.total_loan_repayment,
+			"net_pay_bonus": ss.custom_net_pay_excluding_bonus,
 		}
 
 		update_column_width(ss, columns)
@@ -81,6 +82,8 @@ def execute(filters=None):
 					"gross_pay": flt(ss.gross_pay) * flt(ss.exchange_rate),
 					"total_deduction": flt(ss.total_deduction) * flt(ss.exchange_rate),
 					"net_pay": flt(ss.net_pay) * flt(ss.exchange_rate),
+					"net_pay_bonus": flt(ss.custom_net_pay_excluding_bonus) * flt(ss.exchange_rate) if ss.custom_net_pay_excluding_bonus else 0,
+     
 				}
 			)
 
@@ -305,6 +308,13 @@ def get_columns(earning_types, ded_types):
 			{
 				"label": _("Net Pay"),
 				"fieldname": "net_pay",
+				"fieldtype": "Currency",
+				"options": "currency",
+				"width": 120,
+			},
+{
+				"label": _("Net Pay (Bonus"),
+				"fieldname": "net_pay_bonus",
 				"fieldtype": "Currency",
 				"options": "currency",
 				"width": 120,
