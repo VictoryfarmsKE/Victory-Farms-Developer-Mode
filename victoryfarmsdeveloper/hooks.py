@@ -220,6 +220,14 @@ scheduler_events = {
         "0 17 * * 0": [
             "victoryfarmsdeveloper.notifications.po_pending_approval.notify_old_pos"
         ],
+        # Generate LDCs on 15th of Mar/Jun/Sep/Dec at 05:30
+        "30 5 15 3,6,9,12 *": [
+            "victoryfarmsdeveloper.notifications.ldc.generate_quarterly_ldcs"
+        ],
+        # Send reminder on 26th of Mar/Jun/Sep/Dec at 06:30
+        "30 6 26 3,6,9,12 *": [
+            "victoryfarmsdeveloper.notifications.ldc.send_ldc_reminders"
+        ],
         "59 23 28-31 * *": [
             "victoryfarmsdeveloper.notifications.po_pending_approval.auto_freeze_old_pos"
         ],
