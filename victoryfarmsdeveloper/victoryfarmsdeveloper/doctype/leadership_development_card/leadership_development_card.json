@@ -1,0 +1,173 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-03-03 11:11:13.337389",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "department",
+  "column_break_oajy",
+  "reports_to",
+  "column_break_ogpi",
+  "quarter",
+  "year",
+  "section_break_luyu",
+  "quarterly_reflection_column",
+  "key_achievement",
+  "biggest_challenge",
+  "your_personal_growth_column",
+  "next_quarter_learning",
+  "yearly_goal",
+  "preparing_the_feedback_meeting_column",
+  "support_needed",
+  "other_discussion_points",
+  "amended_from",
+  "section_break_drqc",
+  "feedback"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_luyu",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Leadership Development Card",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "quarterly_reflection_column",
+   "fieldtype": "Column Break",
+   "label": "Quarterly Reflection"
+  },
+  {
+   "fieldname": "key_achievement",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "What are you most proud of from last quarter?\u200b",
+   "reqd": 1
+  },
+  {
+   "fieldname": "biggest_challenge",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "What was hardest during the past quarter? \u200b",
+   "reqd": 1
+  },
+  {
+   "fieldname": "your_personal_growth_column",
+   "fieldtype": "Column Break",
+   "label": "Your Personal Growth"
+  },
+  {
+   "fieldname": "next_quarter_learning",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "What do you want to learn coming quarter? \u200b",
+   "reqd": 1
+  },
+  {
+   "fieldname": "yearly_goal",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "Where do you see yourself in 12 months?\u200b",
+   "reqd": 1
+  },
+  {
+   "fieldname": "preparing_the_feedback_meeting_column",
+   "fieldtype": "Column Break",
+   "label": "Preparing the Feedback meeting"
+  },
+  {
+   "fieldname": "support_needed",
+   "fieldtype": "Text",
+   "label": "How can we help you in your growth plans?\u200b",
+   "reqd": 1
+  },
+  {
+   "fieldname": "other_discussion_points",
+   "fieldtype": "Text",
+   "label": "Anything else to discuss with your Manager? \u200b",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_drqc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "feedback",
+   "fieldtype": "Text",
+   "label": "Do you have any feedback for your manager? (optional)"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "employee.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fetch_from": "employee.reports_to",
+   "fieldname": "reports_to",
+   "fieldtype": "Data",
+   "label": "Direct Manager",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_oajy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ogpi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "quarter",
+   "fieldtype": "Select",
+   "label": "Quarter",
+   "options": "\nQ1\nQ2\nQ3\nQ4",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Link",
+   "label": "Year",
+   "options": "Fiscal Year",
+   "read_only": 1,
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-03-03 11:54:05.677835",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Leadership Development Card",
+ "owner": "Administrator",
+ "permissions": [
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
