@@ -11,7 +11,6 @@ fixtures = [
     "Client Script",
     "Server Script",
     "Custom Field",
-    {"dt": "DocType", "filters": [["name", "=", "Leadership Development Card"]]},
     {"dt": "Client Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Server Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Custom Field", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
