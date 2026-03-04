@@ -18,14 +18,12 @@ def _get_quarter_label(target_date: date) -> str:
 
 
 def _get_fiscal_year_for_date(target_date: date) -> str | None:
-    fiscal = frappe.db.get_value(
-        "Fiscal Year",
-        filters={"year_start_date": ["<=", target_date], "year_end_date": [">=", target_date]},
-    )
-    return fiscal
+    #get date of running cron (today) to estimate fiscal year, year starts in January
+    year = target_date.year
+    return str(year) if target_date.month >= 1 else str(year - 1)
 
 
-def generate_quarterly_ldcs(publish_progress: bool = False):
+def generate_quarterly_ldcs():
     """Create Draft Leadership Development Cards for active employees whose
     `custom_appraisal_template` contains 'M/D/C' for the current quarter.
     Trigged by cron on 15th of Mar/Jun/Sep/Dec.
@@ -39,58 +37,60 @@ def generate_quarterly_ldcs(publish_progress: bool = False):
     employees = frappe.get_all(
         "Employee",
         filters={"status": "Active", "custom_appraisal_template": ["like", "%M/D/C%"]},
-        fields=["name"],
+        fields=["name","department","reports_to"],
     )
 
     count = 0
     for emp in employees:
         exists = frappe.db.exists(
-            "Leadership Development Card",
-            {"employee": emp.name, "quarter": quarter_label, "year": fiscal_year },
+                "Leadership Development Card",
+            {"employee": emp.name, "department": emp.department, "reports_to": emp.reports_to, "quarter": quarter_label, "year": fiscal_year },
         )
-        print(f"Checking LDC for {emp.name} - exists: {exists}", quarter_label, fiscal_year)
         if exists:
             continue
 
-        create_ldc_for_employee(emp.name, quarter_label, fiscal_year)
+        create_ldc_for_employee(emp.name, emp.department, emp.reports_to,  quarter_label, fiscal_year)
         count += 1
 
-        if publish_progress and employees:
-            frappe.publish_progress(count * 100 / len(employees), title="Creating LDCs...")
+def create_ldc_for_employee(employee: str, department: str, reports_to: str, quarter_label: str, fiscal_year: str):
+    filters = {"employee": employee, "quarter": quarter_label}
+    if fiscal_year:
+        filters["year"] = fiscal_year
 
-
-def create_ldc_for_employee(employee: str, quarter_label: str, fiscal_year: str):
-    doc = frappe.get_doc(
-        {
-            "doctype": "Leadership Development Card",
-            "employee": employee,
-            "quarter": quarter_label,
-            "year": fiscal_year,
-        }
-    )
-    doc.flags.ignore_permissions = True
+    if frappe.db.exists("Leadership Development Card", filters):
+        frappe.log_error("A Leadership Development Card already exists for this employee and quarter. Please complete and submit it.")
+        return
     try:
-        doc.insert()
+        ldc = frappe.new_doc("Leadership Development Card")
+        ldc.employee = employee
+        ldc.department = department
+        ldc.reports_to = reports_to
+        ldc.quarter = quarter_label
+        ldc.year = fiscal_year
+        ldc.flags.ignore_permissions = True
+        ldc.insert()
+        ldc.save()
     except Exception:
         frappe.log_error(frappe.get_traceback(), "generate_quarterly_ldcs: create failed")
-    else:
-        # Email 1: notify employee that LDC is available
-        try:
-            employee_user = frappe.db.get_value("Employee", employee, "user_id")
-            employee_name = frappe.db.get_value("Employee", employee, "employee_name")
-            if employee_user:
-                ldc_link = get_url_to_form(doc.doctype, doc.name)
-                month_end = formatdate(get_last_day(getdate()))
-                message = (
-                    f"Hi {employee_name},\n\n"
-                    f"Your Leadership Development Card (LDC) for this quarter has now been created in the system.\n\n"
-                    f"Please complete your LDC before {month_end}.\n\n"
-                    "The LDC is an opportunity to reflect on your performance, development progress, and priorities for the upcoming quarter.\n\n"
-                    f"You can access your LDC here:\n{ldc_link}\n\nThank you."
-                )
-                frappe.sendmail(recipients=[employee_user], subject="Action Required - Leadership Development Card Now Available", message=message)
-        except Exception:
-            frappe.log_error(frappe.get_traceback(), "create_ldc_for_employee: notification failed")
+        return
+
+    # Email 1:notify employee that LDC is available
+    try:
+        employee_user = frappe.db.get_value("Employee", employee, "user_id")
+        employee_name = frappe.db.get_value("Employee", employee, "employee_name")
+        if employee_user:
+            ldc_link = get_url_to_form(ldc.doctype, ldc.name)
+            month_end = formatdate(get_last_day(getdate()))
+            message = (
+                f"Hi {employee_name},<br><br>"
+                f"Your Leadership Development Card (LDC) for this quarter has now been created in the system.<br><br>"
+                f"Please complete your LDC before {month_end}.<br><br>"
+                "The LDC is an opportunity to reflect on your performance, development progress, and priorities for the upcoming quarter.<br><br>"
+                f'You can access your LDC here:<br><b><a href="{ldc_link}">{ldc_link}</a></b><br><br>Thank you.'
+            )
+            frappe.sendmail(recipients=[employee_user], subject="Action Required - Leadership Development Card Now Available", message=message)
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "create_ldc_for_employee: notification failed")
 
 
 def send_ldc_reminders():
@@ -107,10 +107,6 @@ def send_ldc_reminders():
 
     for d in drafts:
         employee_user = frappe.db.get_value("Employee", d.employee, "user_id")
-        manager_user = None
-        if d.reports_to:
-            manager_user = frappe.db.get_value("Employee", d.reports_to, "user_id")
-
         recipients = []
         if employee_user:
             recipients.append(employee_user)
@@ -120,14 +116,13 @@ def send_ldc_reminders():
             month_end = formatdate(get_last_day(getdate()))
             employee_name = frappe.db.get_value("Employee", d.employee, "employee_name")
             message = (
-                f"Hi {employee_name},\n\n"
-                f"This is a reminder that your Leadership Development Card (LDC) for this quarter has not yet been completed.\n\n"
-                f"Please ensure your LDC is submitted before {month_end}.\n\n"
-                "You can access it here:\n"
-                f"{url}\n\nThank you for your prompt attention to this."
+                f"Hi {employee_name},<br><br>"
+                f"This is a reminder that your Leadership Development Card (LDC) for this quarter has not yet been completed.<br><br>"
+                f"Please ensure your LDC is submitted before {month_end}.<br><br>"
+                "You can access it here:<br>"
+                f"<b><a href=\"{url}\">{d.name}</a></b><br><br>Thank you for your prompt attention to this."
             )
-            # send to employee; copy manager if available
-            frappe.sendmail(recipients=recipients, subject=f"Reminder: Leadership Development Card due by {month_end}.", message=message, cc=([manager_user] if manager_user else None))
+            frappe.sendmail(recipients=recipients, subject=f"Reminder: Leadership Development Card due by {month_end}.", message=message)
         except Exception:
             frappe.log_error(frappe.get_traceback(), "send_ldc_reminders: email failed")
 
@@ -145,11 +140,11 @@ def notify_manager_on_submit(doc):
         manager_name = frappe.db.get_value("Employee", manager_emp, "employee_name")
         employee_name = frappe.db.get_value("Employee", doc.employee, "employee_name")
         message = (
-            f"Hi {manager_name},\n\n"
-            f"{employee_name} has completed their Leadership Development Card (LDC) for this quarter and it is now ready for your review.\n\n"
-            "Please review ahead of your quarterly feedback conversation.\n\n"
-            "You can access the LDC here:\n"
-            f"{url}\n\nThank you."
+            f"Hi {manager_name},<br><br>"
+            f"{employee_name} has completed their Leadership Development Card (LDC) for this quarter and it is now ready for your review.<br><br>"
+            "Please review ahead of your quarterly feedback conversation.<br><br>"
+            "You can access the LDC here:<br>"
+            f"<b><a href=\"{url}\">{doc.name}</a></b><br><br>Thank you."
         )
         if manager_user:
             frappe.sendmail(recipients=[manager_user], subject=f"Leadership Development Card Ready for Review – {employee_name}", message=message, cc=[employee_user] if employee_user else None)
