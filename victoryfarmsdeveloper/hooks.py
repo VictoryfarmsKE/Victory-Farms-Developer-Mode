@@ -217,20 +217,17 @@ scheduler_events = {
         "30 8 25-31 * *": [
             "victoryfarmsdeveloper.notifications.scorecard.send_pending_appraisal_notifications"
         ],
-        # Generate LDCs on 15th of Mar/Jun/Sep/Dec at 05:30
-        "30 5 15 3,6,9,12 *": [
+        "10 6 * * *": [
+            "victoryfarmsdeveloper.notifications.scorecard.send_probation_review_notifications"
+        ],
+         # Generate LDCs on 15th of Mar/Jun/Sep/Dec at 05:00
+        "00 5 15 3,6,9,12 *": [
             "victoryfarmsdeveloper.notifications.ldc.generate_quarterly_ldcs"
         ],
         # Send reminder on 26th of Mar/Jun/Sep/Dec at 06:30
-        "30 6 26 3,6,9,12 *": [
+        "00 6 26 3,6,9,12 *": [
             "victoryfarmsdeveloper.notifications.ldc.send_ldc_reminders"
         ],
-        "59 23 28-31 * *": [
-            "victoryfarmsdeveloper.notifications.po_pending_approval.auto_freeze_old_pos"
-        ],
-        "10 6 * * *": [
-            "victoryfarmsdeveloper.notifications.scorecard.send_probation_review_notifications"
-        ]
     }
 }
 

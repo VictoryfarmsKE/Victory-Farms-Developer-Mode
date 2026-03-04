@@ -1,0 +1,187 @@
+{
+ "actions": [],
+ "autoname": "HR-LDC-.YYYY.-.####",
+ "creation": "2026-03-04 15:39:06.761505",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "employee",
+  "department",
+  "reports_to",
+  "column_break_plib",
+  "quarter",
+  "year",
+  "section_break_m3zw",
+  "quarterly_reflection",
+  "key_achievement",
+  "biggest_challenge",
+  "personal_growth",
+  "next_quarter_learning",
+  "yearly_goal",
+  "feedback",
+  "support_needed",
+  "other_discussion_points",
+  "section_break_kwfj",
+  "extra_feedback",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_m3zw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Leadership Development Card",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Employee",
+   "options": "Employee",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "in_list_view": 1,
+   "label": "Department",
+   "options": "Department",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "reports_to",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Manager",
+   "options": "Employee",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_plib",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "quarterly_reflection",
+   "fieldtype": "Column Break",
+   "label": "Quarterly Reflection\u200b"
+  },
+  {
+   "fieldname": "key_achievement",
+   "fieldtype": "Text",
+   "label": "What are you most proud of from last quarter?\u200b"
+  },
+  {
+   "fieldname": "biggest_challenge",
+   "fieldtype": "Text",
+   "label": "What was hardest during the past quarter?"
+  },
+  {
+   "fieldname": "personal_growth",
+   "fieldtype": "Column Break",
+   "label": "Your personal growth\u200b"
+  },
+  {
+   "fieldname": "next_quarter_learning",
+   "fieldtype": "Text",
+   "label": "What do you want to learn coming quarter?",
+   "mandatory_depends_on": "eval: doc.docstatus == 1"
+  },
+  {
+   "fieldname": "yearly_goal",
+   "fieldtype": "Text",
+   "label": "Where do you see yourself in 12 months?"
+  },
+  {
+   "fieldname": "feedback",
+   "fieldtype": "Column Break",
+   "label": "Preparing the feedback meeting\u200b"
+  },
+  {
+   "fieldname": "support_needed",
+   "fieldtype": "Text",
+   "label": "How can we help you in your growth plans?"
+  },
+  {
+   "fieldname": "other_discussion_points",
+   "fieldtype": "Text",
+   "label": "Anything else to discuss with your Manager?"
+  },
+  {
+   "fieldname": "section_break_kwfj",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "quarter",
+   "fieldtype": "Data",
+   "label": "Quarter",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Data",
+   "label": "Year",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "extra_feedback",
+   "fieldtype": "Text",
+   "label": "Do you have any feedback for your manager (optional)? \u200b"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-03-04 19:09:54.891719",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Leadership Development Card",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
