@@ -3,7 +3,7 @@
 
 import frappe
 from frappe import _
-from frappe.utils import cint, flt, date_diff, getdate
+from frappe.utils import cint, flt, date_diff, getdate, add_days
 
 from erpnext.accounts.report.accounts_receivable_summary.accounts_receivable_summary import (
 AccountsReceivableSummary,
@@ -65,50 +65,46 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 			label=_("Outstanding Amount"), fieldname="outstanding", fieldtype="Currency", width=140
 		)
 
-		# -- SECTION A: Aged Balance (days since posting date) --
 		self.add_column(
-			label=_("Aged Balance: 0-30"), fieldname="aged_0_30", fieldtype="Currency", width=120
+			label=_("0-30"), fieldname="aged_0_30", fieldtype="Currency", width=120
 		)
 		self.add_column(
-			label=_("Aged Balance: 31-60"), fieldname="aged_31_60", fieldtype="Currency", width=120
+			label=_("31-60"), fieldname="aged_31_60", fieldtype="Currency", width=120
 		)
 		self.add_column(
-			label=_("Aged Balance: 61-90"), fieldname="aged_61_90", fieldtype="Currency", width=120
+			label=_("61-90"), fieldname="aged_61_90", fieldtype="Currency", width=120
 		)
 		self.add_column(
-			label=_("Aged Balance: 91-120"), fieldname="aged_91_120", fieldtype="Currency", width=120
+			label=_("91-120"), fieldname="aged_91_120", fieldtype="Currency", width=120
 		)
 		self.add_column(
-			label=_("Aged Balance: 121-Above"), fieldname="aged_121_above", fieldtype="Currency", width=130
+			label=_("121-Above"), fieldname="aged_121_above", fieldtype="Currency", width=130
 		)
 
-		# -- SECTION B: Overdue Balance (days past due date) --
 		self.add_column(
-			label=_("Overdue Balance: 0-7 (Suboptimal Terms)"),
+			label=_("0-7"),
 			fieldname="overdue_0_7",
 			fieldtype="Currency",
 			width=180,
 		)
 		self.add_column(
-			label=_("Overdue Balance: 8-30"), fieldname="overdue_8_30", fieldtype="Currency", width=130
+			label=_("8-30"), fieldname="overdue_8_30", fieldtype="Currency", width=130
 		)
 		self.add_column(
-			label=_("Overdue Balance: 31-60"), fieldname="overdue_31_60", fieldtype="Currency", width=130
+			label=_("31-60"), fieldname="overdue_31_60", fieldtype="Currency", width=130
 		)
 		self.add_column(
-			label=_("Overdue Balance: 61-90"), fieldname="overdue_61_90", fieldtype="Currency", width=130
+			label=_("61-90"), fieldname="overdue_61_90", fieldtype="Currency", width=130
 		)
 		self.add_column(
-			label=_("Overdue Balance: 91-120"), fieldname="overdue_91_120", fieldtype="Currency", width=140
+			label=_("91-120"), fieldname="overdue_91_120", fieldtype="Currency", width=140
 		)
 		self.add_column(
-			label=_("Overdue Balance: 121-Above"),
+			label=_("121-Above"),
 			fieldname="overdue_121_above",
 			fieldtype="Currency",
 			width=150,
 		)
-
-		# Supplier group and currency
 		self.add_column(
 			label=_("Supplier Group"),
 			fieldname="supplier_group",
@@ -129,9 +125,10 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 		self.receivables = ReceivablePayableReport(self.filters).run(args)[1]
 
 		self.party_total = frappe._dict()
+		self.supplier_credit_map = self.get_supplier_credit_terms()
 		self.calculate_custom_ageing()
 
-		supplier_credit_map = self.get_supplier_credit_terms()
+		supplier_credit_map = self.supplier_credit_map
 
 		for party, party_dict in self.party_total.items():
 			if flt(party_dict.outstanding) == 0:
@@ -148,7 +145,6 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 
 			row.update(party_dict)
 
-			# Set credit terms after update() so they override the zero-defaults in party_dict
 			credit = supplier_credit_map.get(party, frappe._dict())
 			row.credit_days = cint(credit.get("credit_days"))
 			row.credit_limit = flt(credit.get("credit_limit")) if credit.get("credit_limit") else 0.0
@@ -184,9 +180,14 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 				self.party_total[d.party].supplier_group = d.get("supplier_group")
 			if d.get("currency"):
 				self.party_total[d.party].currency = d.get("currency")
+			if getattr(self.filters, "ageing_based_on", None) == "Due Date":
+				entry_date = d.get("due_date") or d.get("posting_date") or report_date
+			elif getattr(self.filters, "ageing_based_on", None) == "Supplier Invoice Date":
+				entry_date = d.get("bill_date") or d.get("posting_date") or report_date
+			else:
+				entry_date = d.get("posting_date") or report_date
 
-			# Section A: age by posting date (all invoices)
-			posting_date = getdate(d.get("posting_date") or report_date)
+			posting_date = getdate(entry_date)
 			age = max(date_diff(report_date, posting_date), 0)
 
 			if age <= 30:
@@ -200,8 +201,15 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 			else:
 				self.party_total[d.party].aged_121_above += outstanding
 
-			# Section B: overdue only (due_date <= report_date)
-			due_date = getdate(d.get("due_date") or d.get("posting_date") or report_date)
+			# Compute due date from supplier credit days
+			credit_days = 0
+			if d.get("party"):
+				credit_days = cint(self.supplier_credit_map.get(d.party, {}).get("credit_days") or 0)
+
+			if credit_days:
+				due_date = add_days(posting_date, credit_days)
+			else:
+				due_date = getdate(d.get("due_date") or d.get("posting_date") or report_date)
 
 			if due_date <= report_date:
 				days_overdue = max(date_diff(report_date, due_date), 0)
@@ -260,10 +268,8 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 			fields=["name", "payment_terms"],
 		)
 
-		# Collect unique payment term template names for a single bulk query
 		templates = {s.payment_terms for s in suppliers if s.payment_terms}
 
-		# Fetch the first (lowest idx) detail row per template in one query
 		template_credit_days = {}
 		if templates:
 			rows = frappe.db.get_all(
@@ -273,7 +279,6 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 				order_by="parent asc, idx asc",
 			)
 			for row in rows:
-				# Keep only the first row per template (primary terms)
 				if row.parent not in template_credit_days:
 					template_credit_days[row.parent] = cint(row.credit_days)
 
