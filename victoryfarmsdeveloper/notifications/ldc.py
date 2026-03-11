@@ -134,7 +134,6 @@ def notify_manager_on_submit(doc):
         return
 
     manager_user = frappe.db.get_value("Employee", manager_emp, "user_id")
-    employee_user = frappe.db.get_value("Employee", doc.employee, "user_id")
     try:
         url = get_url_to_form(doc.doctype, doc.name)
         manager_name = frappe.db.get_value("Employee", manager_emp, "employee_name")
@@ -147,6 +146,6 @@ def notify_manager_on_submit(doc):
             f"<b><a href=\"{url}\">{doc.name}</a></b><br><br>Thank you."
         )
         if manager_user:
-            frappe.sendmail(recipients=[manager_user], subject=f"Leadership Development Card Ready for Review – {employee_name}", message=message, cc=[employee_user] if employee_user else None)
+            frappe.sendmail(recipients=[manager_user], subject=f"Leadership Development Card Ready for Review – {employee_name}", message=message)
     except Exception:
         frappe.log_error(frappe.get_traceback(), "notify_manager_on_submit: email failed")
