@@ -16,6 +16,7 @@ class LeadershipDevelopmentCard(Document):
 			"yearly_goal",
 			"support_needed",
 			"other_discussion_points",
+			"extra_feedback",
 		]
 
 		for fn in min_fields:
@@ -37,6 +38,7 @@ class LeadershipDevelopmentCard(Document):
 			"yearly_goal",
 			"support_needed",
 			"other_discussion_points",
+			"extra_feedback",
 		]
 
 		for fn in required_fields:

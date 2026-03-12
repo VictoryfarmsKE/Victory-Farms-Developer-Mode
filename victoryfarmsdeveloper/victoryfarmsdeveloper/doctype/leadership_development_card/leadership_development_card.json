@@ -101,17 +101,17 @@
   {
    "fieldname": "yearly_goal",
    "fieldtype": "Text",
-   "label": "Where do you see yourself in 12 months?"
+   "label": "What actions will you take to realize this learning?"
   },
   {
    "fieldname": "feedback",
    "fieldtype": "Column Break",
-   "label": "Preparing the feedback meeting\u200b"
+   "label": "Your career at VF"
   },
   {
    "fieldname": "support_needed",
    "fieldtype": "Text",
-   "label": "How can we help you in your growth plans?"
+   "label": "Where do you see yourself in 12 months?"
   },
   {
    "fieldname": "other_discussion_points",
@@ -139,14 +139,14 @@
   {
    "fieldname": "extra_feedback",
    "fieldtype": "Text",
-   "label": "Do you have any feedback for your manager (optional)? \u200b"
+   "label": "Do you have any feedback for your manager? \u200b"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-03-04 19:09:54.891719",
+ "modified": "2026-03-12 15:10:27.558001",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Leadership Development Card",
@@ -167,7 +167,6 @@
    "write": 1
   },
   {
-   "create": 1,
    "email": 1,
    "export": 1,
    "print": 1,
