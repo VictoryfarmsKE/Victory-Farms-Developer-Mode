@@ -95,7 +95,7 @@
   {
    "fieldname": "next_quarter_learning",
    "fieldtype": "Text",
-   "label": "What do you want to learn coming quarter?",
+   "label": "What do you want to learn in the coming quarter?",
    "mandatory_depends_on": "eval: doc.docstatus == 1"
   },
   {
@@ -138,7 +138,7 @@
   },
   {
    "fieldname": "extra_feedback",
-   "fieldtype": "Text",
+   "fieldtype": "Small Text",
    "label": "Do you have any feedback for your manager? \u200b"
   }
  ],
@@ -146,7 +146,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-03-12 15:10:27.558001",
+ "modified": "2026-03-12 15:43:30.921864",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Leadership Development Card",
