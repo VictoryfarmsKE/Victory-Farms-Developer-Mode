@@ -224,8 +224,14 @@
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2026-02-09 10:03:29.480433",
+ "links": [
+  {
+   "group": "Timesheet",
+   "link_doctype": "Timesheet",
+   "link_fieldname": "custom_plot"
+  }
+ ],
+ "modified": "2026-03-13 14:59:18.533104",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Plot",
