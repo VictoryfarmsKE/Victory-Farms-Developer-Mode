@@ -78,7 +78,7 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 			label=_("91-120"), fieldname="aged_91_120", fieldtype="Currency", width=120
 		)
 		self.add_column(
-			label=_("121-Above"), fieldname="aged_121_above", fieldtype="Currency", width=130
+			label=_("121 and above"), fieldname="aged_121_above", fieldtype="Currency", width=130
 		)
 
 		self.add_column(
@@ -87,24 +87,10 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 			fieldtype="Currency",
 			width=180,
 		)
-		self.add_column(
-			label=_("8-30"), fieldname="overdue_8_30", fieldtype="Currency", width=130
-		)
-		self.add_column(
-			label=_("31-60"), fieldname="overdue_31_60", fieldtype="Currency", width=130
-		)
-		self.add_column(
-			label=_("61-90"), fieldname="overdue_61_90", fieldtype="Currency", width=130
-		)
-		self.add_column(
-			label=_("91-120"), fieldname="overdue_91_120", fieldtype="Currency", width=140
-		)
-		self.add_column(
-			label=_("121-Above"),
-			fieldname="overdue_121_above",
-			fieldtype="Currency",
-			width=150,
-		)
+		self.add_column(label=_("8-15"), fieldname="overdue_8_15", fieldtype="Currency", width=130)
+		self.add_column(label=_("16-30"), fieldname="overdue_16_30", fieldtype="Currency", width=130)
+		self.add_column(label=_("31-45"), fieldname="overdue_31_45", fieldtype="Currency", width=130)
+		self.add_column(label=_("45 and above"), fieldname="overdue_45_above", fieldtype="Currency", width=150)
 		self.add_column(
 			label=_("Supplier Group"),
 			fieldname="supplier_group",
@@ -155,14 +141,10 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 	def calculate_custom_ageing(self):
 		"""
 		SECTION A - Aged Balance
-		  Every invoice is bucketed by age since posting date
-		  (report_date - posting_date). Covers ALL outstanding invoices and
-		  provides forward visibility for cash planning before invoices fall due.
+		  Every invoice is bucketed by age since posting date, (report_date - posting_date). Covers all outstanding invoices
 
 		SECTION B - Overdue Balance
-		  Only invoices where due_date <= report_date are bucketed here,
-		  by days past due (report_date - due_date).
-		  The 0-7 bucket flags suppliers with potentially suboptimal credit terms.
+		  Only invoices where due_date <= report_date are bucketed here, by days past due (report_date - due_date).
 		"""
 		report_date = getdate(self.filters.report_date)
 
@@ -216,16 +198,14 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 
 				if days_overdue <= 7:
 					self.party_total[d.party].overdue_0_7 += outstanding
+				elif days_overdue <= 15:
+					self.party_total[d.party].overdue_8_15 += outstanding
 				elif days_overdue <= 30:
-					self.party_total[d.party].overdue_8_30 += outstanding
-				elif days_overdue <= 60:
-					self.party_total[d.party].overdue_31_60 += outstanding
-				elif days_overdue <= 90:
-					self.party_total[d.party].overdue_61_90 += outstanding
-				elif days_overdue <= 120:
-					self.party_total[d.party].overdue_91_120 += outstanding
+					self.party_total[d.party].overdue_16_30 += outstanding
+				elif days_overdue <= 45:
+					self.party_total[d.party].overdue_31_45 += outstanding
 				else:
-					self.party_total[d.party].overdue_121_above += outstanding
+					self.party_total[d.party].overdue_45_above += outstanding
 
 	def init_party_total(self, row):
 		self.party_total[row.party] = frappe._dict(
@@ -244,11 +224,10 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 				"aged_121_above": 0.0,
 				# Section B - Overdue Balance
 				"overdue_0_7": 0.0,
-				"overdue_8_30": 0.0,
-				"overdue_31_60": 0.0,
-				"overdue_61_90": 0.0,
-				"overdue_91_120": 0.0,
-				"overdue_121_above": 0.0,
+				"overdue_8_15": 0.0,
+				"overdue_16_30": 0.0,
+				"overdue_31_45": 0.0,
+				"overdue_45_above": 0.0,
 			}
 		)
 

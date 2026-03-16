@@ -150,5 +150,24 @@
   "reference_doctype": "File",
   "script": "hr_roles = [\"HR Manager\", \"HR Assistant\", \"Payroll Officer\"]\r\n\r\nuser_roles = [r.role for r in frappe.get_all(\"Has Role\", filters={\"parent\": frappe.session.user}, fields=[\"role\"])]\r\n\r\n# Check if the user has any HR role\r\nif not set(hr_roles).intersection(user_roles):\r\n    condition = \"`tabFile`.`folder` NOT LIKE 'Home/Employee Documents%'\"\r\nelse:\r\n    condition = \"1=1\"\r\n\r\ncondition\r\n",
   "script_type": "Permission Query"
+ },
+ {
+  "allow_guest": 0,
+  "api_method": null,
+  "cron_format": null,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Submit",
+  "enable_rate_limit": 0,
+  "event_frequency": "All",
+  "modified": "2026-03-16 15:46:59.849480",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Validate time",
+  "rate_limit_count": 5,
+  "rate_limit_seconds": 86400,
+  "reference_doctype": "Timesheet",
+  "script": "if doc.custom_plot:\n    for row in doc.time_logs:\n        if not row.from_time:\n            row.from_time = frappe.utils.now()\n        if not row.to_time:\n            row.to_time = row.from_time",
+  "script_type": "DocType Event"
  }
 ]
