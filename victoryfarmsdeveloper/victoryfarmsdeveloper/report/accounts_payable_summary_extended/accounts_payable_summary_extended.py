@@ -141,10 +141,10 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 	def calculate_custom_ageing(self):
 		"""
 		SECTION A - Aged Balance
-		  Every invoice is bucketed by age since posting date, (report_date - posting_date). Covers all outstanding invoices
+		  age = report_date - bill_date
 
 		SECTION B - Overdue Balance
-		  Only invoices where due_date <= report_date are bucketed here, by days past due (report_date - due_date).
+		  due_date = bill_date + credit_days (from supplier payment terms)
 		"""
 		report_date = getdate(self.filters.report_date)
 
@@ -162,15 +162,11 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 				self.party_total[d.party].supplier_group = d.get("supplier_group")
 			if d.get("currency"):
 				self.party_total[d.party].currency = d.get("currency")
-			if getattr(self.filters, "ageing_based_on", None) == "Due Date":
-				entry_date = d.get("due_date") or d.get("posting_date") or report_date
-			elif getattr(self.filters, "ageing_based_on", None) == "Supplier Invoice Date":
-				entry_date = d.get("bill_date") or d.get("posting_date") or report_date
-			else:
-				entry_date = d.get("posting_date") or report_date
 
-			posting_date = getdate(entry_date)
-			age = max(date_diff(report_date, posting_date), 0)
+			bill_date = getdate(d.get("bill_date") or d.get("posting_date") or report_date)
+
+			# --- Section A: Aged Balance (age from bill_date) ---
+			age = max(date_diff(report_date, bill_date), 0)
 
 			if age <= 30:
 				self.party_total[d.party].aged_0_30 += outstanding
@@ -183,15 +179,15 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 			else:
 				self.party_total[d.party].aged_121_above += outstanding
 
-			# Compute due date from supplier credit days
+			# --- Section B: Overdue Balance (due_date = bill_date + credit_days) ---
 			credit_days = 0
 			if d.get("party"):
 				credit_days = cint(self.supplier_credit_map.get(d.party, {}).get("credit_days") or 0)
 
 			if credit_days:
-				due_date = add_days(posting_date, credit_days)
+				due_date = add_days(bill_date, credit_days)
 			else:
-				due_date = getdate(d.get("due_date") or d.get("posting_date") or report_date)
+				due_date = getdate(d.get("due_date") or bill_date)
 
 			if due_date <= report_date:
 				days_overdue = max(date_diff(report_date, due_date), 0)
