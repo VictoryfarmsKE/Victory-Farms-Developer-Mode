@@ -152,6 +152,7 @@ def auto_freeze_old_pos():
         )
         for po in pos_to_freeze:
             doc = frappe.get_doc("Purchase Order", po.name)
+            doc.status = "Closed"
             doc.workflow_state = "Frozen"
             doc.save(ignore_permissions=True)
         frappe.db.commit()
