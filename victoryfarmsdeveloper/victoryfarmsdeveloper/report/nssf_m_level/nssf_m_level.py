@@ -45,7 +45,7 @@ def execute(filters=None):
             `tabSalary Slip` ss
         JOIN
             `tabEmployee` e ON ss.employee = e.name
-        WHERE {conditions} AND ss.custom_grade LIKE '%M%'
+        WHERE {conditions} AND (ss.custom_grade LIKE 'M%%' OR ss.custom_grade LIKE 'AM%%')
         ORDER BY ss.employee
     """
 
