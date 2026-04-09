@@ -163,7 +163,8 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 			if d.get("currency"):
 				self.party_total[d.party].currency = d.get("currency")
 
-			bill_date = getdate(d.get("bill_date") or d.get("posting_date") or report_date)
+			bill_date = getdate(d.get("bill_date"))
+			due_date = getdate(d.get("due_date"))
 
 			# --- Section A: Aged Balance (age from bill_date) ---
 			age = max(date_diff(report_date, bill_date), 0)
@@ -179,15 +180,15 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 			else:
 				self.party_total[d.party].aged_121_above += outstanding
 
-			# --- Section B: Overdue Balance (due_date = bill_date + credit_days) ---
+			# --- Section B: Overdue Balance (due_date = due_date + credit_days) ---
 			credit_days = 0
 			if d.get("party"):
 				credit_days = cint(self.supplier_credit_map.get(d.party, {}).get("credit_days") or 0)
 
 			if credit_days:
-				due_date = add_days(bill_date, credit_days)
+				due_date = add_days(due_date, credit_days)
 			else:
-				due_date = getdate(d.get("due_date") or bill_date)
+				due_date = getdate(d.get("due_date") or due_date)
 
 			if due_date <= report_date:
 				days_overdue = max(date_diff(report_date, due_date), 0)

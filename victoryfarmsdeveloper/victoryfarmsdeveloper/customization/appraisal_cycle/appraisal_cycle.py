@@ -3,9 +3,9 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.query_builder.functions import Count
 from frappe.query_builder.terms import SubQuery
+from hrms.hr.doctype.appraisal_cycle.appraisal_cycle import AppraisalCycle
 
-
-class CustomAppraisalCycle(Document):
+class CustomAppraisalCycle(AppraisalCycle):
     def onload(self):
         self.set_onload("appraisals_created", self.check_if_appraisals_exist())
 
