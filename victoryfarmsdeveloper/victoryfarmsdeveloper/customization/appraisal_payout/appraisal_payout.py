@@ -7,8 +7,8 @@ from frappe.model.document import Document
 from frappe.query_builder import DocType
 from pypika import Order
 from frappe.utils import flt, add_days
-
-class CustomAppraisalPayout(Document):
+from navari_vf.navari_vf.doctype.appraisal_payout.appraisal_payout import AppraisalPayout
+class CustomAppraisalPayout(AppraisalPayout):
 
 	def get_emp_list(self):
 		"""
