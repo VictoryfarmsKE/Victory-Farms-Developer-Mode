@@ -231,6 +231,12 @@ scheduler_events = {
         "59 23 28-31 * *": [
             "victoryfarmsdeveloper.notifications.po_pending_approval.auto_freeze_old_pos"
         ],
+        "0 5 * * *": [
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.doctype.tardiness_record.tardiness_record.process_daily_attendance"
+        ],
+        "0 5 24 * *": [
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.doctype.tardiness_record.tardiness_record.send_monthly_hr_tardiness_report"
+        ],
         "10 6 * * *": [
             "victoryfarmsdeveloper.notifications.scorecard.send_probation_review_notifications"
         ]
