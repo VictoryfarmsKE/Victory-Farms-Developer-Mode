@@ -209,6 +209,7 @@ def _get_tardiness_threshold_rows(period_start, period_end) -> list[dict]:
 			COUNT(tr.name) AS tardy_count
 		FROM `tabTardiness Record` tr
 		WHERE tr.docstatus != 2
+		AND tr.status == 'Rejected'
 		AND tr.attendance_date >= %(period_start)s
 		AND tr.attendance_date <= %(period_end)s
 		GROUP BY tr.employee

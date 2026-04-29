@@ -17,6 +17,7 @@
   "department",
   "section_break_5",
   "attendance_date",
+  "shift_start_time",
   "actual_checkin_time",
   "column_break1",
   "description",
@@ -198,13 +199,23 @@
    "options": "Attendance",
    "reqd": 1,
    "search_index": 1
+  },
+  {
+   "description": "20 minutes allowance accepted",
+   "fetch_from": "shift_type.start_time",
+   "fieldname": "shift_start_time",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Shift Start Time",
+   "reqd": 1,
+   "search_index": 1
   }
  ],
  "icon": "fa fa-calendar",
  "is_submittable": 1,
  "links": [],
  "max_attachments": 3,
- "modified": "2026-04-28 11:05:34.625741",
+ "modified": "2026-04-29 12:12:48.303984",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Tardiness Record",
