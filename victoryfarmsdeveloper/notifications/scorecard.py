@@ -48,7 +48,7 @@ def send_pending_appraisal_notifications(batch_size=10):
                                     recipients=[user_info["user"]],
                                     subject="REMINDER: Scorecard Submission Due by " + last_day_of_month.strftime("%B %d, %Y"),
                                     message = f"Hello {user_info['first_name']},<br><br>A reminder to complete and submit your scorecards by " + last_day_of_month.strftime("%B %d, %Y") + " at 5pm, as per the performance review timelines. <br><br><b>N/B Late Score Card Submission will reflect on the Manager's score card.</b> <br><br> "
-                                    f"<b><a href=\"{url}\">{doc.name}</a></b> is pending your approval.<br><br> Reach out to Angeline/Anne in case of any challenges.<br><br>VF HR",
+                                    f"<b><a href=\"{url}\">{doc.name}</a></b> is pending your approval.<br><br> Reach out to HR in case of any challenges.<br><br>VF HR",
                                     now=True
                                 )
                             except Exception as e:
