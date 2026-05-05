@@ -1,0 +1,179 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2026-04-23 18:00:30.774735",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_txwa",
+  "amended_from",
+  "section_break_mvee",
+  "naming_series",
+  "origin_country",
+  "clearing_agent",
+  "port_of_loading",
+  "port_of_discharge",
+  "column_break_qhut",
+  "eta",
+  "etd",
+  "bill_of_lading",
+  "po_section_section",
+  "linked_purchase_orders",
+  "costing_section",
+  "estimated_freight_cost",
+  "estimated_duty_cost",
+  "actual_duty",
+  "summary_section",
+  "total_containers",
+  "total_received_qty"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_txwa",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Imports Consignment",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "section_break_mvee",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "\nCON-.YYYY.-"
+  },
+  {
+   "fieldname": "origin_country",
+   "fieldtype": "Data",
+   "label": "Origin Country"
+  },
+  {
+   "fieldname": "clearing_agent",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Clearing Agent",
+   "options": "Supplier",
+   "reqd": 1
+  },
+  {
+   "fieldname": "port_of_loading",
+   "fieldtype": "Data",
+   "label": "Port of Loading"
+  },
+  {
+   "fieldname": "port_of_discharge",
+   "fieldtype": "Data",
+   "label": "Port of Discharge"
+  },
+  {
+   "fieldname": "column_break_qhut",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "eta",
+   "fieldtype": "Date",
+   "label": "ETA"
+  },
+  {
+   "fieldname": "etd",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "ETD",
+   "reqd": 1
+  },
+  {
+   "fieldname": "bill_of_lading",
+   "fieldtype": "Data",
+   "label": "Bill of Lading Number"
+  },
+  {
+   "fieldname": "po_section_section",
+   "fieldtype": "Section Break",
+   "label": "PO Section"
+  },
+  {
+   "fieldname": "linked_purchase_orders",
+   "fieldtype": "Table",
+   "label": "Linked Purchase Orders",
+   "options": "Consignment PO Details"
+  },
+  {
+   "fieldname": "costing_section",
+   "fieldtype": "Section Break",
+   "label": "Costing"
+  },
+  {
+   "fieldname": "estimated_freight_cost",
+   "fieldtype": "Currency",
+   "label": "Estimated Freight Cost"
+  },
+  {
+   "fieldname": "estimated_duty_cost",
+   "fieldtype": "Currency",
+   "label": "Estimated Duty Cost"
+  },
+  {
+   "fieldname": "actual_duty",
+   "fieldtype": "Currency",
+   "label": "Actual Duty "
+  },
+  {
+   "fieldname": "summary_section",
+   "fieldtype": "Section Break",
+   "label": "Summary"
+  },
+  {
+   "fieldname": "total_containers",
+   "fieldtype": "Int",
+   "label": "Total Containers",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_received_qty",
+   "fieldtype": "Float",
+   "label": "Total Received Qty",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-05-05 17:45:44.125138",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Imports Consignment",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
