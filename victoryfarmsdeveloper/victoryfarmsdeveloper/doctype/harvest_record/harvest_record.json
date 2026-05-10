@@ -17,7 +17,8 @@
   "harvested_by",
   "employee_no",
   "uom",
-  "naming_series"
+  "naming_series",
+  "harvesters_signature"
  ],
  "fields": [
   {
@@ -99,13 +100,19 @@
    "label": "Naming Series",
    "options": "\nHR-.YY.-.#####",
    "reqd": 1
+  },
+  {
+   "fieldname": "harvesters_signature",
+   "fieldtype": "Signature",
+   "label": "Harvester's Signature",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-05 00:38:59.878151",
+ "modified": "2026-05-06 09:45:54.447189",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Harvest Record",

@@ -18,6 +18,7 @@
   "eta",
   "etd",
   "bill_of_lading",
+  "exempt",
   "po_section_section",
   "linked_purchase_orders",
   "costing_section",
@@ -144,13 +145,19 @@
    "fieldtype": "Float",
    "label": "Total Received Qty",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "exempt",
+   "fieldtype": "Check",
+   "label": "Exempt"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-05 17:45:44.125138",
+ "modified": "2026-05-06 16:29:29.616643",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Imports Consignment",
