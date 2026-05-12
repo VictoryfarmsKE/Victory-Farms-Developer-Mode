@@ -25,6 +25,15 @@
   "estimated_freight_cost",
   "estimated_duty_cost",
   "actual_duty",
+  "time_stamp_section",
+  "production_ongoing_date",
+  "production_complete_date",
+  "shipped_date",
+  "clearance_ongoing_date",
+  "column_break_rzvn",
+  "clearance_complete_date",
+  "transit_to_farm_date",
+  "received_at_farm_date",
   "summary_section",
   "total_containers",
   "total_received_qty"
@@ -147,17 +156,62 @@
    "read_only": 1
   },
   {
-   "default": "0",
    "fieldname": "exempt",
-   "fieldtype": "Check",
-   "label": "Exempt"
+   "fieldtype": "Select",
+   "label": "Exempt",
+   "options": "\nYes\nNo",
+   "reqd": 1
+  },
+  {
+   "fieldname": "time_stamp_section",
+   "fieldtype": "Section Break",
+   "label": "Time Stamp"
+  },
+  {
+   "fieldname": "production_ongoing_date",
+   "fieldtype": "Datetime",
+   "label": "Production Ongoing Date"
+  },
+  {
+   "fieldname": "production_complete_date",
+   "fieldtype": "Datetime",
+   "label": "Production Complete Date"
+  },
+  {
+   "fieldname": "shipped_date",
+   "fieldtype": "Datetime",
+   "label": "Shipped Date"
+  },
+  {
+   "fieldname": "clearance_ongoing_date",
+   "fieldtype": "Datetime",
+   "label": "Clearance Ongoing Date"
+  },
+  {
+   "fieldname": "column_break_rzvn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "clearance_complete_date",
+   "fieldtype": "Datetime",
+   "label": "Clearance Complete Date"
+  },
+  {
+   "fieldname": "transit_to_farm_date",
+   "fieldtype": "Datetime",
+   "label": "Transit to Farm Date"
+  },
+  {
+   "fieldname": "received_at_farm_date",
+   "fieldtype": "Datetime",
+   "label": "Received at Farm Date"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-06 16:29:29.616643",
+ "modified": "2026-05-12 11:19:47.149676",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Imports Consignment",
