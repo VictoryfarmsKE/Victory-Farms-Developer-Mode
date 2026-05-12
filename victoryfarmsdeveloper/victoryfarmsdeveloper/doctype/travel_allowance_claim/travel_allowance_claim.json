@@ -1,0 +1,162 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2026-02-26 11:52:33.497359",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "employee_details_section",
+  "employee",
+  "employee_grade",
+  "travel_area",
+  "total_amount",
+  "allownace_rate_used",
+  "cost_center",
+  "column_break_spsp",
+  "travel_start_date",
+  "travel_end_date",
+  "total_days",
+  "total_nights",
+  "allowance_effective_from",
+  "section_break_qbic",
+  "travel_allowance_details",
+  "section_break_3sba",
+  "amended_from",
+  "naming_series"
+ ],
+ "fields": [
+  {
+   "fieldname": "employee_details_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Details"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "depends_on": "eval:doc.employee",
+   "fieldname": "employee_grade",
+   "fieldtype": "Data",
+   "label": "Employee Grade"
+  },
+  {
+   "fieldname": "travel_area",
+   "fieldtype": "Select",
+   "label": "Travel Area",
+   "options": "\nUrban\nRural"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount"
+  },
+  {
+   "fieldname": "allownace_rate_used",
+   "fieldtype": "Link",
+   "label": "Allownace rate used",
+   "options": "Travel Allowance Rate"
+  },
+  {
+   "fieldname": "column_break_spsp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "travel_start_date",
+   "fieldtype": "Date",
+   "label": "Travel Start Date"
+  },
+  {
+   "fieldname": "travel_end_date",
+   "fieldtype": "Date",
+   "label": "Travel End Date"
+  },
+  {
+   "fieldname": "total_days",
+   "fieldtype": "Int",
+   "label": "Total Days"
+  },
+  {
+   "fieldname": "total_nights",
+   "fieldtype": "Int",
+   "label": "Total Nights"
+  },
+  {
+   "fieldname": "allowance_effective_from",
+   "fieldtype": "Date",
+   "label": "Allowance Effective from"
+  },
+  {
+   "fieldname": "section_break_qbic",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "travel_allowance_details",
+   "fieldtype": "Table",
+   "label": "Travel Allowance Details",
+   "options": "Travel Allowance Details"
+  },
+  {
+   "fieldname": "section_break_3sba",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Travel Allowance Claim",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "default": "TAC-.YYYY.-.#####",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "\nTAC-.YYYY.-.#####"
+  },
+  {
+   "fetch_from": "employee.payroll_cost_center",
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-05-12 22:45:23.138290",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Travel Allowance Claim",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
