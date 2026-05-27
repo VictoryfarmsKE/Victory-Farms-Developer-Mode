@@ -240,18 +240,18 @@ class AccountsReceivableSummaryExtended(ReceivablePayableReport):
 		self.add_column(label=_("Total Amount Due"), fieldname="total_due")
 
 		# Section A - Aged Balance (age from invoice date)
-		self.add_column(label=_("0-30"), fieldname="aged_0_30", fieldtype="Currency", width=120)
-		self.add_column(label=_("31-60"), fieldname="aged_31_60", fieldtype="Currency", width=120)
-		self.add_column(label=_("61-90"), fieldname="aged_61_90", fieldtype="Currency", width=120)
-		self.add_column(label=_("91-120"), fieldname="aged_91_120", fieldtype="Currency", width=120)
-		self.add_column(label=_("121 and above"), fieldname="aged_121_above", fieldtype="Currency", width=130)
+		# self.add_column(label=_("0-30"), fieldname="aged_0_30", fieldtype="Currency", width=120)
+		# self.add_column(label=_("31-60"), fieldname="aged_31_60", fieldtype="Currency", width=120)
+		# self.add_column(label=_("61-90"), fieldname="aged_61_90", fieldtype="Currency", width=120)
+		# self.add_column(label=_("91-120"), fieldname="aged_91_120", fieldtype="Currency", width=120)
+		# self.add_column(label=_("121 and above"), fieldname="aged_121_above", fieldtype="Currency", width=130)
 
 		# Section B - Overdue Balance (days past due date)
-		self.add_column(label=_("0-7 Overdue"), fieldname="overdue_0_7", fieldtype="Currency", width=120)
-		self.add_column(label=_("8-15 Overdue"), fieldname="overdue_8_15", fieldtype="Currency", width=120)
-		self.add_column(label=_("16-30 Overdue"), fieldname="overdue_16_30", fieldtype="Currency", width=120)
-		self.add_column(label=_("31-45 Overdue"), fieldname="overdue_31_45", fieldtype="Currency", width=120)
-		self.add_column(label=_("45+ Overdue"), fieldname="overdue_45_above", fieldtype="Currency", width=130)
+		self.add_column(label=_("0-7"), fieldname="overdue_0_7", fieldtype="Currency", width=120)
+		self.add_column(label=_("8-15"), fieldname="overdue_8_15", fieldtype="Currency", width=120)
+		self.add_column(label=_("16-30"), fieldname="overdue_16_30", fieldtype="Currency", width=120)
+		self.add_column(label=_("31-45"), fieldname="overdue_31_45", fieldtype="Currency", width=120)
+		self.add_column(label=_("45+"), fieldname="overdue_45_above", fieldtype="Currency", width=130)
 
 		if self.filters.show_future_payments:
 			self.add_column(label=_("Future Payment Amount"), fieldname="future_amount")
