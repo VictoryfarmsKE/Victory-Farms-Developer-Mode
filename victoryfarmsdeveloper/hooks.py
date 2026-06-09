@@ -117,7 +117,7 @@ doctype_list_js = {
 # ------------------
 # See frappe.core.notifications.get_notification_config
 
-# notification_config = "victoryfarmsdeveloper.notifications.get_notification_config"
+notification_config = "victoryfarmsdeveloper.notifications.get_notification_config"
 
 # Permissions
 # -----------
@@ -195,8 +195,10 @@ override_doctype_class = {
 
 scheduler_events = {
     "daily": [
-        # "victoryfarmsdeveloper.notifications.check_low_stock.check_low_stock"
-        # "victoryfarmsdeveloper.notifications.leave_balance_update_check.process_checkins_without_shift"
+        "victoryfarmsdeveloper.notifications.check_low_stock.check_branch_low_stock",
+        "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check",
+        "victoryfarmsdeveloper.notifications.leave_balance_update_check.process_checkins_without_shift",
+        "victoryfarmsdeveloper.notifications.scorecard.send_pending_appraisal_notifications"
     ],
     "cron": {
         "0 7 * * *": [
@@ -248,6 +250,12 @@ doc_events = {
     },
     "Purchase Order": {
         "on_update": "victoryfarmsdeveloper.notifications.po_pending_approval.send_po_approved_notification"
+    },
+    "Leave Application": {
+        "on_update": "victoryfarmsdeveloper.notifications.leave_balance_update_check.queue_leave_balance_update_check"
+    },
+    "Appraisal": {
+        "on_update": "victoryfarmsdeveloper.notifications.scorecard.queue_appraisal_notifications"
     },
     "Stock Entry": {
         "before_save": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_save_stock_entry",
