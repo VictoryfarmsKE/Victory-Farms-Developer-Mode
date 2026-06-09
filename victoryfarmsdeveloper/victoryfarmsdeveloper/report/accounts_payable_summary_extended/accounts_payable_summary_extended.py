@@ -239,12 +239,17 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 
 		Credit limit is read directly from the Supplier master credit_limit field.
 		"""
+		# Query only available fields - some sites may not have `credit_limit` column
+		fields = ["name", "payment_terms"]
+		if frappe.db.has_column("tabSupplier", "credit_limit"):
+			fields.append("credit_limit")
+
 		suppliers = frappe.db.get_all(
 			"Supplier",
-			fields=["name", "payment_terms"],
+			fields=fields,
 		)
 
-		templates = {s.payment_terms for s in suppliers if s.payment_terms}
+		templates = {s.get("payment_terms") if isinstance(s, dict) else getattr(s, "payment_terms", None) for s in suppliers if (s.get("payment_terms") if isinstance(s, dict) else getattr(s, "payment_terms", None))}
 
 		template_credit_days = {}
 		if templates:
@@ -260,13 +265,13 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 
 		result = frappe._dict()
 		for supplier in suppliers:
-			credit_days = (
-				template_credit_days.get(supplier.payment_terms, 0) if supplier.payment_terms else 0
-			)
-			result[supplier.name] = frappe._dict(
+			payment_terms = supplier.get("payment_terms") if isinstance(supplier, dict) else getattr(supplier, "payment_terms", None)
+			credit_days = template_credit_days.get(payment_terms, 0) if payment_terms else 0
+			credit_limit = supplier.get("credit_limit") if isinstance(supplier, dict) else getattr(supplier, "credit_limit", None)
+			result[supplier.get("name") if isinstance(supplier, dict) else getattr(supplier, "name")] = frappe._dict(
 				{
 					"credit_days": credit_days,
-					"credit_limit": flt(supplier.credit_limit) if supplier.credit_limit else 0.0,
+					"credit_limit": flt(credit_limit) if credit_limit else 0.0,
 				}
 			)
 
