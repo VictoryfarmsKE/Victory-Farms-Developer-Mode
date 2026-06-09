@@ -30,22 +30,20 @@
    "fieldname": "rate",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Rate",
-   "read_only": 1
+   "label": "Rate"
   },
   {
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Amount",
-   "read_only": 1
+   "label": "Amount"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-05-12 22:42:58.056048",
+ "modified": "2026-06-08 13:58:34.363037",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Travel Allowance Details",
