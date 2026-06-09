@@ -210,6 +210,18 @@ def process_checkins_without_shift(batch_size=250, start=0):
                 is_async=True
             )
             
+
+def queue_leave_balance_update_check(doc, method):
+    if getattr(doc, "status", None) == "Pending Sufficient Balance" and getattr(doc, "docstatus", None) == 0:
+        frappe.enqueue(
+            "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check",
+            queue="short",
+            timeout=300,
+            is_async=True,
+            job_name=f"Leave balance update check for {doc.name}"
+        )
+
+
 @frappe.whitelist()
 def start_background_shift_update():
     frappe.enqueue(

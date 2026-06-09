@@ -58,6 +58,7 @@ class AccountsReceivableSummaryExtended(ReceivablePayableReport):
 			gl_balance_map = get_gl_balance(self.filters.report_date, self.filters.company, self.account_type)
 
 		self.calculate_custom_ageing()
+		self.customer_credit_map = self.get_customer_credit_terms()
 
 		for party, party_dict in self.party_total.items():
 			if flt(party_dict.outstanding, self.currency_precision) == 0:
@@ -76,6 +77,11 @@ class AccountsReceivableSummaryExtended(ReceivablePayableReport):
 				row.party_name = frappe.get_cached_value(doctype, party, fieldname)
 
 			row.update(party_dict)
+
+			# Add credit days and credit limit
+			credit = self.customer_credit_map.get(party, frappe._dict())
+			row.credit_days = cint(credit.get("credit_days"))
+			row.credit_limit = flt(credit.get("credit_limit")) if credit.get("credit_limit") else 0.0
 
 			# Advance against party
 			row.advance = party_advance_amount.get(party, 0)
@@ -115,6 +121,8 @@ class AccountsReceivableSummaryExtended(ReceivablePayableReport):
 			"outstanding": 0.0,
 			"total_due": 0.0,
 			"future_amount": 0.0,
+			"credit_days": 0,
+			"credit_limit": 0.0,
 			"sales_person": [],
 			"party_type": row.party_type,
 			# Section A - Aged Balance
@@ -232,6 +240,10 @@ class AccountsReceivableSummaryExtended(ReceivablePayableReport):
 		self.add_column(_(credit_debit_label), fieldname="credit_note")
 		self.add_column(_("Outstanding Amount"), fieldname="outstanding")
 
+		# Credit terms
+		self.add_column(label=_("Credit Days"), fieldname="credit_days", fieldtype="Int", width=100)
+		self.add_column(label=_("Credit Limit"), fieldname="credit_limit", fieldtype="Currency", width=130)
+
 		if self.filters.show_gl_balance:
 			self.add_column(_("GL Balance"), fieldname="gl_balance")
 			self.add_column(_("Difference"), fieldname="diff")
@@ -284,6 +296,57 @@ class AccountsReceivableSummaryExtended(ReceivablePayableReport):
 		self.add_column(
 			label=_("Currency"), fieldname="currency", fieldtype="Link", options="Currency", width=80
 		)
+
+	def get_customer_credit_terms(self):
+		"""
+		Returns a dict keyed by customer/supplier name:
+		  {party: {credit_days: int, credit_limit: float}}
+
+		Credit days are read from the first row of Payment Terms Template Detail
+		(child table of Payment Terms Template) linked on the Customer/Supplier master
+		via the payment_terms field.
+
+		Credit limit is read directly from the Customer/Supplier master credit_limit field.
+		"""
+		if self.account_type == "Receivable":
+			doctype = "Customer"
+		else:
+			doctype = "Supplier"
+
+		parties = frappe.db.get_all(
+			doctype,
+			fields=["name", "payment_terms", "credit_limit"],
+		)
+
+		templates = {p.payment_terms for p in parties if p.payment_terms}
+
+		template_credit_days = {}
+		if templates:
+			template_details = frappe.db.get_all(
+				"Payment Terms Template Detail",
+				fields=["parent", "credit_days"],
+				filters={"parent": ["in", list(templates)]},
+				order_by="parent, idx",
+			)
+
+			for detail in template_details:
+				if detail.parent not in template_credit_days:
+					template_credit_days[detail.parent] = detail.credit_days
+
+		credit_map = {}
+		for party in parties:
+			credit_days = 0
+			if party.payment_terms and party.payment_terms in template_credit_days:
+				credit_days = template_credit_days[party.payment_terms]
+
+			credit_map[party.name] = frappe._dict(
+				{
+					"credit_days": credit_days,
+					"credit_limit": party.credit_limit or 0,
+				}
+			)
+
+		return credit_map
 
 
 def get_gl_balance(report_date, company, account_type):
