@@ -154,3 +154,15 @@ def send_probation_review_notifications():
             f"General error: {e}",
             "Probation Review Notification Failure",
         )
+
+
+def queue_appraisal_notifications(doc, method):
+    if getattr(doc, "workflow_state", None) not in ["Approved", "To Amend", "Cancelled"]:
+        frappe.enqueue(
+            "victoryfarmsdeveloper.notifications.scorecard.send_pending_appraisal_notifications",
+            queue="short",
+            timeout=600,
+            is_async=True,
+            job_name=f"Appraisal notification queue for {doc.name}"
+        )
+

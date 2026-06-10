@@ -47,7 +47,7 @@
    "fieldname": "travel_area",
    "fieldtype": "Select",
    "label": "Travel Area",
-   "options": "\nUrban\nRural"
+   "options": "\nUrban\nRural\nUrban/Rural"
   },
   {
    "fieldname": "total_amount",
@@ -132,7 +132,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-12 22:45:23.138290",
+ "modified": "2026-05-25 13:33:18.596353",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Travel Allowance Claim",
