@@ -313,16 +313,23 @@ class AccountsReceivableSummaryExtended(ReceivablePayableReport):
 		else:
 			doctype = "Supplier"
 
-		parties = frappe.db.get_all(
-			doctype,
-			fields=["name", "payment_terms"],
-		)
+		table = f"tab{doctype}"
 
-		templates = {
-			(p.get("payment_terms") if isinstance(p, dict) else getattr(p, "payment_terms", None))
-			for p in parties
-			if (p.get("payment_terms") if isinstance(p, dict) else getattr(p, "payment_terms", None))
-		}
+		# Check once whether credit_limit column exists in the DB
+		has_credit_limit = frappe.db.has_column(table, "credit_limit")
+
+		if has_credit_limit:
+			parties = frappe.db.sql(
+				f"SELECT `name`, `payment_terms`, `credit_limit` FROM `{table}`",
+				as_dict=True,
+			)
+		else:
+			parties = frappe.db.sql(
+				f"SELECT `name`, `payment_terms` FROM `{table}`",
+				as_dict=True,
+			)
+
+		templates = {p.payment_terms for p in parties if p.payment_terms}
 
 		template_credit_days = {}
 		if templates:
@@ -339,25 +346,13 @@ class AccountsReceivableSummaryExtended(ReceivablePayableReport):
 
 		credit_map = {}
 		for party in parties:
-			payment_terms = (
-				party.get("payment_terms")
-				if isinstance(party, dict)
-				else getattr(party, "payment_terms", None)
-			)
-			credit_days = template_credit_days.get(payment_terms, 0) if payment_terms else 0
+			credit_days = template_credit_days.get(party.payment_terms, 0) if party.payment_terms else 0
+			credit_limit = flt(party.get("credit_limit")) if has_credit_limit else 0.0
 
-			# Fetch credit_limit separately with defensive handling
-			try:
-				credit_limit = frappe.get_cached_value(doctype, party.get("name"), "credit_limit") or 0
-			except Exception:
-				credit_limit = 0
-
-			credit_map[
-				party.get("name") if isinstance(party, dict) else getattr(party, "name")
-			] = frappe._dict(
+			credit_map[party.name] = frappe._dict(
 				{
 					"credit_days": credit_days,
-					"credit_limit": flt(credit_limit),
+					"credit_limit": credit_limit,
 				}
 			)
 
