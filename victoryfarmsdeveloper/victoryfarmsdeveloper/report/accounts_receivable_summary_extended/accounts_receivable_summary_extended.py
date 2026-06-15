@@ -315,8 +315,10 @@ class AccountsReceivableSummaryExtended(ReceivablePayableReport):
 
 		table = f"tab{doctype}"
 
-		# Check once whether credit_limit column exists in the DB
-		has_credit_limit = frappe.db.has_column(table, "credit_limit")
+		# Check once whether credit_limit column exists in the DB.
+		# frappe.db.has_column expects the DocType name (it prepends "tab" itself),
+		# so pass `doctype` ("Customer"/"Supplier"), not the raw table name.
+		has_credit_limit = frappe.db.has_column(doctype, "credit_limit")
 
 		if has_credit_limit:
 			parties = frappe.db.sql(
