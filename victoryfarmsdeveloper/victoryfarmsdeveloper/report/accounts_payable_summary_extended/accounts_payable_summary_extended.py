@@ -190,7 +190,7 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 			# else:
 			due_date = getdate(d.get("due_date") or due_date)
 
-			if due_date <= report_date:
+			if due_date < report_date:
 				days_overdue = max(date_diff(report_date, due_date), 0)
 
 				if days_overdue <= 7:

@@ -81,7 +81,7 @@
   }
  ],
  "links": [],
- "modified": "2025-11-07 09:46:09.152191",
+ "modified": "2026-04-29 19:59:42.745913",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Crop",
@@ -112,8 +112,10 @@
   }
  ],
  "row_format": "Dynamic",
+ "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
+ "title_field": "crop_name",
  "track_changes": 1
 }
