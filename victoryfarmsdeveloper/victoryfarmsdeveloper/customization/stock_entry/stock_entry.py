@@ -237,7 +237,21 @@ def before_save_stock_entry(doc, method):
                     frappe.msgprint(_("A Certificate of Analysis already exists for this Stock Entry. Please complete and submit it."))
                     
 def before_submit_stock_entry(doc, method):
-    #Get previous workflow state
+    # --- FIXED VALUATION RATE LOGIC ---
+    if (doc.stock_entry_type == "Material Transfer" and doc.items
+        and any(item.item_group == "Gutted Fish-Tilapia" for item in doc.items)):
+        from_zone = int(frappe.db.get_value("Warehouse", doc.from_warehouse, "custom_is_fixed_valuation_zone") or 0)
+        to_zone   = int(frappe.db.get_value("Warehouse", doc.to_warehouse,   "custom_is_fixed_valuation_zone") or 0)
+        if from_zone == 0 and to_zone == 1:
+            for item in doc.items:
+                if item.item_group == "Gutted Fish-Tilapia":
+                    fixed_rate = frappe.db.get_value("Item", item.item_code, "custom_fixed_valuation_rate") or 0
+                    if fixed_rate:
+                        actual_rate = item.valuation_rate or item.basic_rate or 0
+                        item.custom_actual_rate_at_transfer = actual_rate
+                        item.incoming_rate = fixed_rate
+
+    # --- EXISTING CoA VALIDATION ---
     previous_doc = doc.get_doc_before_save()
     previous_state = previous_doc.workflow_state if previous_doc else None
     if (
@@ -256,3 +270,36 @@ def before_submit_stock_entry(doc, method):
             })
             if not submitted_coa:
                 frappe.throw(_("You must submit the Certificate of Analysis before confirming this Stock Entry."))
+
+def on_submit_stock_entry(doc, method):
+    if (doc.stock_entry_type == "Material Transfer" and doc.items
+        and any(item.item_group == "Gutted Fish-Tilapia" for item in doc.items)):
+        from_zone = int(frappe.db.get_value("Warehouse", doc.from_warehouse, "custom_is_fixed_valuation_zone") or 0)
+        to_zone   = int(frappe.db.get_value("Warehouse", doc.to_warehouse,   "custom_is_fixed_valuation_zone") or 0)
+        if from_zone == 0 and to_zone == 1:
+            variance_account = frappe.db.get_value("Warehouse", doc.from_warehouse, "custom_price_variance_account")
+            if not variance_account:
+                frappe.throw("Price Variance Account not set on Processing warehouse.")
+            company = doc.company
+            for item in doc.items:
+                if item.item_group == "Gutted Fish-Tilapia" and item.custom_actual_rate_at_transfer:
+                    actual = item.custom_actual_rate_at_transfer
+                    fixed  = item.incoming_rate or frappe.db.get_value("Item", item.item_code, "custom_fixed_valuation_rate") or 0
+                    variance = (actual - fixed) * item.qty
+                    if variance == 0:
+                        continue
+                    gl = frappe.get_doc({
+                        "doctype": "GL Entry",
+                        "posting_date": doc.posting_date,
+                        "posting_time": doc.posting_time,
+                        "voucher_type": "Stock Entry",
+                        "voucher_no": doc.name,
+                        "company": company,
+                        "account": variance_account,
+                        "debit": variance if variance > 0 else 0,
+                        "credit": abs(variance) if variance < 0 else 0,
+                        "remarks": "Fixed valuation variance for " + item.item_code
+                    })
+                    gl.insert()
+                    gl.submit()
+            frappe.db.commit()
