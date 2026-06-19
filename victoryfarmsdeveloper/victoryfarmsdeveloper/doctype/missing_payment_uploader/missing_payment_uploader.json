@@ -1,0 +1,112 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "VF-MPU-.####",
+ "creation": "2026-06-19 15:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_upload",
+  "payment_file",
+  "column_upload",
+  "status",
+  "created_by_manager",
+  "section_results",
+  "result_log",
+  "total_rows",
+  "success_count",
+  "failure_count"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_upload",
+   "fieldtype": "Section Break",
+   "label": "Upload Missing Payments Excel File"
+  },
+  {
+   "fieldname": "payment_file",
+   "fieldtype": "Attach",
+   "label": "Payment Excel File",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_upload",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "created_by_manager",
+   "fieldtype": "Data",
+   "label": "Uploaded By",
+   "read_only": 1,
+   "default": "__user"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nProcessing\nCompleted\nFailed",
+   "default": "Draft",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_results",
+   "fieldtype": "Section Break",
+   "label": "Import Results"
+  },
+  {
+   "fieldname": "result_log",
+   "fieldtype": "Long Text",
+   "label": "Result Log",
+   "read_only": 1,
+   "depends_on": "eval: doc.status === 'Completed' || doc.status === 'Failed'"
+  },
+  {
+   "fieldname": "total_rows",
+   "fieldtype": "Int",
+   "label": "Total Rows",
+   "read_only": 1
+  },
+  {
+   "fieldname": "success_count",
+   "fieldtype": "Int",
+   "label": "Successfully Imported",
+   "read_only": 1
+  },
+  {
+   "fieldname": "failure_count",
+   "fieldtype": "Int",
+   "label": "Failed Rows",
+   "read_only": 1
+  }
+ ],
+ "index_web_search_pages": 0,
+ "links": [],
+ "modified": "2026-06-19 15:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Missing Payment Uploader",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 0,
+   "delete": 1
+  },
+  {
+   "role": "Accounts Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "submit": 0,
+   "delete": 0
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "name",
+ "track_changes": 1
+}
