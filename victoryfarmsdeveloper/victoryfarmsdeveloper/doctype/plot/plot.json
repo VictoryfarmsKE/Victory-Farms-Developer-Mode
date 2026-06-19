@@ -14,6 +14,7 @@
   "variety",
   "long_location",
   "lat_location",
+  "plot_images",
   "column_break_eoge",
   "contract_holder",
   "contract_offtaker",
@@ -213,13 +214,20 @@
    "fieldname": "project",
    "fieldtype": "Link",
    "label": "Project",
-   "options": "Project"
+   "options": "Project",
+   "search_index": 1
   },
   {
    "fieldname": "spending_code",
    "fieldtype": "Link",
    "label": "Spending Code",
    "options": "Spending Code"
+  },
+  {
+   "fieldname": "plot_images",
+   "fieldtype": "Data",
+   "label": "Plot Images",
+   "options": "URL"
   }
  ],
  "grid_page_length": 50,
@@ -231,7 +239,7 @@
    "link_fieldname": "custom_plot"
   }
  ],
- "modified": "2026-03-13 14:59:18.533104",
+ "modified": "2026-06-10 10:01:58.858330",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Plot",
