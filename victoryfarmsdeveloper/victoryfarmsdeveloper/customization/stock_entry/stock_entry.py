@@ -9,6 +9,66 @@ class CustomStockEntry(StockEntry):
     def validate_repack_entry(self):
        pass
 
+    def validate(self):
+        super().validate()
+        self.apply_fixed_valuation_rate()
+
+    def apply_fixed_valuation_rate(self):
+        """Force Gutted Fish-Tilapia to enter a fixed-valuation zone (zone 1) at the
+        item's configured fixed rate, while the source (zone 0) is credited at its
+        actual moving-average cost. The difference is booked to the warehouse's
+        price-variance account via an Additional Cost line, keeping the Stock Ledger
+        and General Ledger consistent. Handles fixed rate both above and below cost."""
+        FIXED_GROUP = "Gutted Fish-Tilapia"
+        TAG = "Fixed Valuation Variance"
+
+        # Idempotent: drop any variance line we added on a previous validate pass
+        original_costs = self.additional_costs or []
+        kept_costs = [c for c in original_costs if (c.description or "") != TAG]
+        changed = len(kept_costs) != len(original_costs)
+        self.additional_costs = kept_costs
+
+        if self.stock_entry_type == "Material Transfer" and self.items:
+            total_variance = 0.0
+            variance_account = None
+
+            for item in self.items:
+                if item.item_group != FIXED_GROUP:
+                    continue
+                s_wh, t_wh = item.s_warehouse, item.t_warehouse
+                if not s_wh or not t_wh:
+                    continue
+                from_zone = int(frappe.db.get_value("Warehouse", s_wh, "custom_is_fixed_valuation_zone") or 0)
+                to_zone = int(frappe.db.get_value("Warehouse", t_wh, "custom_is_fixed_valuation_zone") or 0)
+                if not (from_zone == 0 and to_zone == 1):
+                    continue
+                fixed_rate = flt(frappe.db.get_value("Item", item.item_code, "custom_fixed_valuation_rate") or 0)
+                if not fixed_rate:
+                    continue
+
+                # basic_rate is the pure source cost (excludes additional costs),
+                # so it stays stable across repeated validate() calls.
+                actual_rate = flt(item.basic_rate)
+                item.custom_actual_rate_at_transfer = actual_rate
+                total_variance += (fixed_rate - actual_rate) * flt(item.qty)
+
+                if not variance_account:
+                    variance_account = frappe.db.get_value("Warehouse", s_wh, "custom_price_variance_account")
+
+            total_variance = flt(total_variance, 2)
+            if total_variance:
+                if not variance_account:
+                    frappe.throw(_("Price Variance Account is not set on the source (Processing) warehouse."))
+                self.append("additional_costs", {
+                    "expense_account": variance_account,
+                    "description": TAG,
+                    "amount": total_variance,
+                })
+                changed = True
+
+        if changed:
+            self.calculate_rate_and_amount()
+
     def get_basic_rate_for_repacked_items(self, finished_item_qty, outgoing_items_cost):
         finished_items = [d.item_code for d in self.get("items") if d.is_finished_item]
         
@@ -237,7 +297,11 @@ def before_save_stock_entry(doc, method):
                     frappe.msgprint(_("A Certificate of Analysis already exists for this Stock Entry. Please complete and submit it."))
                     
 def before_submit_stock_entry(doc, method):
-    #Get previous workflow state
+    # NOTE: Fixed valuation rate logic now lives in CustomStockEntry.validate()
+    # (see apply_fixed_valuation_rate). It uses ERPNext Additional Costs so the
+    # Stock Ledger and General Ledger stay consistent.
+
+    # --- EXISTING CoA VALIDATION ---
     previous_doc = doc.get_doc_before_save()
     previous_state = previous_doc.workflow_state if previous_doc else None
     if (

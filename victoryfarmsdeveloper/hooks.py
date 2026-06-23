@@ -235,6 +235,10 @@ scheduler_events = {
         ],
         "10 6 * * *": [
             "victoryfarmsdeveloper.notifications.scorecard.send_probation_review_notifications"
+        ],
+        # Daily valuation-rate fluctuation report to Finance at 06:00
+        "0 6 * * *": [
+            "victoryfarmsdeveloper.notifications.valuation_fluctuation.check_valuation_fluctuations"
         ]
     }
 }

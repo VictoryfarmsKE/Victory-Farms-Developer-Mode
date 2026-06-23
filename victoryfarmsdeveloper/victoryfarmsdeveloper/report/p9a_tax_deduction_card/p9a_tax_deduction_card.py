@@ -193,6 +193,8 @@ def execute(filters=None):
                 company_currency,
             )
 
+            total_deductions_amt = total_gross_pay_amt - chargeable_pay_amt
+
             tax_charged_amt = get_p9a_tax_deduction_card_amt(
                 filters,
                 emp.name,
@@ -244,6 +246,7 @@ def execute(filters=None):
                 0,  # PRMF placeholder
                 owner_occupied_interest_amt,
                 retirement_contribution_and_owner_occupied_interest_amt,
+                total_deductions_amt,
                 chargeable_pay_amt,
                 tax_charged_amt,
                 personal_relief_amt,
@@ -344,7 +347,7 @@ def get_columns():
             "width": 150,
         },
         {
-            "fieldname": "chargeable_pay",
+            "fieldname": "total_deductions",
             "label": _("Total Deductions Lower of E F+G+H+I)"),
             "fieldtype": "Currency",
             "width": 150,
@@ -494,8 +497,8 @@ def get_p9a_tax_deduction_card_gross_pay(
             (salary_slip_doc.docstatus == 1)
             & (salary_slip_doc.employee == employee)
             & (salary_slip_doc.company == filters.get("company"))
-            & (salary_slip_doc.start_date == month_start_date)
-            & (salary_slip_doc.end_date == month_end_date)
+            & (salary_slip_doc.start_date >= month_start_date)
+            & (salary_slip_doc.end_date <= month_end_date)
             & (salary_slip_doc.currency == currency_filter)
         )
         .orderby((salary_slip_doc.employee) & (salary_slip_doc.start_date))
