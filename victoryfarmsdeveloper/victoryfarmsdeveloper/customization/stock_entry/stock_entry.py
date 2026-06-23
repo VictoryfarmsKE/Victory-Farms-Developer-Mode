@@ -14,24 +14,21 @@ class CustomStockEntry(StockEntry):
         self.apply_fixed_valuation_rate()
 
     def apply_fixed_valuation_rate(self):
-        """Force Gutted Fish-Tilapia to enter a fixed-valuation zone (zone 1) at the
-        item's configured fixed rate, while the source (zone 0) is credited at its
-        actual moving-average cost. The difference is booked to the warehouse's
-        price-variance account via an Additional Cost line, keeping the Stock Ledger
-        and General Ledger consistent. Handles fixed rate both above and below cost."""
+        """When Gutted Fish-Tilapia transfers from a non-fixed zone (0) to a
+        fixed-valuation zone (1), update the Item master's custom_fixed_valuation_rate
+        to match the current basic_rate (moving average cost). No variance is posted
+        since the fixed rate equals the actual rate."""
         FIXED_GROUP = "Gutted Fish-Tilapia"
         TAG = "Fixed Valuation Variance"
 
-        # Idempotent: drop any variance line we added on a previous validate pass
+        # Backward compatibility: remove any legacy variance lines from old logic
         original_costs = self.additional_costs or []
         kept_costs = [c for c in original_costs if (c.description or "") != TAG]
-        changed = len(kept_costs) != len(original_costs)
-        self.additional_costs = kept_costs
+        if len(kept_costs) != len(original_costs):
+            self.additional_costs = kept_costs
+            self.calculate_rate_and_amount()
 
         if self.stock_entry_type == "Material Transfer" and self.items:
-            total_variance = 0.0
-            variance_account = None
-
             for item in self.items:
                 if item.item_group != FIXED_GROUP:
                     continue
@@ -42,32 +39,14 @@ class CustomStockEntry(StockEntry):
                 to_zone = int(frappe.db.get_value("Warehouse", t_wh, "custom_is_fixed_valuation_zone") or 0)
                 if not (from_zone == 0 and to_zone == 1):
                     continue
-                fixed_rate = flt(frappe.db.get_value("Item", item.item_code, "custom_fixed_valuation_rate") or 0)
-                if not fixed_rate:
-                    continue
 
-                # basic_rate is the pure source cost (excludes additional costs),
-                # so it stays stable across repeated validate() calls.
                 actual_rate = flt(item.basic_rate)
+
+                # Update Item master: fixed rate = actual average rate
+                frappe.db.set_value("Item", item.item_code, "custom_fixed_valuation_rate", actual_rate)
+
+                # Audit trail: record the rate at which this transfer occurred
                 item.custom_actual_rate_at_transfer = actual_rate
-                total_variance += (fixed_rate - actual_rate) * flt(item.qty)
-
-                if not variance_account:
-                    variance_account = frappe.db.get_value("Warehouse", s_wh, "custom_price_variance_account")
-
-            total_variance = flt(total_variance, 2)
-            if total_variance:
-                if not variance_account:
-                    frappe.throw(_("Price Variance Account is not set on the source (Processing) warehouse."))
-                self.append("additional_costs", {
-                    "expense_account": variance_account,
-                    "description": TAG,
-                    "amount": total_variance,
-                })
-                changed = True
-
-        if changed:
-            self.calculate_rate_and_amount()
 
     def get_basic_rate_for_repacked_items(self, finished_item_qty, outgoing_items_cost):
         finished_items = [d.item_code for d in self.get("items") if d.is_finished_item]
