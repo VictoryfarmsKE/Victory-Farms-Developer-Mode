@@ -193,7 +193,13 @@ def execute(filters=None):
                 company_currency,
             )
 
-            total_deductions_amt = total_gross_pay_amt - chargeable_pay_amt
+            # Total Deductions = Lower of E + F + G + H + I
+            # = (lowest_of_column_e + owner_occupied_interest) + housing_levy + shif + PRMF
+            total_deductions_amt = (
+                retirement_contribution_and_owner_occupied_interest_amt
+                + housing_levy_amt
+                + shif_amt
+            )
 
             tax_charged_amt = get_p9a_tax_deduction_card_amt(
                 filters,
@@ -245,7 +251,6 @@ def execute(filters=None):
                 shif_amt,
                 0,  # PRMF placeholder
                 owner_occupied_interest_amt,
-                retirement_contribution_and_owner_occupied_interest_amt,
                 total_deductions_amt,
                 chargeable_pay_amt,
                 tax_charged_amt,
