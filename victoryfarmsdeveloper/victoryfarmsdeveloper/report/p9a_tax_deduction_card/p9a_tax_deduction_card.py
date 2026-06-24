@@ -193,13 +193,29 @@ def execute(filters=None):
                 company_currency,
             )
 
-            # Total Deductions = E2 (Defined Contribution Retirement Scheme) + F + G + H + I
-            # = E2 + housing_levy (F) + shif (G) + PRMF (H, 0) + owner_occupied_interest (I)
+            # Total Deductions = E2 + Affordable Housing Levy (AHL) + SHIF + Owner-Occupied Interest
             total_deductions_amt = (
-                e2_defined_contribution_retirement_scheme_amt
-                + housing_levy_amt
-                + shif_amt
-                + owner_occupied_interest_amt
+                flt(e2_defined_contribution_retirement_scheme_amt)
+                + flt(housing_levy_amt)
+                + flt(shif_amt)
+                + flt(owner_occupied_interest_amt)
+            )
+
+            # TEMP DIAGNOSTIC: writes the live server values to Frappe Error Log.
+            # Check Desk > Error Log (title "P9A Debug Row") after running the report.
+            # Remove once the Total Deductions value is confirmed correct.
+            frappe.log_error(
+                title="P9A Debug Row",
+                message=(
+                    f"emp={emp.name} month={month_name} "
+                    f"E1={e1_defined_contribution_retirement_scheme_amt} "
+                    f"E2={e2_defined_contribution_retirement_scheme_amt} "
+                    f"E3={e3_defined_contribution_retirement_scheme_amt} "
+                    f"AHL={housing_levy_amt} SHIF={shif_amt} "
+                    f"OOI={owner_occupied_interest_amt} "
+                    f"GROSS={total_gross_pay_amt} CHARGEABLE={chargeable_pay_amt} "
+                    f"TOTAL_DEDUCTIONS={total_deductions_amt}"
+                ),
             )
 
             tax_charged_amt = get_p9a_tax_deduction_card_amt(
