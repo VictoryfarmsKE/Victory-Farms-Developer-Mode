@@ -235,6 +235,10 @@ scheduler_events = {
         ],
         "10 6 * * *": [
             "victoryfarmsdeveloper.notifications.scorecard.send_probation_review_notifications"
+        ],
+        # Daily valuation-rate fluctuation report to Finance at 06:00
+        "0 6 * * *": [
+            "victoryfarmsdeveloper.notifications.valuation_fluctuation.check_valuation_fluctuations"
         ]
     }
 }
@@ -262,7 +266,8 @@ doc_events = {
         "before_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_submit_stock_entry"
     },
     "Employee": {
-        "after_insert": "victoryfarmsdeveloper.custom_scripts.server_scripts.leave_allocation.create_leave_allocation_for_new_employee"
+        "after_insert": "victoryfarmsdeveloper.custom_scripts.server_scripts.leave_allocation.create_leave_allocation_for_new_employee",
+        "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.employee.employee.validate_mandatory_fields"
     }
 }
 

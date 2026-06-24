@@ -1,0 +1,368 @@
+"""
+Frappe Console Script — Bulk Update custom_is_fixed_valuation_zone on Warehouse
+Paste this into ERPNext System Console (/app/system-console) and run.
+
+This script updates the custom_is_fixed_valuation_zone field on all warehouses
+based on a predefined classification list. Only existing, non-group, non-disabled
+warehouses are updated.
+"""
+
+# NOTE: Do NOT use "import frappe" — frappe is already available in System Console.
+# ============================================================
+# CLASSIFICATION MAP
+#   1 = FLC + Branch warehouses (fixed valuation zone)
+#   0 = Internal/operational/procurement/farm/vehicle/test/group
+# ============================================================
+
+CLASSIFICATION = {
+    # --- FLC GROUP (1) ---
+    "FLC - VFL": 1,
+    "FLC Branch Returns - VFL": 1,
+    "FLC Branch Spoilage - VFL": 1,
+    "FLC Deformed - VFL": 1,
+    "FLC Donations and Samples - VFL": 1,
+    "FLC Spoilage - VFL": 1,
+    "FLC Variance - VFL": 1,
+
+    # --- REGIONAL DISTRIBUTION CENTERS (LCs) (1) ---
+    "VLC - VFL": 1,
+    "MLC - VFL": 1,
+    "KLC - VFL": 1,
+    "Central - VFL": 1,
+    "Western  - VFL": 1,
+    "Pwani  - VFL": 1,
+    "Homa Bay Region - VFL": 1,
+    "Migori Region - VFL": 1,
+    "Kisii Region - VFL": 1,
+    "Kakamega Region - VFL": 1,
+    "Kericho Region - VFL": 1,
+    "Kisumu Region - VFL": 1,
+    "Siaya Region - VFL": 1,
+    "North Region - VFL": 1,
+    "Central Region - VFL": 1,
+    "East Region - VFL": 1,
+    "South Region - VFL": 1,
+    "West Region - VFL": 1,
+    "Eldoret Region - VFL": 1,
+    "Meru - VFL": 1,
+
+    # --- VLC BRANCHES & SPOILAGE (1) ---
+    "VLC Branch Returns - VFL": 1,
+    "VLC Branch Spoilage - VFL": 1,
+    "VLC Deformed - VFL": 1,
+    "VLC Donations and Samples - VFL": 1,
+    "VLC Sales - VFL": 1,
+    "VLC Sales - VFL Spoilage": 1,
+    "VLC Spoilage - VFL": 1,
+    "VLC Variance - VFL": 1,
+
+    # --- MLC BRANCHES & SPOILAGE (1) ---
+    "MLC Branch Returns - VFL": 1,
+    "MLC Branch Spoilage - VFL": 1,
+    "MLC Returns - VFL": 1,
+    "MLC Spoilage - VFL": 1,
+    "MLC Sales - VFL": 1,
+    "MLC Donations and Samples - VFL": 1,
+    "MLC Variance - VFL": 1,
+
+    # --- KLC BRANCHES & SPOILAGE (1) ---
+    "KLC Branch Returns - VFL": 1,
+    "KLC Branch Spoilage - VFL": 1,
+    "KLC Deformed - VFL": 1,
+    "KLC Donations and Samples - VFL": 1,
+    "KLC Spoilage - VFL": 1,
+    "KLC Variance - VFL": 1,
+    "KLC Sales - VFL": 1,
+
+    # --- NAIROBI AREA BRANCHES (1) ---
+    "Free Area - VFL": 1,
+    "Free Area - VFL Spoilage": 1,
+    "Imara - VFL": 1,
+    "Imara - VFL Spoilage": 1,
+    "Kitengela - VFL": 1,
+    "Kitengela - VFL Spoilage": 1,
+    "Machakos - VFL": 1,
+    "Machakos - VFL Spoilage": 1,
+    "Mlolongo - VFL": 1,
+    "Mlolongo - VFL Spoilage": 1,
+    "Pipeline - VFL": 1,
+    "Pipeline - VFL Spoilage": 1,
+    "Shabab - VFL": 1,
+    "Shabab - VFL Spoilage": 1,
+    "Huruma - VFL": 1,
+    "Huruma - VFL Spoilage": 1,
+    "Ngara - VFL": 1,
+    "Ngara - VFL Spoilage": 1,
+    "Buru Buru - VFL": 1,
+    "Buru Buru - VFL Spoilage": 1,
+    "Dagoretti - VFL": 1,
+    "Dagoretti - VFL Spoilage": 1,
+    "Yaya - VFL": 1,
+    "Yaya - VFL Spoilage": 1,
+    "Bombolulu - VFL": 1,
+    "Bombolulu - VFL Spoilage": 1,
+    "Kangemi - VFL": 1,
+    "Kangemi - VFL Spoilage": 1,
+    "Keroka - VFL": 1,
+    "Keroka - VFL Spoilage": 1,
+    "Kibera - VFL": 1,
+    "Kibera - VFL Spoilage": 1,
+    "Nairobi West - VFL": 1,
+    "Nairobi West - VFL Spoilage": 1,
+    "Naivas Capital - VFL": 1,
+    "Naivas Capital - VFL Spoilage": 1,
+    "Satellite - VFL": 1,
+    "Satellite - VFL Spoilage": 1,
+    "Mathare - VFL": 1,
+    "Mathare - VFL Spoilage": 1,
+    "Kawangware - VFL": 1,
+    "Kawangware - VFL Spoilage": 1,
+    "Garden Estate - VFL": 1,
+    "Garden Estate - VFL Spoilage": 1,
+    "Kariobangi North - VFL": 1,
+    "Kariobangi North - VFL Spoilage": 1,
+    "Ngong Town - VFL": 1,
+    "Ngong Town - VFL Spoilage": 1,
+    "Rongai - VFL": 1,
+    "Rongai - VFL Spoilage": 1,
+    "Juja - VFL": 1,
+    "Juja - VFL Spoilage": 1,
+    "Kahawa Wendani - VFL": 1,
+    "Kahawa Wendani - VFL Spoilage": 1,
+    "Kasarani - VFL": 1,
+    "Kasarani - VFL Spoilage": 1,
+    "Mwiki - VFL": 1,
+    "Mwiki - VFL Spoilage": 1,
+    "Zimmerman - VFL": 1,
+    "Zimmerman - VFL Spoilage": 1,
+    "Thika - VFL": 1,
+    "Thika - VFL Spoilage": 1,
+    "Kahawa West - VFL": 1,
+    "Kahawa West - VFL Spoilage": 1,
+    "Githurai - VFL": 1,
+    "Githurai - VFL Spoilage": 1,
+    "Dandora - VFL": 1,
+    "Dandora - VFL Spoilage": 1,
+    "Donholm - VFL": 1,
+    "Donholm - VFL Spoilage": 1,
+    "Kangundo Road - VFL": 1,
+    "Kangundo Road - VFL Spoilage": 1,
+    "Kayole - VFL": 1,
+    "Kayole - VFL Spoilage": 1,
+    "Ruai - VFL": 1,
+    "Ruai - VFL Spoilage": 1,
+    "Umoja - VFL": 1,
+    "Umoja - VFL Spoilage": 1,
+    "Utawala - VFL": 1,
+    "Utawala - VFL Spoilage": 1,
+    "Jogoo Road - VFL": 1,
+    "Jogoo Road - VFL Spoilage": 1,
+    "Lucky Summer - VFL": 1,
+    "Lucky Summer - VFL Spoilage": 1,
+    "Kariobangi South - VFL": 1,
+    "Kariobangi South - VFL Spoilage": 1,
+    "Makongeni - VFL": 1,
+    "Makongeni - VFL Spoilage": 1,
+    "Mlango Kubwa - VFL": 1,
+    "Mlango Kubwa - VFL Spoilage": 1,
+    "Antarctica - VFL": 1,
+    "Africa - VFL": 1,
+    "Asia - VFL": 1,
+    "Europe - VFL": 1,
+    "North America - VFL": 1,
+    "South America - VFL": 1,
+    "Oceania - VFL": 1,
+
+    # --- MOMBASA AREA BRANCHES (1) ---
+    "Mombasa - VFL": 1,
+    "M/T1 Bamburi Branch - VFL": 1,
+    "M/T1 Bamburi Branch - VFL Spoilage": 1,
+    "M/T1 Kisauni - VFL": 1,
+    "M/T1 Kisauni - VFL Spoilage": 1,
+    "M/T1 Kongowea - VFL": 1,
+    "M/T1 Kongowea - VFL Spoilage": 1,
+    "M/T1 Majengo-Sakina Branch - VFL": 1,
+    "M/T1 Majengo-Sakina Branch - VFL Spoilage": 1,
+    "M/T1 Mombasa-Bombolulu  - VFL": 1,
+    "M/T1 Mombasa-Bombolulu  - VFL Spoilage": 1,
+    "M/T1 Mshomoroni Branch - VFL": 1,
+    "M/T1 Mshomoroni Branch - VFL Spoilage": 1,
+    "M/T1 Mtwapa Branch - VFL": 1,
+    "M/T1 Mtwapa Branch - VFL Spoilage": 1,
+    "M/T1 Tononoka - VFL": 1,
+    "M/T1 Tononoka - VFL Spoilage": 1,
+
+    # --- WESTERN REGION BRANCHES (1) ---
+    "Eldoret - VFL": 1,
+    "Kimilili - VFL": 1,
+    "Kimilili Spoilage - VFL": 1,
+    "Mlango Nandi - VFL": 1,
+    "Mlango Nandi Spoilage - VFL": 1,
+    "Nandi Hills - VFL": 1,
+    "Nandi Hills Spoilage - VFL": 1,
+    "Pipeline- Juakali - VFL": 1,
+    "Pipelihne Juakali Spoilage - VFL": 1,
+    "Webuye - VFL": 1,
+    "Webuye Spoilage - VFL": 1,
+    "Bungoma - VFL": 1,
+    "Bungoma - VFL Spoilage": 1,
+    "Mumias - VFL": 1,
+    "Mumias - VFL Spoilage": 1,
+
+    # --- HOMA BAY REGION BRANCHES (1) ---
+    "Homabay - VFL": 1,
+    "Homabay - VFL Spoilage": 1,
+    "Mbita - VFL": 1,
+    "Mbita - VFL Spoilage": 1,
+    "Ndhiwa - VFL": 1,
+    "Ndhiwa - VFL Spoilage": 1,
+    "Rodi - VFL": 1,
+    "Rodi - VFL Spoilage": 1,
+    "Roo - VFL": 1,
+    "Roo - VFL Spoilage": 1,
+    "Sindo - VFL": 1,
+    "Sindo - VFL Spoilage": 1,
+
+    # --- MIGORI REGION BRANCHES (1) ---
+    "Awendo - VFL": 1,
+    "Awendo - VFL Spoilage": 1,
+    "Isebania - VFL": 1,
+    "Isebania - VFL Spoilage": 1,
+    "Kehancha - VFL": 1,
+    "Kehancha - VFL Spoilage": 1,
+    "Masara - VFL": 1,
+    "Masara - VFL Spoilage": 1,
+    "Migori - VFL": 1,
+    "Migori - VFL Spoilage": 1,
+    "Rongo - VFL": 1,
+    "Rongo - VFL Spoilage": 1,
+    "Suna East - VFL": 1,
+    "Suna East - VFL Spoilage": 1,
+    "Suneka - VFL": 1,
+    "Suneka - VFL Spoilage": 1,
+
+    # --- KAKAMEGA REGION BRANCHES (1) ---
+    "Chavakali - VFL": 1,
+    "Chavakali - VFL Spoilage": 1,
+    "Kakamega - VFL": 1,
+    "Kakamega - VFL Spoilage": 1,
+    "Mbale - VFL": 1,
+    "Mbale - VFL Spoilage": 1,
+    "Ugunja - VFL": 1,
+    "Ugunja - VFL Spoilage": 1,
+    "Majengo - VFL": 1,
+    "Majengo - VFL Spoilage": 1,
+
+    # --- KERICHO REGION BRANCHES (1) ---
+    "Awasi - VFL": 1,
+    "Awasi - VFL Spoilage": 1,
+    "Katito - VFL": 1,
+    "Katito - VFL Spoilage": 1,
+    "Muhoroni - VFL": 1,
+    "Muhoroni - VFL Spoilage": 1,
+    "Ahero - VFL": 1,
+    "Ahero - VFL Spoilage": 1,
+
+    # --- KISII REGION BRANCHES (1) ---
+    "Kisii - Keroka - VFL": 1,
+    "Kisii - Keroka - VFL Spoilage": 1,
+    "Nyakoe - VFL": 1,
+    "Nyakoe - VFL Spoilage": 1,
+    "Nyamira - VFL": 1,
+    "Nyamira - VFL Spoilage": 1,
+    "Oyugis - VFL": 1,
+    "Oyugis - VFL Spoilage": 1,
+    "Kisii - VFL": 1,
+    "Kisii - VFL Spoilage": 1,
+    "Sondu - VFL": 1,
+    "Sondu - VFL Spoilage": 1,
+
+    # --- KISUMU REGION BRANCHES (1) ---
+    "Kondele - VFL": 1,
+    "Kondele - VFL Spoilage": 1,
+    "Manyatta - VFL": 1,
+    "Manyatta - VFL Spoilage": 1,
+    "Nyalenda - VFL": 1,
+    "Nyalenda - VFL Spoilage": 1,
+    "Nyamasaria - VFL": 1,
+    "Nyamasaria - VFL Spoilage": 1,
+    "Luanda - VFL": 1,
+    "Luanda - VFL Spoilage": 1,
+    "Siaya - VFL": 1,
+    "Siaya - VFL Spoilage": 1,
+    "W/T3 - Siaya - VFL": 1,
+    "Bondo - VFL": 1,
+    "Bondo - VFL Spoilage": 1,
+    "Otonglo - VFL": 1,
+    "Otonglo - Spoilage - VFL": 1,
+
+    # --- MERU / CENTRAL BRANCHES (1) ---
+    "C/T3 - Muthara Branch - VFL": 1,
+    "C/T3 - Maua Branch - VFL": 1,
+    "C/T2 - Chuka Branch - VFL": 1,
+    "C/T3 - Chogoria Branch - VFL": 1,
+    "C/T2 - Nkubu Town Branch - VFL": 1,
+    "C/T2 - Kaaga Branch - VFL": 1,
+    "C/T2 - Meru CBD Branch  - VFL": 1,
+    "C/T2 - Meru LC - VFL": 1,
+
+    # --- NBO / SALES GROUPS (1) ---
+    "NBO - VFL": 1,
+
+    # --- ALL OTHERS DEFAULT TO 0 ---
+}
+
+# ============================================================
+# SCRIPT LOGIC
+# ============================================================
+
+updated = []
+skipped = []
+failed = []
+
+for wh_name, target_value in CLASSIFICATION.items():
+    wh = frappe.db.get_value(
+        "Warehouse",
+        wh_name,
+        ["name", "is_group", "disabled", "custom_is_fixed_valuation_zone"],
+        as_dict=True,
+    )
+    if not wh:
+        skipped.append((wh_name, "does not exist"))
+        continue
+
+    if int(wh.get("is_group", 0)):
+        skipped.append((wh_name, "is group parent"))
+        continue
+
+    if int(wh.get("disabled", 0)):
+        skipped.append((wh_name, "is disabled"))
+        continue
+
+    current = int(wh.get("custom_is_fixed_valuation_zone", 0))
+    if current == target_value:
+        skipped.append((wh_name, "already = {}".format(target_value)))
+        continue
+
+    try:
+        frappe.db.set_value("Warehouse", wh_name, "custom_is_fixed_valuation_zone", target_value)
+        updated.append((wh_name, current, target_value))
+    except Exception as e:
+        failed.append((wh_name, str(e)))
+
+frappe.db.commit()
+
+# Print results
+print("=== UPDATED ({}) ===".format(len(updated)))
+for wh_name, old, new in updated:
+    print(f"  {wh_name}: {old} -> {new}")
+
+print("\n=== SKIPPED ({}) ===".format(len(skipped)))
+for wh_name, reason in skipped:
+    print(f"  {wh_name}: {reason}")
+
+print("\n=== FAILED ({}) ===".format(len(failed)))
+for wh_name, err in failed:
+    print(f"  {wh_name}: {err}")
+
+print("\n\nDone. Please validate a few branch warehouses (should be 1) and Processing - VFL (should be 0).")
