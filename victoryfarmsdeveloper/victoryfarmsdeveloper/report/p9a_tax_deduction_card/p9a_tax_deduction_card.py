@@ -193,10 +193,10 @@ def execute(filters=None):
                 company_currency,
             )
 
-            # Total Deductions = E2 (Defined Contribution Retirement Scheme) + F + G + H + I
-            # = E2 + housing_levy (F) + shif (G) + PRMF (H, 0) + owner_occupied_interest (I)
+            # Total Deductions = E1 (Defined Contribution Retirement Scheme, 30% of basic) + F + G + H + I
+            # = E1 + housing_levy (F) + shif (G) + PRMF (H, 0) + owner_occupied_interest (I)
             total_deductions_amt = (
-                e2_defined_contribution_retirement_scheme_amt
+                e1_defined_contribution_retirement_scheme_amt
                 + housing_levy_amt
                 + shif_amt
                 + owner_occupied_interest_amt
