@@ -193,10 +193,10 @@ def execute(filters=None):
                 company_currency,
             )
 
-            # Total Deductions = E1 (Defined Contribution Retirement Scheme, 30% of basic) + F + G + H + I
-            # = E1 + housing_levy (F) + shif (G) + PRMF (H, 0) + owner_occupied_interest (I)
+            # Total Deductions = E2 (Defined Contribution Retirement Scheme) + F + G + H + I
+            # = E2 + housing_levy (F) + shif (G) + PRMF (H, 0) + owner_occupied_interest (I)
             total_deductions_amt = (
-                e1_defined_contribution_retirement_scheme_amt
+                e2_defined_contribution_retirement_scheme_amt
                 + housing_levy_amt
                 + shif_amt
                 + owner_occupied_interest_amt
@@ -354,7 +354,7 @@ def get_columns():
         },
         {
             "fieldname": "total_deductions",
-            "label": _("Total Deductions Lower of E F+G+H+I)"),
+            "label": _("Total Deductions Lower of E F+G+H+I) v2"),
             "fieldtype": "Currency",
             "width": 150,
         },
