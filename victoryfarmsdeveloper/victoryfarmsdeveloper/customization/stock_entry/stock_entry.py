@@ -28,6 +28,12 @@ class CustomStockEntry(StockEntry):
             self.additional_costs = kept_costs
             self.calculate_rate_and_amount()
 
+        # Degrade gracefully if the zone field hasn't been created in this
+        # environment. Prevents crashing Stock Entry saves where the
+        # fixed-valuation feature isn't rolled out (e.g. production/pre-prod).
+        if not frappe.db.has_column("Warehouse", "custom_is_fixed_valuation_zone"):
+            return
+
         if self.stock_entry_type == "Material Transfer" and self.items:
             for item in self.items:
                 if item.item_group != FIXED_GROUP:
