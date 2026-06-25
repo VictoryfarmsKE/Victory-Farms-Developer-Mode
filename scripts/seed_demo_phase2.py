@@ -41,7 +41,7 @@ last_sle = frappe.db.sql("""
     WHERE item_code = %s AND warehouse = %s AND is_cancelled = 0
     ORDER BY posting_date DESC, posting_time DESC, creation DESC
     LIMIT 1
-"", (TEST_ITEM, TEST_WAREHOUSE), as_dict=True)
+""", (TEST_ITEM, TEST_WAREHOUSE), as_dict=True)
 
 if not last_sle:
     frappe.throw(
@@ -92,7 +92,7 @@ sle_check = frappe.db.sql("""
     WHERE item_code = %s AND warehouse = %s
       AND posting_date = %s AND is_cancelled = 0
     ORDER BY creation DESC LIMIT 1
-"", (TEST_ITEM, TEST_WAREHOUSE, ANALYSIS_DATE), as_dict=True)
+""", (TEST_ITEM, TEST_WAREHOUSE, ANALYSIS_DATE), as_dict=True)
 
 if sle_check:
     print("Verified: SLE created with rate {:.2f}".format(flt(sle_check[0].valuation_rate)))
