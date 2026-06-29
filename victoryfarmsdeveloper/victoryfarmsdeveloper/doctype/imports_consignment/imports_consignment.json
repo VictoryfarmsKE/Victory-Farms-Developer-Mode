@@ -146,14 +146,12 @@
   {
    "fieldname": "total_containers",
    "fieldtype": "Int",
-   "label": "Total Containers",
-   "read_only": 1
+   "label": "Total Containers"
   },
   {
    "fieldname": "total_received_qty",
    "fieldtype": "Float",
-   "label": "Total Received Qty",
-   "read_only": 1
+   "label": "Total Received Qty"
   },
   {
    "fieldname": "exempt",
@@ -211,7 +209,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-12 11:19:47.149676",
+ "modified": "2026-06-29 16:01:18.937425",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Imports Consignment",
