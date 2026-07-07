@@ -11,9 +11,11 @@ fixtures = [
     "Client Script",
     "Server Script",
     "Custom Field",
+    "Property Setter",
     {"dt": "Client Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Server Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Custom Field", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+    {"dt": "Property Setter", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
 ]
 
 
