@@ -37,13 +37,8 @@ def validate_mandatory_fields(doc, method):
     _require(doc, "ctc", _("Basic Salary"))
     _require(doc, "salary_currency", _("Salary Currency"))
     _require(doc, "salary_mode", _("Salary Mode"))
-    _require(doc, "bank", _("Bank"))
     _require(doc, "custom_appraisal_template", _("Appraisal Template"))
     _require(doc, "bonus_potential", _("Bonus Potential"))
-    _require(doc, "bank_name", _("Bank Name"))
-    _require(doc, "custom_bank_code", _("Bank Code"))
-    _require(doc, "bank_branch_name", _("Bank Branch Name"))
-    _require(doc, "custom_branch_code", _("Branch Code"))
     _require(doc, "bank_ac_no", _("Bank A/C No."))
     _require(doc, "custom_validation_id", _("Validation ID"))
     _require(doc, "national_id", _("National ID"))
@@ -54,6 +49,17 @@ def validate_mandatory_fields(doc, method):
     _require(doc, "type_of_employee", _("Type Of Employee"))
     _require(doc, "type_of_housing", _("Type Of Housing"))
 
+    # --- Bank details (mandatory unless USD + International transfer) ---
+    is_usd = doc.salary_currency == "USD"
+    is_intl = getattr(doc, "custom_transfer_type", None) == "International"
+    bank_not_required = is_usd and is_intl
+
+    if not bank_not_required:
+        _require(doc, "bank_name", _("Bank Name"))
+        _require(doc, "custom_bank_code", _("Bank Code"))
+        _require(doc, "bank_branch_name", _("Bank Branch Name"))
+        _require(doc, "custom_branch_code", _("Branch Code"))
+
     # --- Conditional: USD currency ---
     if doc.salary_currency == "USD":
         if doc.meta.has_field("custom_account_name") and not doc.custom_account_name:
@@ -61,12 +67,6 @@ def validate_mandatory_fields(doc, method):
                 _("Account Name is mandatory when Salary Currency is USD."),
                 title=_("Missing Mandatory Field")
             )
-        if doc.custom_transfer_type == "International":
-            if doc.meta.has_field("custom_swift_code") and not doc.custom_swift_code:
-                frappe.throw(
-                    _("SWIFT Code is mandatory for USD International transfers."),
-                    title=_("Missing Mandatory Field")
-                )
 
     # --- Conditional: Resident-only statutory fields ---
     if doc.residential_status == "Resident":
