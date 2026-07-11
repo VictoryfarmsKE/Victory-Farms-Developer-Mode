@@ -277,6 +277,10 @@ override_whitelisted_methods = {
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
+override_doctype_dashboards = {
+    "Purchase Invoice": "victoryfarmsdeveloper.dashboard_overrides.get_dashboard_data_for_purchase_invoice",
+    "Travel Allowance Claim": "victoryfarmsdeveloper.dashboard_overrides.get_dashboard_data_for_travel_allowance_claim",
+}
 # override_doctype_dashboards = {
 # 	"Task": "victoryfarmsdeveloper.task.get_dashboard_data"
 # }
