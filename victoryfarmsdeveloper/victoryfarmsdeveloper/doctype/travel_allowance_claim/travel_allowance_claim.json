@@ -34,6 +34,9 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Employee",
    "options": "Employee"
   },
@@ -46,12 +49,17 @@
   {
    "fieldname": "travel_area",
    "fieldtype": "Select",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Travel Area",
    "options": "\nUrban\nRural\nUrban/Rural"
   },
   {
    "fieldname": "total_amount",
    "fieldtype": "Currency",
+   "in_filter": 1,
+   "in_list_view": 1,
    "label": "Total Amount"
   },
   {
@@ -67,11 +75,13 @@
   {
    "fieldname": "travel_start_date",
    "fieldtype": "Date",
+   "in_filter": 1,
    "label": "Travel Start Date"
   },
   {
    "fieldname": "travel_end_date",
    "fieldtype": "Date",
+   "in_filter": 1,
    "label": "Travel End Date"
   },
   {
@@ -132,7 +142,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-06-17 15:45:26.003393",
+ "modified": "2026-07-08 16:58:52.946175",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Travel Allowance Claim",
