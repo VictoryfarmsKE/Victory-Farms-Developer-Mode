@@ -8,12 +8,10 @@ app_include = ["erpnext"]
 required_apps = ["frappe", "erpnext"]
 
 fixtures = [
-    "Client Script",
-    "Server Script",
-    "Custom Field",
     {"dt": "Client Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Server Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Custom Field", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+    {"dt": "Property Setter", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
 ]
 
 
