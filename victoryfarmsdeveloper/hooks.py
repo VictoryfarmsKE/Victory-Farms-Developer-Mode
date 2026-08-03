@@ -13,6 +13,8 @@ fixtures = [
     {"dt": "Custom Field", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Property Setter", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Workflow", "filters": [["name", "in", ["Material Issue Approval Workflow"]]]},
+    {"dt": "Workflow State", "filters": [["name", "in", ["Draft", "Pending Approval", "Approved", "Rejected", "Cancelled"]]]},
+    {"dt": "Workflow Action Master", "filters": [["name", "in", ["Submit for Approval", "Approve", "Reject", "Resubmit for Approval", "Cancel"]]]},
 ]
 
 
