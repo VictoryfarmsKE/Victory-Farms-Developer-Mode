@@ -1,0 +1,32 @@
+[
+ {
+  "doctype": "Workflow State",
+  "workflow_state_name": "Draft",
+  "style": "Inverse",
+  "name": "Draft"
+ },
+ {
+  "doctype": "Workflow State",
+  "workflow_state_name": "Pending Approval",
+  "style": "Warning",
+  "name": "Pending Approval"
+ },
+ {
+  "doctype": "Workflow State",
+  "workflow_state_name": "Approved",
+  "style": "Success",
+  "name": "Approved"
+ },
+ {
+  "doctype": "Workflow State",
+  "workflow_state_name": "Rejected",
+  "style": "Danger",
+  "name": "Rejected"
+ },
+ {
+  "doctype": "Workflow State",
+  "workflow_state_name": "Cancelled",
+  "style": "Danger",
+  "name": "Cancelled"
+ }
+]
