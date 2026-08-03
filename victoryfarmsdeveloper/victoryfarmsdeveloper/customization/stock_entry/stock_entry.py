@@ -280,6 +280,20 @@ def before_submit_stock_entry(doc, method):
     # (see apply_fixed_valuation_rate). It uses ERPNext Additional Costs so the
     # Stock Ledger and General Ledger stay consistent.
 
+    # --- MATERIAL ISSUE WORKFLOW VALIDATION ---
+    # Ensure Material Issue entries go through approval workflow
+    if doc.stock_entry_type == "Material Issue":
+        workflow_state = getattr(doc, "workflow_state", None)
+        
+        # Check if workflow is active for Stock Entry
+        if frappe.db.exists("Workflow", {"document_type": "Stock Entry", "is_active": 1}):
+            # Ensure the document has been approved before submission
+            if workflow_state != "Approved":
+                frappe.throw(
+                    _("Material Issue entries must be approved before submission. Current status: {0}").format(workflow_state or "Draft"),
+                    title=_("Approval Required")
+                )
+
     # --- EXISTING CoA VALIDATION ---
     previous_doc = doc.get_doc_before_save()
     previous_state = previous_doc.workflow_state if previous_doc else None
