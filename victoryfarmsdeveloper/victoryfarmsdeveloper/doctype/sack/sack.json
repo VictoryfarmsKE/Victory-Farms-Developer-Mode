@@ -1,0 +1,123 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:sack_id",
+ "creation": "2026-07-29 11:39:37.874007",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_fjzt",
+  "amended_from",
+  "section_break_hseo",
+  "sack_id",
+  "crop",
+  "packing_date",
+  "total_weight",
+  "status",
+  "section_break_fhgk",
+  "sack_batches_column",
+  "sack_batches"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_fjzt",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Sack",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "section_break_hseo",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "sack_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Sack ID",
+   "unique": 1
+  },
+  {
+   "fieldname": "crop",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Crop",
+   "options": "Crop",
+   "reqd": 1
+  },
+  {
+   "fieldname": "packing_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Packing Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "total_weight",
+   "fieldtype": "Float",
+   "in_standard_filter": 1,
+   "label": "Total Weight"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nPacked\nDispatched"
+  },
+  {
+   "fieldname": "section_break_fhgk",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "sack_batches_column",
+   "fieldtype": "Column Break",
+   "label": "Sack Batches"
+  },
+  {
+   "fieldname": "sack_batches",
+   "fieldtype": "Table",
+   "label": "Sack Batches",
+   "options": "Sack Batches"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-07-29 12:24:18.718500",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Sack",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
