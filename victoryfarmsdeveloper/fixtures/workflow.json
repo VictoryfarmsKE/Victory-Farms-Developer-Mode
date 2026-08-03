@@ -1,0 +1,91 @@
+[
+ {
+  "name": "Material Issue Approval Workflow",
+  "document_type": "Stock Entry",
+  "is_active": 1,
+  "workflow_name": "Material Issue Approval Workflow",
+  "workflow_state_field": "workflow_state",
+  "send_email_alert": 1,
+  "states": [
+   {
+    "state": "Draft",
+    "doc_status": "0",
+    "allow_edit": "Stock User",
+    "state_style": "Inverse",
+    "is_optional_state": 0
+   },
+   {
+    "state": "Pending Approval",
+    "doc_status": "0",
+    "allow_edit": "Stock Manager",
+    "state_style": "Warning",
+    "is_optional_state": 0
+   },
+   {
+    "state": "Approved",
+    "doc_status": "1",
+    "allow_edit": "Stock Manager",
+    "state_style": "Success",
+    "is_optional_state": 0
+   },
+   {
+    "state": "Rejected",
+    "doc_status": "0",
+    "allow_edit": "Stock User",
+    "state_style": "Danger",
+    "is_optional_state": 1
+   },
+   {
+    "state": "Cancelled",
+    "doc_status": "2",
+    "allow_edit": "Stock Manager",
+    "state_style": "Danger",
+    "is_optional_state": 1
+   }
+  ],
+  "transitions": [
+   {
+    "state": "Draft",
+    "action": "Submit for Approval",
+    "next_state": "Pending Approval",
+    "allowed": "Stock User",
+    "allow_self_approval": 0,
+    "condition": "doc.stock_entry_type == 'Material Issue'"
+   },
+   {
+    "state": "Pending Approval",
+    "action": "Approve",
+    "next_state": "Approved",
+    "allowed": "Stock Manager",
+    "allow_self_approval": 0,
+    "condition": "doc.stock_entry_type == 'Material Issue'"
+   },
+   {
+    "state": "Pending Approval",
+    "action": "Reject",
+    "next_state": "Rejected",
+    "allowed": "Stock Manager",
+    "allow_self_approval": 0,
+    "condition": "doc.stock_entry_type == 'Material Issue'"
+   },
+   {
+    "state": "Rejected",
+    "action": "Resubmit for Approval",
+    "next_state": "Pending Approval",
+    "allowed": "Stock User",
+    "allow_self_approval": 0,
+    "condition": "doc.stock_entry_type == 'Material Issue'"
+   },
+   {
+    "state": "Approved",
+    "action": "Cancel",
+    "next_state": "Cancelled",
+    "allowed": "Stock Manager",
+    "allow_self_approval": 0,
+    "condition": "doc.stock_entry_type == 'Material Issue'"
+   }
+  ],
+  "doctype": "Workflow",
+  "docstatus": 0
+ }
+]

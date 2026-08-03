@@ -12,6 +12,7 @@ fixtures = [
     {"dt": "Server Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Custom Field", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Property Setter", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+    {"dt": "Workflow", "filters": [["name", "in", ["Material Issue Approval Workflow"]]]},
 ]
 
 
@@ -257,7 +258,7 @@ doc_events = {
         "on_update": "victoryfarmsdeveloper.notifications.leave_balance_update_check.queue_leave_balance_update_check"
     },
     "Appraisal": {
-        "on_update": "victoryfarmsdeveloper.notifications.scorecard.queue_appraisal_notifications"
+        "on_update": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal.appraisal.queue_appraisal_notifications"
     },
     "Stock Entry": {
         "before_save": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_save_stock_entry",
@@ -266,6 +267,11 @@ doc_events = {
     "Employee": {
         "after_insert": "victoryfarmsdeveloper.custom_scripts.server_scripts.leave_allocation.create_leave_allocation_for_new_employee",
         "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.employee.employee.validate_mandatory_fields"
+    },
+    "Payment Entry": {
+        "validate": [
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payment_entry.payment_entry.set_beneficiary_purpose_of_payment",
+        ]
     }
 }
 
