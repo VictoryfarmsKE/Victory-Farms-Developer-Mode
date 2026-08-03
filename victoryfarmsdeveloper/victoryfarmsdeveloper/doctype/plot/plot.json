@@ -15,6 +15,12 @@
   "long_location",
   "lat_location",
   "plot_images",
+  "crop_1",
+  "crop_1_percentage",
+  "crop_1_planting_date",
+  "crop_2",
+  "crop_2_percentage",
+  "crop_2_planting_date",
   "column_break_eoge",
   "contract_holder",
   "contract_offtaker",
@@ -23,6 +29,12 @@
   "acreage",
   "project",
   "spending_code",
+  "crop_3",
+  "crop_3_percentage",
+  "crop_3_planting_date",
+  "crop_4",
+  "crop_4_percentage",
+  "crop_4_planting_date",
   "section_break_nsvx",
   "google_map_link",
   "comments",
@@ -150,7 +162,7 @@
    "fieldname": "drip_installed",
    "fieldtype": "Select",
    "label": "Drip Installed?",
-   "options": "\nYes\nNone\nDrip\nFurrow\nN/A"
+   "options": "\nNone\nDrip\nFurrow\nN/A"
   },
   {
    "fieldname": "tab_break_psym",
@@ -228,6 +240,74 @@
    "fieldtype": "Data",
    "label": "Plot Images",
    "options": "URL"
+  },
+  {
+   "fieldname": "crop_1",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Crop 1",
+   "options": "Crop Type"
+  },
+  {
+   "fieldname": "crop_2",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Crop 2",
+   "options": "Crop Type"
+  },
+  {
+   "fieldname": "crop_3",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Crop 3",
+   "options": "Crop Type"
+  },
+  {
+   "fieldname": "crop_4",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Crop 4",
+   "options": "Crop Type"
+  },
+  {
+   "fieldname": "crop_1_percentage",
+   "fieldtype": "Password",
+   "label": "Crop 1 Percentage"
+  },
+  {
+   "fieldname": "crop_2_percentage",
+   "fieldtype": "Password",
+   "label": "Crop 2 Percentage"
+  },
+  {
+   "fieldname": "crop_3_percentage",
+   "fieldtype": "Password",
+   "label": "Crop 3 Percentage"
+  },
+  {
+   "fieldname": "crop_4_percentage",
+   "fieldtype": "Password",
+   "label": "Crop 4 Percentage"
+  },
+  {
+   "fieldname": "crop_1_planting_date",
+   "fieldtype": "Date",
+   "label": "Crop 1 planting Date"
+  },
+  {
+   "fieldname": "crop_2_planting_date",
+   "fieldtype": "Date",
+   "label": "Crop 2 Planting Date"
+  },
+  {
+   "fieldname": "crop_3_planting_date",
+   "fieldtype": "Date",
+   "label": "Crop 3 Planting Date"
+  },
+  {
+   "fieldname": "crop_4_planting_date",
+   "fieldtype": "Date",
+   "label": "Crop 4 Planting Date"
   }
  ],
  "grid_page_length": 50,
@@ -239,7 +319,7 @@
    "link_fieldname": "custom_plot"
   }
  ],
- "modified": "2026-06-10 10:01:58.858330",
+ "modified": "2026-08-03 15:44:15.983926",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Plot",
