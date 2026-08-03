@@ -16,6 +16,7 @@
   "wet_weight_received",
   "datetime_received",
   "datetime_drying_completed",
+  "dry_weight_out",
   "status"
  ],
  "fields": [
@@ -86,6 +87,11 @@
    "in_standard_filter": 1,
    "label": "Plot",
    "options": "Plot"
+  },
+  {
+   "fieldname": "dry_weight_out",
+   "fieldtype": "Float",
+   "label": "Dry Weight Out"
   }
  ],
  "grid_page_length": 50,
@@ -98,7 +104,7 @@
    "link_fieldname": "batch_id"
   }
  ],
- "modified": "2026-07-08 15:29:23.233816",
+ "modified": "2026-07-29 11:52:51.695646",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Produce Batch",
