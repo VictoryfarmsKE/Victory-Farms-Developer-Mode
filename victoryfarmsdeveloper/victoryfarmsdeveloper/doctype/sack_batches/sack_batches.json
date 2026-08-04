@@ -6,12 +6,13 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "produce_batch",
   "drying_record",
+  "produce_batch",
   "dry_weight"
  ],
  "fields": [
   {
+   "fetch_from": "drying_record.produce_batch",
    "fieldname": "produce_batch",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -26,7 +27,7 @@
    "options": "Drying Record"
   },
   {
-   "fetch_from": "drying_record.total_weight",
+   "fetch_from": "drying_record.dry_weight_out",
    "fieldname": "dry_weight",
    "fieldtype": "Float",
    "in_list_view": 1,
@@ -37,7 +38,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-07-29 12:05:30.431837",
+ "modified": "2026-08-04 18:16:23.144212",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Sack Batches",
