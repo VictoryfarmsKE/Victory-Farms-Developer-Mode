@@ -18,6 +18,7 @@ def create_journal_entry_on_submit(doc, method=None):
 
     company = doc.company
     payroll_payable_account = _get_payroll_payable_account(company)
+    cost_center = getattr(doc, "payroll_cost_center", None) or getattr(doc, "cost_center", None) or None
 
     accounts = []
 
@@ -30,7 +31,7 @@ def create_journal_entry_on_submit(doc, method=None):
                     "account": account,
                     "debit_in_account_currency": abs(row.amount),
                     "credit_in_account_currency": 0,
-                    "cost_center": doc.payroll_cost_center or None,
+                    "cost_center": cost_center,
                     "reference_type": "Salary Slip",
                     "reference_name": doc.name,
                     "party_type": None,
@@ -46,7 +47,7 @@ def create_journal_entry_on_submit(doc, method=None):
                     "account": account,
                     "debit_in_account_currency": 0,
                     "credit_in_account_currency": abs(row.amount),
-                    "cost_center": doc.payroll_cost_center or None,
+                    "cost_center": cost_center,
                     "reference_type": "Salary Slip",
                     "reference_name": doc.name,
                     "party_type": None,
@@ -66,7 +67,7 @@ def create_journal_entry_on_submit(doc, method=None):
             "account": payroll_payable_account,
             "debit_in_account_currency": 0 if difference > 0 else abs(difference),
             "credit_in_account_currency": difference if difference > 0 else 0,
-            "cost_center": doc.payroll_cost_center or None,
+            "cost_center": cost_center,
             "reference_type": "Salary Slip",
             "reference_name": doc.name,
             "party_type": "Employee",
