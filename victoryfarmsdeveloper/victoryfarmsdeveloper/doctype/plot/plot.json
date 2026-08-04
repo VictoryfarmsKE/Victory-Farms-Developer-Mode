@@ -15,12 +15,6 @@
   "long_location",
   "lat_location",
   "plot_images",
-  "crop_1",
-  "crop_1_percentage",
-  "crop_1_planting_date",
-  "crop_2",
-  "crop_2_percentage",
-  "crop_2_planting_date",
   "column_break_eoge",
   "contract_holder",
   "contract_offtaker",
@@ -29,11 +23,20 @@
   "acreage",
   "project",
   "spending_code",
+  "crop_allocation_section",
+  "column_break_cudz",
+  "crop_1",
+  "crop_1_allocation",
+  "crop_1_planting_date",
+  "crop_2",
+  "crop_2_allocation",
+  "crop_2_planting_date",
+  "column_break_nsip",
   "crop_3",
-  "crop_3_percentage",
+  "crop_3_allocation_",
   "crop_3_planting_date",
   "crop_4",
-  "crop_4_percentage",
+  "crop_4_allocation",
   "crop_4_planting_date",
   "section_break_nsvx",
   "google_map_link",
@@ -270,44 +273,70 @@
    "options": "Crop Type"
   },
   {
-   "fieldname": "crop_1_percentage",
-   "fieldtype": "Password",
-   "label": "Crop 1 Percentage"
-  },
-  {
-   "fieldname": "crop_2_percentage",
-   "fieldtype": "Password",
-   "label": "Crop 2 Percentage"
-  },
-  {
-   "fieldname": "crop_3_percentage",
-   "fieldtype": "Password",
-   "label": "Crop 3 Percentage"
-  },
-  {
-   "fieldname": "crop_4_percentage",
-   "fieldtype": "Password",
-   "label": "Crop 4 Percentage"
-  },
-  {
    "fieldname": "crop_1_planting_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "Crop 1 planting Date"
   },
   {
    "fieldname": "crop_2_planting_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "Crop 2 Planting Date"
   },
   {
    "fieldname": "crop_3_planting_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "Crop 3 Planting Date"
   },
   {
    "fieldname": "crop_4_planting_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "Crop 4 Planting Date"
+  },
+  {
+   "fieldname": "crop_1_allocation",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Crop 1 Allocation(%)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "crop_2_allocation",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Crop 2 Allocation(%)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "crop_3_allocation_",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Crop 3 Allocation (%)"
+  },
+  {
+   "bold": 1,
+   "fieldname": "column_break_nsip",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "crop_4_allocation",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Crop 4 Allocation(%)"
+  },
+  {
+   "bold": 1,
+   "fieldname": "crop_allocation_section",
+   "fieldtype": "Section Break",
+   "label": "Crop Allocation"
+  },
+  {
+   "bold": 1,
+   "fieldname": "column_break_cudz",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
@@ -319,7 +348,7 @@
    "link_fieldname": "custom_plot"
   }
  ],
- "modified": "2026-08-03 15:44:15.983926",
+ "modified": "2026-08-04 19:44:10.316201",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Plot",
@@ -342,5 +371,6 @@
  "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }
