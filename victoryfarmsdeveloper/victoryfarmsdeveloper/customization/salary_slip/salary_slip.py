@@ -12,6 +12,10 @@ def create_journal_entry_on_submit(doc, method=None):
     if doc.docstatus != 1:
         return
 
+    # Skip if a Journal Entry is already linked (e.g., created from Payroll Entry)
+    if doc.journal_entry:
+        return
+
     company = doc.company
     payroll_payable_account = _get_payroll_payable_account(company)
 
