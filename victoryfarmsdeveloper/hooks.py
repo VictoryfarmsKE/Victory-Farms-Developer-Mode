@@ -279,6 +279,10 @@ doc_events = {
         "validate": [
             "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payment_entry.payment_entry.set_beneficiary_purpose_of_payment",
         ]
+    },
+    "Salary Slip": {
+        "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.create_journal_entry_on_submit",
+        "on_cancel": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.unlink_journal_entry_on_cancel",
     }
 }
 
