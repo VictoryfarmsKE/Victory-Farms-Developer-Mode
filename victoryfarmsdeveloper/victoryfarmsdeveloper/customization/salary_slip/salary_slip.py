@@ -32,8 +32,8 @@ def create_journal_entry_on_submit(doc, method=None):
                     "debit_in_account_currency": abs(row.amount),
                     "credit_in_account_currency": 0,
                     "cost_center": cost_center,
-                    "reference_type": "Salary Slip",
-                    "reference_name": doc.name,
+                    "reference_type": None,
+                    "reference_name": None,
                     "party_type": None,
                     "party": None,
                 })
@@ -48,8 +48,8 @@ def create_journal_entry_on_submit(doc, method=None):
                     "debit_in_account_currency": 0,
                     "credit_in_account_currency": abs(row.amount),
                     "cost_center": cost_center,
-                    "reference_type": "Salary Slip",
-                    "reference_name": doc.name,
+                    "reference_type": None,
+                    "reference_name": None,
                     "party_type": None,
                     "party": None,
                 })
@@ -68,10 +68,10 @@ def create_journal_entry_on_submit(doc, method=None):
             "debit_in_account_currency": 0 if difference > 0 else abs(difference),
             "credit_in_account_currency": difference if difference > 0 else 0,
             "cost_center": cost_center,
-            "reference_type": "Salary Slip",
-            "reference_name": doc.name,
-            "party_type": "Employee",
-            "party": doc.employee,
+            "reference_type": "Payroll Entry",
+            "reference_name": doc.payroll_entry or None,
+            "party_type": "Employee" if doc.payroll_entry else None,
+            "party": doc.employee if doc.payroll_entry else None,
         })
 
     je = frappe.get_doc({
