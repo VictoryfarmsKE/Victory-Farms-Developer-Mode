@@ -2,15 +2,17 @@ frappe.ui.form.on('Payment Entry', {
     refresh(frm) {
         set_beneficiary_purpose(frm);
         add_upload_beneficiaries_button(frm);
-    },
-    validate(frm) {
-        set_beneficiary_purpose(frm);
     }
 });
 
 frappe.ui.form.on('Payment Entry Reference', {
     reference_name(frm, cdt, cdn) {
-        set_beneficiary_purpose(frm);
+        const row = locals[cdt][cdn];
+        if (row.reference_doctype === 'Purchase Invoice' && row.reference_name) {
+            resolve_purchase_invoice_po(frm, row.reference_name);
+        } else {
+            set_beneficiary_purpose(frm);
+        }
     },
     reference_doctype(frm, cdt, cdn) {
         set_beneficiary_purpose(frm);
@@ -24,10 +26,33 @@ frappe.ui.form.on('Payment Entry Reference', {
 });
 
 function set_beneficiary_purpose(frm) {
-    const po_refs = (frm.doc.references || []).filter(
-        (r) => r.reference_doctype === 'Purchase Order' && r.reference_name
-    ).map((r) => r.reference_name);
+    const po_refs = (frm.doc.references || [])
+        .filter((r) => r.reference_doctype === 'Purchase Order' && r.reference_name)
+        .map((r) => r.reference_name);
 
+    apply_po_values(frm, po_refs);
+}
+
+function resolve_purchase_invoice_po(frm, invoice_name) {
+    frappe.db.get_value('Purchase Invoice', invoice_name, 'purchase_order', (r) => {
+        let po = (r && r.message && r.message.purchase_order) || null;
+        if (po) {
+            apply_po_values(frm, [po]);
+            return;
+        }
+        frappe.db.get_value(
+            'Purchase Invoice Item',
+            { parent: invoice_name, purchase_order: ['is', 'set'] },
+            'purchase_order',
+            (item) => {
+                po = (item && item.message && item.message.purchase_order) || null;
+                if (po) apply_po_values(frm, [po]);
+            }
+        );
+    });
+}
+
+function apply_po_values(frm, po_refs) {
     const unique_refs = [...new Set(po_refs)];
     if (!unique_refs.length) return;
 
