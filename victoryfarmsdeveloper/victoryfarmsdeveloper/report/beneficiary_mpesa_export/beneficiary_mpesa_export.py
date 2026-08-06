@@ -24,7 +24,6 @@ def get_data(filters):
 
     query_filters = {
         "docstatus": ["in", [0, 1]],
-        "custom_beneficiary_name": ["is", "set"],
     }
 
     if filters.get("company"):
@@ -37,32 +36,34 @@ def get_data(filters):
     payment_entries = frappe.get_all(
         "Payment Entry",
         filters=query_filters,
-        fields=[
-            "name",
-            "custom_beneficiary_name",
-            "custom_beneficiary_mobile_number",
-            "custom_beneficiary_document_type",
-            "custom_beneficiary_document_number",
-            "custom_beneficiary_amount",
-            "custom_beneficiary_purpose_of_payment",
-        ],
+        fields=["name"],
     )
 
     data = []
     for pe in payment_entries:
-        # Replace newline-separated PO refs with pipe separator for Excel export
-        purpose = (pe.custom_beneficiary_purpose_of_payment or "").replace("\n", " | ")
-
-        data.append(
-            {
-                "mobile_number": pe.custom_beneficiary_mobile_number,
-                "document_type": pe.custom_beneficiary_document_type,
-                "document_number": pe.custom_beneficiary_document_number,
-                "amount": pe.custom_beneficiary_amount,
-                "purpose_of_payment": purpose,
-                "name": pe.custom_beneficiary_name,
-            }
+        beneficiaries = frappe.get_all(
+            "Payment Entry Beneficiary",
+            filters={"parent": pe.name, "parenttype": "Payment Entry"},
+            fields=[
+                "mobile_number",
+                "document_type",
+                "document_number",
+                "amount",
+                "purpose_of_payment",
+                "beneficiary_name",
+            ],
         )
+        for row in beneficiaries:
+            data.append(
+                {
+                    "mobile_number": row.mobile_number,
+                    "document_type": row.document_type,
+                    "document_number": row.document_number,
+                    "amount": row.amount,
+                    "purpose_of_payment": row.purpose_of_payment,
+                    "name": row.beneficiary_name,
+                }
+            )
 
     return data
 
