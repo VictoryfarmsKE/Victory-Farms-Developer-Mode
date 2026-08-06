@@ -47,7 +47,8 @@ app_include_js = [
 doctype_js = {
     "Stock Entry": "victoryfarmsdeveloper/customization/stock_entry_item_break_down/stock_entry_item_break_down.js",
     "Landed Cost Voucher": "victoryfarmsdeveloper/public/js/landed_cost_voucher.js",
-    "Leave Application": "public/js/leave_application.js"
+    "Leave Application": "public/js/leave_application.js",
+    "Payment Entry": "public/js/payment_entry.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 doctype_list_js = {
@@ -279,10 +280,6 @@ doc_events = {
         "validate": [
             "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payment_entry.payment_entry.set_beneficiary_purpose_of_payment",
         ]
-    },
-    "Salary Slip": {
-        "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.create_journal_entry_on_submit",
-        "on_cancel": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.unlink_journal_entry_on_cancel",
     }
 }
 
