@@ -6,46 +6,16 @@ PO_REF_SEPARATOR = " | "
 
 
 def get_po_refs(doc):
-    """Return a list of unique Purchase Order reference names.
-
-    For direct Purchase Order references, the reference name is used.
-    For Purchase Invoice references, the linked Purchase Order is resolved
-    from the invoice's items.
-    """
+    """Return a list of unique Purchase Order reference names."""
     if not doc.references:
         return []
 
-    po_refs = []
-    for r in doc.references:
-        if not r.reference_name:
-            continue
-        if r.reference_doctype == "Purchase Order":
-            po_refs.append(r.reference_name)
-        elif r.reference_doctype == "Purchase Invoice":
-            po = _get_purchase_order_from_invoice(r.reference_name)
-            if po:
-                po_refs.append(po)
-
+    po_refs = [
+        r.reference_name
+        for r in doc.references
+        if r.reference_doctype == "Purchase Order" and r.reference_name
+    ]
     return list(dict.fromkeys(po_refs))  # preserve order, remove duplicates
-
-
-def _get_purchase_order_from_invoice(invoice_name):
-    """Return the first linked Purchase Order for a Purchase Invoice."""
-    if not invoice_name:
-        return None
-
-    # Try the purchase_order field on the invoice header first
-    po = frappe.db.get_value("Purchase Invoice", invoice_name, "purchase_order")
-    if po:
-        return po
-
-    # Fall back to the first item with a linked PO
-    return frappe.db.get_value(
-        "Purchase Invoice Item",
-        {"parent": invoice_name, "purchase_order": ["is", "set"]},
-        "purchase_order",
-        order_by="idx asc",
-    )
 
 
 def set_beneficiary_purpose_of_payment(doc, method=None):

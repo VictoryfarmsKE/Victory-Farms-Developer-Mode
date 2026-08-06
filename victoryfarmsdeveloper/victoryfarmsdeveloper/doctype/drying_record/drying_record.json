@@ -1,0 +1,120 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:produce_batch",
+ "creation": "2026-07-29 11:34:58.113858",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_is8o",
+  "amended_from",
+  "section_break_qoxw",
+  "produce_batch",
+  "crop",
+  "plot",
+  "harvest_date",
+  "datetime_drying_completed",
+  "dry_weight_out",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_is8o",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Drying Record",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "section_break_qoxw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "produce_batch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Produce Batch",
+   "options": "Produce Batch",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fetch_from": "produce_batch.crop_type",
+   "fieldname": "crop",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Crop",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "produce_batch.plot",
+   "fieldname": "plot",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Plot",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "produce_batch.harvest_date",
+   "fieldname": "harvest_date",
+   "fieldtype": "Date",
+   "label": "Harvest Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nDrying\nCompleted"
+  },
+  {
+   "fieldname": "datetime_drying_completed",
+   "fieldtype": "Datetime",
+   "label": "Datetime Drying Completed"
+  },
+  {
+   "fieldname": "dry_weight_out",
+   "fieldtype": "Float",
+   "label": "Dry Weight Out"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-07-29 11:52:07.311480",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Drying Record",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

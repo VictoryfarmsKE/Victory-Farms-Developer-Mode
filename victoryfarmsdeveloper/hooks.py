@@ -274,7 +274,8 @@ doc_events = {
         "before_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_submit_stock_entry"
     },
     "Employee": {
-        "after_insert": "victoryfarmsdeveloper.custom_scripts.server_scripts.leave_allocation.create_leave_allocation_for_new_employee"
+        "after_insert": "victoryfarmsdeveloper.custom_scripts.server_scripts.leave_allocation.create_leave_allocation_for_new_employee",
+        "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.employee.employee.validate_mandatory_fields"
     },
     "Payment Entry": {
         "validate": [
@@ -302,6 +303,10 @@ override_whitelisted_methods = {
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
+override_doctype_dashboards = {
+    "Purchase Invoice": "victoryfarmsdeveloper.dashboard_overrides.get_dashboard_data_for_purchase_invoice",
+    "Travel Allowance Claim": "victoryfarmsdeveloper.dashboard_overrides.get_dashboard_data_for_travel_allowance_claim",
+}
 # override_doctype_dashboards = {
 # 	"Task": "victoryfarmsdeveloper.task.get_dashboard_data"
 # }
