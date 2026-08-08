@@ -4,6 +4,9 @@ TARGET_FIELD = "taxes_and_charges"
 TARGET_VALUE = 'eval:doc.custom_type=="Feeds"'
 
 
+LANDED_COST_FIELDS = ["landed_cost_voucher", "custom_landed_costs"]
+
+
 def execute():
     """
     Make Landed Costs non-mandatory on Purchase Receipt under all conditions and
@@ -18,7 +21,7 @@ def execute():
     Template so the Feeds mandatory rule is visible and enforceable.
     """
     _clear_stale_mandatory_rules()
-    _clear_landed_cost_reqd()
+    _clear_landed_cost_rules()
     _ensure_taxes_template_visible()
     _apply_rule_to_taxes_template()
 
@@ -44,21 +47,43 @@ def _clear_stale_mandatory_rules():
         frappe.delete_doc("Property Setter", row.name, force=1, ignore_permissions=True)
 
 
-def _clear_landed_cost_reqd():
-    """Delete every reqd / mandatory_depends_on setter on Purchase Receipt -> Landed Costs."""
-    reqd_setters = frappe.get_all(
-        "Property Setter",
-        filters={
-            "doctype_or_field": "DocField",
-            "doc_type": "Purchase Receipt",
-            "field_name": "landed_cost_voucher",
-            "property": ["in", ["reqd", "mandatory_depends_on"]],
-        },
-        pluck="name",
-    )
+def _clear_landed_cost_rules():
+    """
+    Delete every reqd / mandatory_depends_on setter on Purchase Receipt ->
+    Landed Costs, and clear any depends_on rule that ties its visibility to
+    custom_type. Landed Costs must be non-mandatory and visible for everything.
+    """
+    for field_name in LANDED_COST_FIELDS:
+        reqd_setters = frappe.get_all(
+            "Property Setter",
+            filters={
+                "doctype_or_field": "DocField",
+                "doc_type": "Purchase Receipt",
+                "field_name": field_name,
+                "property": ["in", ["reqd", "mandatory_depends_on"]],
+            },
+            pluck="name",
+        )
 
-    for name in reqd_setters:
-        frappe.delete_doc("Property Setter", name, force=1, ignore_permissions=True)
+        for name in reqd_setters:
+            frappe.delete_doc("Property Setter", name, force=1, ignore_permissions=True)
+
+        visibility_setters = frappe.get_all(
+            "Property Setter",
+            filters={
+                "doctype_or_field": "DocField",
+                "doc_type": "Purchase Receipt",
+                "field_name": field_name,
+                "property": ["in", ["hidden", "depends_on"]],
+            },
+            fields=["name", "property", "value"],
+        )
+
+        for row in visibility_setters:
+            if row.property == "hidden" or (
+                row.property == "depends_on" and "custom_type" in (row.value or "")
+            ):
+                frappe.delete_doc("Property Setter", row.name, force=1, ignore_permissions=True)
 
 
 def _ensure_taxes_template_visible():
