@@ -13,6 +13,9 @@ def execute():
     This supersedes update_purchase_receipt_mandatory_rules, whose cleanup only
     matched double-quoted rule values and therefore left behind single-quoted
     variants such as eval:doc.custom_type=='Feeds'.
+
+    Re-triggered deploy: ensures the Feeds rule is re-applied to the Purchase
+    Taxes and Charges Template and Landed Cost Voucher remains non-mandatory.
     """
     _clear_stale_mandatory_rules()
     _clear_landed_cost_reqd()
