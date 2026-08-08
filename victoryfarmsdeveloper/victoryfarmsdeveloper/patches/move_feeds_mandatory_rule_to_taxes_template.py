@@ -14,11 +14,12 @@ def execute():
     matched double-quoted rule values and therefore left behind single-quoted
     variants such as eval:doc.custom_type=='Feeds'.
 
-    Re-triggered deploy: ensures the Feeds rule is re-applied to the Purchase
-    Taxes and Charges Template and Landed Cost Voucher remains non-mandatory.
+    Also clears any hidden/depends_on rule hiding the Purchase Taxes and Charges
+    Template so the Feeds mandatory rule is visible and enforceable.
     """
     _clear_stale_mandatory_rules()
     _clear_landed_cost_reqd()
+    _ensure_taxes_template_visible()
     _apply_rule_to_taxes_template()
 
     frappe.clear_cache(doctype="Purchase Receipt")
@@ -44,6 +45,7 @@ def _clear_stale_mandatory_rules():
 
 
 def _clear_landed_cost_reqd():
+    """Delete every reqd / mandatory_depends_on setter on Purchase Receipt -> Landed Costs."""
     reqd_setters = frappe.get_all(
         "Property Setter",
         filters={
@@ -57,6 +59,26 @@ def _clear_landed_cost_reqd():
 
     for name in reqd_setters:
         frappe.delete_doc("Property Setter", name, force=1, ignore_permissions=True)
+
+
+def _ensure_taxes_template_visible():
+    """Remove hidden/depends_on setters that hide the Purchase Taxes and Charges Template."""
+    stale = frappe.get_all(
+        "Property Setter",
+        filters={
+            "doctype_or_field": "DocField",
+            "doc_type": "Purchase Receipt",
+            "field_name": TARGET_FIELD,
+            "property": ["in", ["hidden", "depends_on"]],
+        },
+        fields=["name", "property", "value"],
+    )
+
+    for row in stale:
+        if row.property == "hidden" or (
+            row.property == "depends_on" and "custom_type" in (row.value or "")
+        ):
+            frappe.delete_doc("Property Setter", row.name, force=1, ignore_permissions=True)
 
 
 def _apply_rule_to_taxes_template():
