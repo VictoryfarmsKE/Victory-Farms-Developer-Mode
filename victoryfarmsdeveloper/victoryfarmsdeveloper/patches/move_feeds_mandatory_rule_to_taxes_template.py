@@ -115,13 +115,3 @@ def _apply_rule_to_taxes_template():
     ps.property_type = "Text"
     ps.module = "VictoryFarmsDeveloper"
     ps.insert(ignore_permissions=True)
-
-    ps = frappe.new_doc("Property Setter")
-    ps.doctype_or_field = "DocField"
-    ps.doc_type = "Purchase Receipt"
-    ps.field_name = TARGET_FIELD
-    ps.property = "mandatory_depends_on"
-    ps.value = TARGET_VALUE
-    ps.property_type = "Text"
-    ps.module = "VictoryFarmsDeveloper"
-    ps.insert(ignore_permissions=True)
