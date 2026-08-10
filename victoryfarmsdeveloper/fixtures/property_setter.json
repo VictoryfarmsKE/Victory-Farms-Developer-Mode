@@ -51,7 +51,7 @@
   "doctype": "Property Setter",
   "doctype_or_field": "DocField",
   "field_name": "taxes_and_charges",
-  "modified": "2026-07-23 16:00:00.000000",
+  "modified": "2026-08-10 00:00:00.000000",
   "module": "VictoryFarmsDeveloper",
   "name": "Purchase Receipt-taxes_and_charges-mandatory_depends_on",
   "property": "mandatory_depends_on",
