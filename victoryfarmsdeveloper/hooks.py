@@ -285,6 +285,9 @@ doc_events = {
     },
     "Purchase Receipt": {
         "validate": "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.validate_purchase_receipt"
+    },
+    "Salary Slip": {
+        "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.sync_additional_salary_notes"
     }
 }
 
