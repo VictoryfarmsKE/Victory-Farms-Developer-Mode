@@ -109,7 +109,7 @@ def _require(doc, fieldname, label):
     if not doc.meta.has_field(fieldname):
         return
     value = getattr(doc, fieldname, None)
-    if not value:
+    if value is None or value == "":
         frappe.throw(
             _("{0} is mandatory.").format(label),
             title=_("Missing Mandatory Field")
