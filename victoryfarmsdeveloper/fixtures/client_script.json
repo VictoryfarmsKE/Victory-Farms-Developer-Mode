@@ -185,5 +185,27 @@
    "name": "Material Issue Approval Workflow",
    "script": "frappe.ui.form.on('Stock Entry', {\r\n    refresh(frm) {\r\n        if (frm.doc.stock_entry_type === 'Material Issue' && !frm.is_new()) {\r\n            show_material_issue_workflow_status(frm);\r\n        }\r\n    },\r\n\r\n    stock_entry_type(frm) {\r\n        if (frm.doc.stock_entry_type === 'Material Issue' && frm.is_new()) {\r\n            frappe.show_alert({\r\n                message: __('Material Issue entries are governed by the Stock Transfer workflow and require approval before submission.'),\r\n                indicator: 'blue'\r\n            }, 5);\r\n        }\r\n    },\r\n\r\n    before_submit(frm) {\r\n        if (frm.doc.stock_entry_type === 'Material Issue') {\r\n            const state = frm.doc.workflow_state || 'Draft';\r\n            if (!['Approved', 'Submitted'].includes(state)) {\r\n                frappe.throw(__('Material Issue entries must be approved before submission. Current status: {0}', [state]));\r\n            }\r\n        }\r\n    }\r\n});\r\n\r\nfunction show_material_issue_workflow_status(frm) {\r\n    const state = frm.doc.workflow_state || 'Draft';\r\n    const colours = {\r\n        'Draft': 'blue',\r\n        'Pending Approval (Material Issue)': 'orange',\r\n        'Pending Approval': 'orange',\r\n        'Approved': 'green',\r\n        'Submitted': 'green',\r\n        'Rejected': 'red',\r\n        'Cancelled': 'red'\r\n    };\r\n    frm.dashboard.add_comment(\r\n        __('Material Issue workflow status: {0}', [state]),\r\n        colours[state] || 'blue',\r\n        true\r\n    );\r\n}",
    "view": "Form"
-  }
+  },
+   {
+    "docstatus": 0,
+    "doctype": "Client Script",
+    "dt": "Purchase Receipt",
+    "enabled": 1,
+    "modified": "2026-08-11 13:00:00.000000",
+    "module": "VictoryFarmsDeveloper",
+    "name": "Purchase Receipt Feeds Tax Template Rule",
+    "script": "frappe.ui.form.on('Purchase Receipt', {\n    refresh(frm) { apply_vf_purchase_receipt_rules(frm); },\n    custom_type(frm) { apply_vf_purchase_receipt_rules(frm); },\n    validate(frm) { apply_vf_purchase_receipt_rules(frm); }\n});\n\nfunction apply_vf_purchase_receipt_rules(frm) {\n    // Landed Costs is never mandatory, for any Type.\n    ['custom_landed_costs', 'landed_cost_voucher'].forEach(function (fieldname) {\n        if (frm.fields_dict[fieldname]) {\n            frm.set_df_property(fieldname, 'reqd', 0);\n            frm.refresh_field(fieldname);\n        }\n    });\n\n    // Purchase Taxes and Charges Template is mandatory only for Feeds.\n    // Matched with includes('feed') so both 'Feed' and 'Feeds' work.\n    if (!frm.fields_dict.taxes_and_charges) {\n        return;\n    }\n\n    const is_feeds = (frm.doc.custom_type || '').toLowerCase().indexOf('feed') !== -1;\n    frm.set_df_property('taxes_and_charges', 'reqd', is_feeds ? 1 : 0);\n    frm.set_df_property('taxes_and_charges', 'hidden', 0);\n    frm.refresh_field('taxes_and_charges');\n}",
+    "view": "Form"
+   },
+   {
+    "docstatus": 0,
+    "doctype": "Client Script",
+    "dt": "Salary Slip",
+    "enabled": 1,
+    "modified": "2026-08-12 15:50:00.000000",
+    "module": "VictoryFarmsDeveloper",
+    "name": "Show Note Column on Salary Slip",
+    "script": "frappe.ui.form.on('Salary Slip', {\n    refresh(frm) {\n        show_note_column(frm, 'earnings');\n        show_note_column(frm, 'deductions');\n    }\n});\n\nfunction show_note_column(frm, table_field) {\n    const grid = frm.fields_dict[table_field] && frm.fields_dict[table_field].grid;\n    if (!grid) return;\n\n    // Ensure custom_note is visible as a column in the child table\n    grid.set_column_in_list_view('custom_note', true);\n}",
+    "view": "Form"
+   }
 ]
