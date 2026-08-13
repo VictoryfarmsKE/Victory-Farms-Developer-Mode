@@ -77,8 +77,7 @@ function resolve_po_refs(frm) {
             frappe.db.get_list('Purchase Invoice Item', {
                 filters: { parent: invoice_name, purchase_order: ['is', 'set'] },
                 fields: ['purchase_order'],
-                distinct: true,
-                parent: invoice_name
+                distinct: true
             }).then((rows) => {
                 rows.forEach((row) => {
                     if (row.purchase_order) po_refs.push(row.purchase_order);
