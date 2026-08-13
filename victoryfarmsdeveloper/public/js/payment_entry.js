@@ -72,22 +72,23 @@ function resolve_po_refs(frm) {
             return;
         }
 
-        let pending = invoice_refs.length;
-        invoice_refs.forEach((invoice_name) => {
-            frappe.db.get_list('Purchase Invoice Item', {
-                filters: { parent: invoice_name, purchase_order: ['is', 'set'] },
-                fields: ['purchase_order'],
-                distinct: true
-            }).then((rows) => {
-                rows.forEach((row) => {
-                    if (row.purchase_order) po_refs.push(row.purchase_order);
+        // Use whitelisted server method to resolve POs from Purchase Invoices.
+        // Cannot use frappe.db.get_list on child table doctypes (permission error).
+        frappe.call({
+            method: 'victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payment_entry.payment_entry.get_po_refs_for_invoices',
+            args: { invoice_names: invoice_refs },
+            callback(r) {
+                const mapping = r.message || {};
+                invoice_refs.forEach((inv) => {
+                    (mapping[inv] || []).forEach((po) => {
+                        if (po) po_refs.push(po);
+                    });
                 });
-                pending -= 1;
-                if (pending <= 0) resolve(po_refs);
-            }).catch(() => {
-                pending -= 1;
-                if (pending <= 0) resolve(po_refs);
-            });
+                resolve(po_refs);
+            },
+            error() {
+                resolve(po_refs);
+            }
         });
     });
 }

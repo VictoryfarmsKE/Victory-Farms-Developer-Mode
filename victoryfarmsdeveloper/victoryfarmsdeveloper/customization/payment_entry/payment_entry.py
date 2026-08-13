@@ -41,6 +41,24 @@ def _get_purchase_orders_from_invoice(invoice_name):
     return [r.purchase_order for r in rows if r.purchase_order]
 
 
+@frappe.whitelist()
+def get_po_refs_for_invoices(invoice_names):
+    """Return a dict mapping each Purchase Invoice name to its linked POs.
+
+    This is a whitelisted endpoint so the client-side JS can resolve
+    Purchase Invoice → Purchase Order links without querying child
+    tables directly (which fails due to permission issues on child
+    doctypes).
+    """
+    if isinstance(invoice_names, str):
+        invoice_names = frappe.parse_json(invoice_names)
+
+    result = {}
+    for invoice_name in invoice_names:
+        result[invoice_name] = _get_purchase_orders_from_invoice(invoice_name)
+    return result
+
+
 def set_beneficiary_purpose_of_payment(doc, method=None):
     """Auto-fill PurposeOfPayment on all beneficiary rows from PO references.
 
