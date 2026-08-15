@@ -90,6 +90,10 @@ doctype_list_js = {
 # before_install = "victoryfarmsdeveloper.install.before_install"
 # after_install = "victoryfarmsdeveloper.install.after_install"
 
+after_migrate = [
+    "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.enforce"
+]
+
 # Uninstallation
 # ------------
 
@@ -278,6 +282,12 @@ doc_events = {
         "validate": [
             "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payment_entry.payment_entry.set_beneficiary_purpose_of_payment",
         ]
+    },
+    "Purchase Receipt": {
+        "validate": "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.validate_purchase_receipt"
+    },
+    "Salary Slip": {
+        "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.sync_additional_salary_notes"
     }
 }
 

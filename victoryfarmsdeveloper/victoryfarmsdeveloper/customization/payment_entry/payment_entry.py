@@ -6,16 +6,57 @@ PO_REF_SEPARATOR = " | "
 
 
 def get_po_refs(doc):
-    """Return a list of unique Purchase Order reference names."""
+    """Return a list of unique Purchase Order reference names.
+
+    Resolves Purchase Invoice references to their linked Purchase Order(s).
+    """
     if not doc.references:
         return []
 
-    po_refs = [
-        r.reference_name
-        for r in doc.references
-        if r.reference_doctype == "Purchase Order" and r.reference_name
-    ]
+    po_refs = []
+    for r in doc.references:
+        if not r.reference_name:
+            continue
+
+        if r.reference_doctype == "Purchase Order":
+            po_refs.append(r.reference_name)
+        elif r.reference_doctype == "Purchase Invoice":
+            invoice_pos = _get_purchase_orders_from_invoice(r.reference_name)
+            po_refs.extend(invoice_pos)
+
     return list(dict.fromkeys(po_refs))  # preserve order, remove duplicates
+
+
+def _get_purchase_orders_from_invoice(invoice_name):
+    """Return unique purchase_order values from a Purchase Invoice's items."""
+    if not invoice_name:
+        return []
+
+    rows = frappe.get_all(
+        "Purchase Invoice Item",
+        filters={"parent": invoice_name, "purchase_order": ["is", "set"]},
+        fields=["purchase_order"],
+        distinct=True,
+    )
+    return [r.purchase_order for r in rows if r.purchase_order]
+
+
+@frappe.whitelist()
+def get_po_refs_for_invoices(invoice_names):
+    """Return a dict mapping each Purchase Invoice name to its linked POs.
+
+    This is a whitelisted endpoint so the client-side JS can resolve
+    Purchase Invoice → Purchase Order links without querying child
+    tables directly (which fails due to permission issues on child
+    doctypes).
+    """
+    if isinstance(invoice_names, str):
+        invoice_names = frappe.parse_json(invoice_names)
+
+    result = {}
+    for invoice_name in invoice_names:
+        result[invoice_name] = _get_purchase_orders_from_invoice(invoice_name)
+    return result
 
 
 def set_beneficiary_purpose_of_payment(doc, method=None):

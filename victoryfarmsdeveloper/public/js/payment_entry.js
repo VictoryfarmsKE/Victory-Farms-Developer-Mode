@@ -24,33 +24,73 @@ frappe.ui.form.on('Payment Entry Reference', {
 });
 
 function set_beneficiary_purpose(frm) {
-    const po_refs = (frm.doc.references || []).filter(
-        (r) => r.reference_doctype === 'Purchase Order' && r.reference_name
-    ).map((r) => r.reference_name);
+    resolve_po_refs(frm).then((po_refs) => {
+        const unique_refs = [...new Set(po_refs)];
+        if (!unique_refs.length) return;
 
-    const unique_refs = [...new Set(po_refs)];
-    if (!unique_refs.length) return;
+        const new_value = unique_refs.join(' | ');
+        const first_po = unique_refs[0];
 
-    const new_value = unique_refs.join(' | ');
-    const first_po = unique_refs[0];
+        // Auto-fill Reference Number with the first PO reference
+        if (frm.doc.reference_no !== first_po) {
+            frm.set_value('reference_no', first_po);
+        }
 
-    // Auto-fill Reference Number with the first PO reference
-    if (frm.doc.reference_no !== first_po) {
-        frm.set_value('reference_no', first_po);
-    }
+        const rows = frm.doc.custom_beneficiaries || [];
+        let changed = false;
+        rows.forEach((row) => {
+            if (row.purpose_of_payment !== new_value) {
+                frappe.model.set_value(row.doctype, row.name, 'purpose_of_payment', new_value);
+                changed = true;
+            }
+        });
 
-    const rows = frm.doc.custom_beneficiaries || [];
-    let changed = false;
-    rows.forEach((row) => {
-        if (row.purpose_of_payment !== new_value) {
-            frappe.model.set_value(row.doctype, row.name, 'purpose_of_payment', new_value);
-            changed = true;
+        if (changed) {
+            frm.refresh_field('custom_beneficiaries');
         }
     });
+}
 
-    if (changed) {
-        frm.refresh_field('custom_beneficiaries');
-    }
+function resolve_po_refs(frm) {
+    return new Promise((resolve) => {
+        const references = frm.doc.references || [];
+        const po_refs = [];
+        const invoice_refs = [];
+
+        references.forEach((r) => {
+            if (!r.reference_name) return;
+
+            if (r.reference_doctype === 'Purchase Order') {
+                po_refs.push(r.reference_name);
+            } else if (r.reference_doctype === 'Purchase Invoice') {
+                invoice_refs.push(r.reference_name);
+            }
+        });
+
+        if (!invoice_refs.length) {
+            resolve(po_refs);
+            return;
+        }
+
+        // Use whitelisted server method to resolve POs from Purchase Invoices.
+        // Cannot use frappe.db.get_list on child table doctypes (permission error).
+        frappe.call({
+            method: 'victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payment_entry.payment_entry.get_po_refs_for_invoices',
+            args: { invoice_names: invoice_refs },
+            callback(r) {
+                const mapping = r.message || {};
+                invoice_refs.forEach((inv) => {
+                    (mapping[inv] || []).forEach((po) => {
+                        if (po) po_refs.push(po);
+                    });
+                });
+                resolve(po_refs);
+            },
+            error() {
+                resolve(po_refs);
+            }
+        });
+    });
 }
 
 function add_upload_beneficiaries_button(frm) {
