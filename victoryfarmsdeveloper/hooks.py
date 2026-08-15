@@ -268,7 +268,7 @@ doc_events = {
         "on_update": "victoryfarmsdeveloper.notifications.leave_balance_update_check.queue_leave_balance_update_check"
     },
     "Appraisal": {
-        "on_update": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal.appraisal.queue_appraisal_notifications"
+        "on_update": "victoryfarmsdeveloper.notifications.scorecard.queue_appraisal_notifications"
     },
     "Stock Entry": {
         "before_save": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_save_stock_entry",
