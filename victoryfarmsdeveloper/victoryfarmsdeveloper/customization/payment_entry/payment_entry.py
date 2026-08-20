@@ -223,3 +223,17 @@ def flt(value, precision=None):
     return _flt(value, precision)
 
 
+@frappe.whitelist()
+def get_upload_type_options():
+    """Return the Upload Type options from the Payment Entry doctype.
+
+    Used by the Bulk Upload Client Script to dynamically populate its
+    Type field so both doctypes stay in sync.
+    """
+    meta = frappe.get_meta("Payment Entry")
+    for field in meta.fields:
+        if field.fieldname == "custom_upload_type" and field.fieldtype == "Select":
+            return field.options or ""
+    return ""
+
+
