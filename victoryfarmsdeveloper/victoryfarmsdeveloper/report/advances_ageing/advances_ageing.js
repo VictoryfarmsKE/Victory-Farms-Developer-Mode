@@ -39,6 +39,15 @@ frappe.query_reports["Advances Ageing"] = {
 			fieldtype: "Link",
 			options: "Supplier Group",
 		},
+		{
+			fieldname: "show_unmatched",
+			label: __("Show Unmatched Entries (for review)"),
+			fieldtype: "Check",
+			default: 0,
+			on_change: function (report) {
+				report.refresh();
+			},
+		},
 	],
 
 	onload: function (report) {
@@ -48,6 +57,9 @@ frappe.query_reports["Advances Ageing"] = {
 	},
 
 	get_datatable_options(options) {
+		if (frappe.query_report.get_filter_value("show_unmatched")) {
+			return options;
+		}
 		return Object.assign(options, {
 			headerGroups: [
 				{ html: "", colspan: 4 },
