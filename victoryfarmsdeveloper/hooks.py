@@ -8,12 +8,10 @@ app_include = ["erpnext"]
 required_apps = ["frappe", "erpnext"]
 
 fixtures = [
-    "Client Script",
-    "Server Script",
-    "Custom Field",
     {"dt": "Client Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Server Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Custom Field", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+    {"dt": "Property Setter", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
 ]
 
 
@@ -46,7 +44,8 @@ app_include_js = [
 doctype_js = {
     "Stock Entry": "victoryfarmsdeveloper/customization/stock_entry_item_break_down/stock_entry_item_break_down.js",
     "Landed Cost Voucher": "victoryfarmsdeveloper/public/js/landed_cost_voucher.js",
-    "Leave Application": "public/js/leave_application.js"
+    "Leave Application": "public/js/leave_application.js",
+    "Payment Entry": "public/js/payment_entry.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 doctype_list_js = {
@@ -91,6 +90,10 @@ doctype_list_js = {
 # before_install = "victoryfarmsdeveloper.install.before_install"
 # after_install = "victoryfarmsdeveloper.install.after_install"
 
+after_migrate = [
+    "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.enforce"
+]
+
 # Uninstallation
 # ------------
 
@@ -117,7 +120,7 @@ doctype_list_js = {
 # ------------------
 # See frappe.core.notifications.get_notification_config
 
-# notification_config = "victoryfarmsdeveloper.notifications.get_notification_config"
+notification_config = "victoryfarmsdeveloper.notifications.get_notification_config"
 
 # Permissions
 # -----------
@@ -195,8 +198,10 @@ override_doctype_class = {
 
 scheduler_events = {
     "daily": [
-        # "victoryfarmsdeveloper.notifications.check_low_stock.check_low_stock"
-        # "victoryfarmsdeveloper.notifications.leave_balance_update_check.process_checkins_without_shift"
+        "victoryfarmsdeveloper.notifications.check_low_stock.check_branch_low_stock",
+        "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check",
+        "victoryfarmsdeveloper.notifications.leave_balance_update_check.process_checkins_without_shift",
+        "victoryfarmsdeveloper.notifications.scorecard.send_pending_appraisal_notifications"
     ],
     "cron": {
         "0 7 * * *": [
@@ -231,8 +236,18 @@ scheduler_events = {
         "59 23 28-31 * *": [
             "victoryfarmsdeveloper.notifications.po_pending_approval.auto_freeze_old_pos"
         ],
+        "0 5 * * *": [
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.doctype.tardiness_record.tardiness_record.process_daily_attendance"
+        ],
+        "0 5 24 * *": [
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.doctype.tardiness_record.tardiness_record.send_monthly_hr_tardiness_report"
+        ],
         "10 6 * * *": [
             "victoryfarmsdeveloper.notifications.scorecard.send_probation_review_notifications"
+        ],
+        # Daily valuation-rate fluctuation report to Finance at 06:00
+        "0 6 * * *": [
+            "victoryfarmsdeveloper.notifications.valuation_fluctuation.check_valuation_fluctuations"
         ]
     }
 }
@@ -249,13 +264,34 @@ doc_events = {
     "Purchase Order": {
         "on_update": "victoryfarmsdeveloper.notifications.po_pending_approval.send_po_approved_notification"
     },
+    "Leave Application": {
+        "on_update": "victoryfarmsdeveloper.notifications.leave_balance_update_check.queue_leave_balance_update_check"
+    },
+    "Appraisal": {
+        "on_update": "victoryfarmsdeveloper.notifications.scorecard.queue_appraisal_notifications"
+    },
     "Stock Entry": {
         "before_save": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_save_stock_entry",
         "before_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_submit_stock_entry"
     },
     "Employee": {
-        "after_insert": "victoryfarmsdeveloper.custom_scripts.server_scripts.leave_allocation.create_leave_allocation_for_new_employee"
-    }
+        "after_insert": "victoryfarmsdeveloper.custom_scripts.server_scripts.leave_allocation.create_leave_allocation_for_new_employee",
+        "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.employee.employee.validate_mandatory_fields"
+    },
+    "Payment Entry": {
+        "validate": [
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payment_entry.payment_entry.set_beneficiary_purpose_of_payment",
+        ]
+    },
+    "Purchase Receipt": {
+        "validate": "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.validate_purchase_receipt"
+    },
+    "Salary Slip": {
+        "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.sync_additional_salary_notes",
+        "on_update": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.sync_additional_salary_notes",
+        "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.create_journal_entry_on_submit",
+        "on_cancel": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.unlink_journal_entry_on_cancel"
+       }
 }
 
 

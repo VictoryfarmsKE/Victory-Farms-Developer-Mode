@@ -78,6 +78,21 @@ def create_leave_allocation_for_new_employee(doc, method):
                 to_date=to_date,
                 new_leaves_allocated=allocation["new_leaves_allocated"]
             )
+
+        try:
+            frappe.enqueue(
+                method="victoryfarmsdeveloper.notifications.leave_balance_update_check.create_employee_folders",
+                queue="long",
+                timeout=600,
+                is_async=True,
+                employee_names=[doc.name],
+                job_name=f"Create folders for {doc.name}"
+            )
+        except Exception as e:
+            frappe.log_error(
+                message=frappe.get_traceback(),
+                title=_("Employee Folder Onboarding Error for {0}").format(doc.name),
+            )
         
         frappe.msgprint(
             _("Leave allocations created successfully for {0}").format(employee_full_name),

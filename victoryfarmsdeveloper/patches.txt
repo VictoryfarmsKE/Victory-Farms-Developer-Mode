@@ -4,3 +4,11 @@
 
 [post_model_sync]
 # Patches added in this section will be executed after doctypes are migrated
+# Purchase Receipt landed cost / taxes template rules are enforced by the
+# after_migrate hook (victoryfarmsdeveloper.setup.purchase_receipt_field_rules),
+# because patches run only once while other apps re-sync their customizations
+# on every migrate.
+victoryfarmsdeveloper.victoryfarmsdeveloper.patches.update_purchase_receipt_mandatory_rules
+victoryfarmsdeveloper.victoryfarmsdeveloper.patches.move_feeds_mandatory_rule_to_taxes_template
+victoryfarmsdeveloper.victoryfarmsdeveloper.patches.remove_legacy_beneficiary_fields
+victoryfarmsdeveloper.victoryfarmsdeveloper.patches.cleanup_payment_entry_beneficiary_layout
