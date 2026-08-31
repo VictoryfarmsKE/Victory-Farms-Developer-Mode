@@ -109,7 +109,7 @@ def create_journal_entry_on_submit(doc, method=None):
         "doctype": "Journal Entry",
         "voucher_type": "Journal Entry",
         "company": company,
-        "posting_date": doc.end_date,
+        "posting_date": doc.posting_date,
         "accounts": accounts,
         "user_remark": "Auto-created from Salary Slip {0} for {1}".format(doc.name, doc.employee_name),
         "remark": "Salary Slip {0} - {1}".format(doc.name, doc.employee_name),
