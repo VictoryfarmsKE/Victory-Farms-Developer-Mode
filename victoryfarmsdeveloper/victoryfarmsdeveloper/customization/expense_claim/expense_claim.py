@@ -194,3 +194,25 @@ def get_default_service_item():
     )
     item.insert(ignore_permissions=True)
     return item.name
+
+
+@frappe.whitelist()
+def get_payroll_officer_user():
+    """Return the first enabled User with the Payroll Officer role.
+
+    Roles live in the ``Has Role`` child table, so a direct ``get_list``
+    filter on ``roles`` is not valid. Query the join instead.
+    """
+    user = frappe.db.sql(
+        """
+        SELECT u.name
+        FROM `tabUser` u
+        INNER JOIN `tabHas Role` r ON r.parent = u.name
+        WHERE r.role = 'Payroll Officer'
+            AND u.enabled = 1
+        ORDER BY u.creation ASC
+        LIMIT 1
+        """,
+        as_dict=True,
+    )
+    return user[0].name if user else None
