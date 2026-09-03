@@ -7,6 +7,23 @@ VF_STAFF_ALLOWANCES_SUPPLIER = "VF Staff Allowances"
 DEVELOPMENT_ALLOWANCE_COMPONENT = "Development Allowance"
 
 
+def validate_expense_claim(doc, method=None):
+    """Sync approval_status with workflow_state so ERPNext's built-in
+    Expense Claim validation does not block submission.
+
+    ERPNext requires ``approval_status`` to be 'Approved' or 'Rejected'
+    before the claim can be submitted.  When a Workflow is active the
+    workflow_state controls the state, but the standard validation still
+    checks approval_status — so we keep them in sync here.
+    """
+    if doc.workflow_state == "Approved":
+        doc.approval_status = "Approved"
+    elif doc.workflow_state == "Rejected":
+        doc.approval_status = "Rejected"
+    elif doc.workflow_state == "Submitted":
+        doc.approval_status = "Approved"
+
+
 def on_expense_claim_update(doc, method=None):
     """Handle Expense Claim workflow state changes for Development Allowance claims."""
     if doc.custom_claim_category != "Development Allowance":
@@ -210,7 +227,7 @@ def get_payroll_officer_user():
         INNER JOIN `tabHas Role` r ON r.parent = u.name
         WHERE r.role = 'Payroll Officer'
             AND u.enabled = 1
-        ORDER BY u.creation ASC
+        ORDER BY u.creation DESC
         LIMIT 1
         """,
         as_dict=True,
