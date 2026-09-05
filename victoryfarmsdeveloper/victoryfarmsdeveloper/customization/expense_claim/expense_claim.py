@@ -15,11 +15,19 @@ def validate_expense_claim(doc, method=None):
     before the claim can be submitted.  When a Workflow is active the
     workflow_state controls the state, but the standard validation still
     checks approval_status — so we keep them in sync here.
+
+    For Development Allowance claims the workflow controls the actual
+    approval flow, so we always set approval_status to 'Approved' to
+    prevent ERPNext's built-in check from blocking submission.
     """
-    if doc.workflow_state == "Approved":
-        doc.approval_status = "Approved"
-    elif doc.workflow_state == "Rejected":
+    if doc.workflow_state == "Rejected":
         doc.approval_status = "Rejected"
+    elif doc.workflow_state == "Approved":
+        doc.approval_status = "Approved"
+    elif doc.custom_claim_category == "Development Allowance":
+        # Development Allowance uses a workflow — always pass the
+        # standard ERPNext validation so the workflow Submit action works.
+        doc.approval_status = "Approved"
     elif doc.workflow_state == "Submitted":
         doc.approval_status = "Approved"
 
