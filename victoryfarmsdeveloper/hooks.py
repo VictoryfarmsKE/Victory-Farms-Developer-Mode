@@ -90,8 +90,13 @@ doctype_list_js = {
 # before_install = "victoryfarmsdeveloper.install.before_install"
 # after_install = "victoryfarmsdeveloper.install.after_install"
 
+before_migrate = [
+    "victoryfarmsdeveloper.setup.doctype_link_repair.repair_renamed_links"
+]
+
 after_migrate = [
-    "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.enforce"
+    "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.enforce",
+    "victoryfarmsdeveloper.setup.doctype_link_repair.repair_renamed_links"
 ]
 
 # Uninstallation
