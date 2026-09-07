@@ -225,12 +225,26 @@ def get_default_service_item():
 
 
 @frappe.whitelist()
-def get_payroll_officer_user():
-    """Return the first enabled User with the Payroll Officer role.
+def get_designated_approver():
+    """Return the designated Expense Claim approver (Payroll Officer).
 
-    Roles live in the ``Has Role`` child table, so a direct ``get_list``
-    filter on ``roles`` is not valid. Query the join instead.
+    The approver is the enabled User with the Payroll Officer role.
+    If multiple users have the role, prefer the one matching the
+    configured email (Vincent Njuguna). Falls back to the first
+    Payroll Officer found.
     """
+    DESIGNATED_EMAIL = "vincentn@victoryfarmskenya.com"
+
+    # Try the designated user first
+    user = frappe.db.get_value(
+        "User",
+        {"email": DESIGNATED_EMAIL, "enabled": 1, "name": ["in", frappe.get_all("Has Role", filters={"role": "Payroll Officer"}, pluck="parent")]},
+        "name",
+    )
+    if user:
+        return user
+
+    # Fallback: first enabled Payroll Officer
     user = frappe.db.sql(
         """
         SELECT u.name
@@ -238,7 +252,7 @@ def get_payroll_officer_user():
         INNER JOIN `tabHas Role` r ON r.parent = u.name
         WHERE r.role = 'Payroll Officer'
             AND u.enabled = 1
-        ORDER BY u.creation DESC
+        ORDER BY u.creation ASC
         LIMIT 1
         """,
         as_dict=True,
