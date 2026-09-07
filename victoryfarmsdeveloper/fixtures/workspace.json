@@ -9,11 +9,11 @@
   "hide_custom": 0,
   "icon": "expenses",
   "is_hidden": 0,
-  "label": "Employee",
+  "label": "Employee Expenses",
   "links": [],
   "modified": "2026-08-17 12:00:00.000000",
   "module": "VictoryFarmsDeveloper",
-  "name": "Employee",
+  "name": "Employee Expenses",
   "number_cards": [],
   "parent_page": "",
   "public": 1,
@@ -55,6 +55,6 @@
     "type": "DocType"
    }
   ],
-  "title": "Employee"
+  "title": "Employee Expenses"
  }
 ]
