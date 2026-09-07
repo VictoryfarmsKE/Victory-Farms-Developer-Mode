@@ -3,6 +3,7 @@ from erpnext.stock.doctype.stock_entry.stock_entry import StockEntry
 from frappe import _
 from erpnext.stock.doctype.stock_entry.stock_entry import make_stock_in_entry as original_make_stock_in_entry
 from frappe.utils import nowdate, flt
+from victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.weighbridge import check_weighbridge
 
 
 class CustomStockEntry(StockEntry):
@@ -299,3 +300,5 @@ def before_submit_stock_entry(doc, method):
             })
             if not submitted_coa:
                 frappe.throw(_("You must submit the Certificate of Analysis before confirming this Stock Entry."))
+
+            check_weighbridge(doc)
