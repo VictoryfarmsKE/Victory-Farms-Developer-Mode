@@ -132,18 +132,21 @@ def create_additional_salary(doc):
 def get_payroll_date(submission_date):
     """Return the payroll date based on the 26th-25th cycle rule.
 
-    Claims submitted between the 26th and 25th are processed in the current cycle.
-    Claims submitted after the 25th are pushed to the following cycle.
+    Claims submitted between the 26th and 25th are processed in the
+    current cycle — the payroll date is the actual submission date.
+    Claims submitted after the 25th are pushed to the following cycle
+    (1st of the next month).
     """
     submission_date = getdate(submission_date)
     cutoff_day = 25
 
     if submission_date.day > cutoff_day:
-        # Push to next month
+        # Push to next month (start of next cycle)
         next_month = add_months(submission_date, 1)
         return next_month.replace(day=1)
 
-    return submission_date.replace(day=1)
+    # Within current cycle — keep the actual submission date
+    return submission_date
 
 
 def send_status_notification(doc, status):
