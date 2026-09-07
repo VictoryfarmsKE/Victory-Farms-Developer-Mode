@@ -1,0 +1,168 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-15 12:36:08.654250",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "reference",
+  "debit_amount",
+  "payment_type",
+  "beneficiary_name",
+  "beneficiary_account",
+  "network_type",
+  "swift_code",
+  "beneficiary_email_id",
+  "column_break_61pj",
+  "beneficiary_address_1",
+  "beneficiary_address_2",
+  "beneficiary_address_3",
+  "beneficiary_address_4",
+  "charge_bearer",
+  "debit_narrative",
+  "credit_narrative",
+  "deal_reference_number"
+ ],
+ "fields": [
+  {
+   "fieldname": "reference",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Reference",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "payment_reference.reference_no",
+   "fetch_if_empty": 1,
+   "fieldname": "debit_amount",
+   "fieldtype": "Float",
+   "label": "Debit Amount",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "payment_type",
+   "fieldtype": "Data",
+   "label": "Payment Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "beneficiary_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Beneficiary Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "beneficiary_account",
+   "fieldtype": "Data",
+   "label": "Beneficiary Account",
+   "read_only": 1
+  },
+  {
+   "fieldname": "network_type",
+   "fieldtype": "Data",
+   "label": "Network Type",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "bank_account.bank_account_no",
+   "fetch_if_empty": 1,
+   "fieldname": "swift_code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Swift Code",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "bank_account.custom_bank_code",
+   "fetch_if_empty": 1,
+   "fieldname": "beneficiary_email_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Beneficiary Email ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_61pj",
+   "fieldtype": "Column Break",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "bank_account.custom_branch",
+   "fetch_if_empty": 1,
+   "fieldname": "beneficiary_address_1",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Beneficiary Address 1",
+   "read_only": 1,
+   "width": "40"
+  },
+  {
+   "fieldname": "beneficiary_address_2",
+   "fieldtype": "Data",
+   "label": "Beneficiary Address 2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "beneficiary_address_3",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Beneficiary Address 3",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "bank.swift_number",
+   "fetch_if_empty": 1,
+   "fieldname": "beneficiary_address_4",
+   "fieldtype": "Data",
+   "label": "Beneficiary Address 4",
+   "read_only": 1
+  },
+  {
+   "fieldname": "charge_bearer",
+   "fieldtype": "Data",
+   "label": "Charge Bearer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "debit_narrative",
+   "fieldtype": "Data",
+   "label": "Debit Narrative",
+   "read_only": 1
+  },
+  {
+   "fieldname": "credit_narrative",
+   "fieldtype": "Data",
+   "label": "Credit Narrative",
+   "read_only": 1
+  },
+  {
+   "fieldname": "deal_reference_number",
+   "fieldtype": "Data",
+   "label": "Deal Reference Number",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-10-15 12:36:08.654250",
+ "modified_by": "Administrator",
+ "module": "Upande Vf Custom",
+ "name": "Local USD Bulk Upload Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
