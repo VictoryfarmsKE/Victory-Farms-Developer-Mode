@@ -92,7 +92,8 @@ doctype_list_js = {
 # after_install = "victoryfarmsdeveloper.install.after_install"
 
 after_migrate = [
-    "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.enforce"
+    "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.enforce",
+    "victoryfarmsdeveloper.setup.suvac_processing_fields.enforce"
 ]
 
 # Uninstallation

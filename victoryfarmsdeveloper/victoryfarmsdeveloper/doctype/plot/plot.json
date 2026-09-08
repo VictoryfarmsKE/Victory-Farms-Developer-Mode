@@ -249,28 +249,28 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Crop 1",
-   "options": "Crop Type"
+   "options": "Crop"
   },
   {
    "fieldname": "crop_2",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Crop 2",
-   "options": "Crop Type"
+   "options": "Crop"
   },
   {
    "fieldname": "crop_3",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Crop 3",
-   "options": "Crop Type"
+   "options": "Crop"
   },
   {
    "fieldname": "crop_4",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Crop 4",
-   "options": "Crop Type"
+   "options": "Crop"
   },
   {
    "fieldname": "crop_1_planting_date",
@@ -348,7 +348,7 @@
    "link_fieldname": "custom_plot"
   }
  ],
- "modified": "2026-08-04 19:44:10.316201",
+ "modified": "2026-08-12 19:59:10.577346",
  "modified_by": "Administrator",
  "module": "VictoryFarmsDeveloper",
  "name": "Plot",
