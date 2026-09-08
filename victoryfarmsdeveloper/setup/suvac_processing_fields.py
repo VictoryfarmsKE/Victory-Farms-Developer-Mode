@@ -292,6 +292,10 @@ def restore_hidden_fields(doctype):
     if not isinstance(order, list):
         return
 
+    cleaned = [fieldname for fieldname in order if fieldname]
+    dropped = len(order) - len(cleaned)
+    order = cleaned
+
     anchors = {}
     missing = []
     for field in frappe.get_meta(doctype).fields:
@@ -302,7 +306,7 @@ def restore_hidden_fields(doctype):
             "Custom Field", {"dt": doctype, "fieldname": field.fieldname}, "insert_after"
         )
 
-    if not missing:
+    if not missing and not dropped:
         return
 
     pending = list(missing)
@@ -329,8 +333,16 @@ def restore_hidden_fields(doctype):
         update_modified=False,
     )
 
-    print(
-        "VictoryFarmsDeveloper: restored {0} hidden field(s) on {1}: {2}".format(
-            len(missing), doctype, ", ".join(missing)
+    if dropped:
+        print(
+            "VictoryFarmsDeveloper: dropped {0} empty entry(s) from the {1} layout".format(
+                dropped, doctype
+            )
         )
-    )
+
+    if missing:
+        print(
+            "VictoryFarmsDeveloper: restored {0} hidden field(s) on {1}: {2}".format(
+                len(missing), doctype, ", ".join(missing)
+            )
+        )
