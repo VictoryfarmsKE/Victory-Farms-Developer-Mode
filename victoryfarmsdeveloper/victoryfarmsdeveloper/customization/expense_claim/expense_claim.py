@@ -8,25 +8,21 @@ DEVELOPMENT_ALLOWANCE_COMPONENT = "Development Allowance"
 
 
 def validate_expense_claim(doc, method=None):
-    """Sync approval_status with workflow_state so ERPNext's built-in
-    Expense Claim validation does not block submission.
+    """Enforce mandatory attachment and sync approval_status for Development Allowance claims."""
 
-    ERPNext requires ``approval_status`` to be 'Approved' or 'Rejected'
-    before the claim can be submitted.  When a Workflow is active the
-    workflow_state controls the state, but the standard validation still
-    checks approval_status — so we keep them in sync here.
-
-    For Development Allowance claims the workflow controls the actual
-    approval flow, so we always set approval_status to 'Approved' to
-    prevent ERPNext's built-in check from blocking submission.
-    """
-    if doc.workflow_state == "Rejected":
+    if doc.custom_claim_category == "Development Allowance":
+        # Development Allowance uses a workflow - always pass the
+        # standard ERPNext validation so the workflow Submit action works.
+        doc.approval_status = "Approved"
+        # Make payable_account optional for Development Allowance claims
+        # since these are reimbursed via PO or Additional Salary
+        doc.payable_account = doc.payable_account or None
+        # Enforce mandatory attachment for Development Allowance claims
+        if doc.docstatus == 1 and not frappe.db.exists("File", {"attached_to_doctype": "Expense Claim", "attached_to_name": doc.name}):
+            frappe.throw(_("Please attach supporting documents before submitting."))
+    elif doc.workflow_state == "Rejected":
         doc.approval_status = "Rejected"
     elif doc.workflow_state == "Approved":
-        doc.approval_status = "Approved"
-    elif doc.custom_claim_category == "Development Allowance":
-        # Development Allowance uses a workflow — always pass the
-        # standard ERPNext validation so the workflow Submit action works.
         doc.approval_status = "Approved"
     elif doc.workflow_state == "Submitted":
         doc.approval_status = "Approved"
