@@ -7,25 +7,53 @@ VF_STAFF_ALLOWANCES_SUPPLIER = "VF Staff Allowances"
 DEVELOPMENT_ALLOWANCE_COMPONENT = "Development Allowance"
 
 
-def validate_expense_claim(doc, method=None):
-    """Enforce mandatory attachment and sync approval_status for Development Allowance claims."""
+def before_save_expense_claim(doc, method=None):
+    """Prepare Development Allowance claims before saving.
 
-    if doc.custom_claim_category == "Development Allowance":
-        # Development Allowance uses a workflow - always pass the
-        # standard ERPNext validation so the workflow Submit action works.
-        doc.approval_status = "Approved"
-        # Make payable_account optional for Development Allowance claims
-        # since these are reimbursed via PO or Additional Salary
-        doc.payable_account = doc.payable_account or None
-        # Enforce mandatory attachment for Development Allowance claims
-        if doc.docstatus == 1 and not frappe.db.exists("File", {"attached_to_doctype": "Expense Claim", "attached_to_name": doc.name}):
-            frappe.throw(_("Please attach supporting documents before submitting."))
-    elif doc.workflow_state == "Rejected":
+    ERPNext requires payable_account on Expense Claim. For Development Allowance
+    claims the actual reimbursement is done via Purchase Order or Additional
+    Salary, so we auto-fill the company's default payable account to satisfy the
+    validation without forcing the user to select one.
+    """
+    if doc.custom_claim_category != "Development Allowance":
+        return
+
+    if not doc.payable_account:
+        company = doc.company or frappe.defaults.get_user_default("Company")
+        if company:
+            payable_account = frappe.get_cached_value(
+                "Company", company, "default_payable_account"
+            )
+            if payable_account:
+                doc.payable_account = payable_account
+
+    # Sync approval_status with the workflow state so ERPNext's standard
+    # Expense Claim validation (which expects Approved/Rejected) does not block
+    # the workflow Submit/Approve/Reject actions.
+    if doc.workflow_state == "Rejected":
         doc.approval_status = "Rejected"
-    elif doc.workflow_state == "Approved":
+    elif doc.workflow_state in ("Submitted", "Approved"):
         doc.approval_status = "Approved"
-    elif doc.workflow_state == "Submitted":
+    else:
         doc.approval_status = "Approved"
+
+
+def before_submit_expense_claim(doc, method=None):
+    """Enforce mandatory attachment for Development Allowance claims."""
+    if doc.custom_claim_category != "Development Allowance":
+        return
+
+    if not frappe.db.exists(
+        "File",
+        {
+            "attached_to_doctype": "Expense Claim",
+            "attached_to_name": doc.name,
+        },
+    ):
+        frappe.throw(_("Please attach supporting documents before submitting."))
+
+    if not doc.custom_expense_sub_type:
+        frappe.throw(_("Please select an Expense Sub-Type before submitting."))
 
 
 def on_expense_claim_update(doc, method=None):
