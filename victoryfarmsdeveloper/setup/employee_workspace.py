@@ -1,19 +1,3 @@
-"""
-Keep the app's Employee workspace from shadowing the Employee doctype.
-
-The workspace shipped as "Employee", which is also a DocType name. Frappe's router
-resolves /app/<slug> to a workspace before it looks for a doctype, so the workspace made
-the Employee list unreachable.
-
-Wired to `after_migrate` rather than `patches.txt` because the workspace is also shipped as
-a fixture, and `sync_fixtures` runs on every migrate. A patch renames it once and is then
-recorded as done, while the fixture puts it straight back. Only `after_migrate` runs last,
-every time.
-
-The fixture itself now ships "Employee Expenses", so this only has to clean up databases
-that already have the old name.
-"""
-
 import frappe
 
 MODULE = "VictoryFarmsDeveloper"

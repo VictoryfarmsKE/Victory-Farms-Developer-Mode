@@ -1,19 +1,3 @@
-"""
-SUVAC processing fields on Stock Entry Detail.
-
-Wired to `after_migrate` rather than `patches.txt` for the same reason as
-`purchase_receipt_field_rules`: other installed apps ship a `field_order` Property Setter
-for Stock Entry Detail as a `sync_on_migrate` fixture. A `field_order` is the complete
-ordered field list for a doctype, so every field missing from that snapshot stops rendering.
-Upande's snapshot predates these fields and drops 20+ of them, including SUVAC's.
-
-`sync_customizations` runs after all patches, so a patch cannot win. Only `after_migrate`
-runs last, on every migrate.
-
-`restore_hidden_fields` appends anything missing rather than replacing the list, so the
-ordering other apps intend is preserved.
-"""
-
 import json
 
 import frappe
