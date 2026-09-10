@@ -7,6 +7,32 @@ VF_STAFF_ALLOWANCES_SUPPLIER = "VF Staff Allowances"
 DEVELOPMENT_ALLOWANCE_COMPONENT = "Development Allowance"
 
 
+def _has_development_allowance_rows(doc):
+    """Return True if any expense row uses 'Development Allowance' claim type."""
+    return any(
+        row.expense_claim_type == DEVELOPMENT_ALLOWANCE_COMPONENT
+        for row in (doc.expenses or [])
+    )
+
+
+def _get_sub_type(doc):
+    """Return the first non-empty Expense Sub-Type from Development Allowance rows."""
+    for row in (doc.expenses or []):
+        if row.expense_claim_type == DEVELOPMENT_ALLOWANCE_COMPONENT and row.custom_expense_sub_type:
+            return row.custom_expense_sub_type
+    return None
+
+
+def _is_any_row_taxable(doc):
+    """Return True if any Development Allowance row has a taxable sub-type."""
+    taxable_types = ("Personal Flights", "Other Taxable Expenses")
+    return any(
+        row.custom_expense_sub_type in taxable_types
+        for row in (doc.expenses or [])
+        if row.expense_claim_type == DEVELOPMENT_ALLOWANCE_COMPONENT
+    )
+
+
 def before_save_expense_claim(doc, method=None):
     """Prepare Development Allowance claims before saving.
 
@@ -15,7 +41,7 @@ def before_save_expense_claim(doc, method=None):
     Salary, so we auto-fill the company's default payable account to satisfy the
     validation without forcing the user to select one.
     """
-    if doc.custom_claim_category != "Development Allowance":
+    if not _has_development_allowance_rows(doc):
         return
 
     if not doc.payable_account:
@@ -39,8 +65,8 @@ def before_save_expense_claim(doc, method=None):
 
 
 def before_submit_expense_claim(doc, method=None):
-    """Enforce mandatory attachment for Development Allowance claims."""
-    if doc.custom_claim_category != "Development Allowance":
+    """Enforce mandatory attachment and sub-type for Development Allowance rows."""
+    if not _has_development_allowance_rows(doc):
         return
 
     if not frappe.db.exists(
@@ -52,13 +78,16 @@ def before_submit_expense_claim(doc, method=None):
     ):
         frappe.throw(_("Please attach supporting documents before submitting."))
 
-    if not doc.custom_expense_sub_type:
-        frappe.throw(_("Please select an Expense Sub-Type before submitting."))
+    for row in (doc.expenses or []):
+        if row.expense_claim_type == DEVELOPMENT_ALLOWANCE_COMPONENT and not row.custom_expense_sub_type:
+            frappe.throw(
+                _("Please select an Expense Sub-Type for row {0} (Development Allowance).").format(row.idx)
+            )
 
 
 def on_expense_claim_update(doc, method=None):
     """Handle Expense Claim workflow state changes for Development Allowance claims."""
-    if doc.custom_claim_category != "Development Allowance":
+    if not _has_development_allowance_rows(doc):
         return
 
     if not doc.workflow_state:
@@ -78,7 +107,7 @@ def on_expense_claim_update(doc, method=None):
 
 def handle_approved_claim(doc):
     """Create Purchase Order or Additional Salary based on expense sub-type."""
-    if doc.custom_is_taxable:
+    if _is_any_row_taxable(doc):
         create_additional_salary(doc)
     else:
         create_purchase_order(doc)
@@ -103,7 +132,7 @@ def create_purchase_order(doc):
                 {
                     "item_code": get_default_service_item(),
                     "schedule_date": today(),
-                    "description": f"Development Allowance - {doc.custom_expense_sub_type} for {doc.employee_name}",
+                    "description": f"Development Allowance - {_get_sub_type(doc)} for {doc.employee_name}",
                     "qty": 1,
                     "rate": doc.total_sanctioned_amount or doc.total_claimed_amount,
                     "amount": doc.total_sanctioned_amount or doc.total_claimed_amount,
@@ -138,7 +167,7 @@ def create_additional_salary(doc):
             "payroll_date": payroll_date,
             "company": doc.company or frappe.defaults.get_user_default("Company"),
             "custom_expense_claim": doc.name,
-            "custom_note": doc.custom_hr_remarks or f"Development Allowance - {doc.custom_expense_sub_type}",
+            "custom_note": doc.custom_hr_remarks or f"Development Allowance - {_get_sub_type(doc)}",
             "docstatus": 0,
         }
     )
@@ -186,7 +215,7 @@ def send_status_notification(doc, status):
     """
 
     if status == "approved":
-        if doc.custom_is_taxable:
+        if _is_any_row_taxable(doc):
             message += f"""
             <p>An Additional Salary draft has been created for payroll processing.</p>
             """
