@@ -25,9 +25,8 @@ def _get_sub_type(doc):
 
 def _is_any_row_taxable(doc):
     """Return True if any Development Allowance row has a taxable sub-type."""
-    taxable_types = ("Personal Flights", "Other Taxable Expenses")
     return any(
-        row.custom_expense_sub_type in taxable_types
+        "(Taxable)" in (row.custom_expense_sub_type or "")
         for row in (doc.expenses or [])
         if row.expense_claim_type == DEVELOPMENT_ALLOWANCE_COMPONENT
     )
