@@ -13,7 +13,6 @@ fixtures = [
     {"dt": "Server Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Custom Field", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Property Setter", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
-    {"dt": "Workspace", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
 ]
 
 
