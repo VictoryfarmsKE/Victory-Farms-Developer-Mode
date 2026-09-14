@@ -1,4 +1,4 @@
-import frappe
+﻿import frappe
 from frappe import _
 from frappe.utils import today, getdate, add_months
 
@@ -10,7 +10,7 @@ DEVELOPMENT_ALLOWANCE_COMPONENT = "Development Allowance"
 def _has_development_allowance_rows(doc):
     """Return True if any expense row uses 'Development Allowance' claim type."""
     return any(
-        row.expense_claim_type == DEVELOPMENT_ALLOWANCE_COMPONENT
+        row.expense_type == DEVELOPMENT_ALLOWANCE_COMPONENT
         for row in (doc.expenses or [])
     )
 
@@ -18,7 +18,7 @@ def _has_development_allowance_rows(doc):
 def _get_sub_type(doc):
     """Return the first non-empty Expense Sub-Type from Development Allowance rows."""
     for row in (doc.expenses or []):
-        if row.expense_claim_type == DEVELOPMENT_ALLOWANCE_COMPONENT and row.custom_expense_sub_type:
+        if row.expense_type == DEVELOPMENT_ALLOWANCE_COMPONENT and row.custom_expense_sub_type:
             return row.custom_expense_sub_type
     return None
 
@@ -28,7 +28,7 @@ def _is_any_row_taxable(doc):
     return any(
         "(Taxable)" in (row.custom_expense_sub_type or "")
         for row in (doc.expenses or [])
-        if row.expense_claim_type == DEVELOPMENT_ALLOWANCE_COMPONENT
+        if row.expense_type == DEVELOPMENT_ALLOWANCE_COMPONENT
     )
 
 
@@ -78,7 +78,7 @@ def before_submit_expense_claim(doc, method=None):
         frappe.throw(_("Please attach supporting documents before submitting."))
 
     for row in (doc.expenses or []):
-        if row.expense_claim_type == DEVELOPMENT_ALLOWANCE_COMPONENT and not row.custom_expense_sub_type:
+        if row.expense_type == DEVELOPMENT_ALLOWANCE_COMPONENT and not row.custom_expense_sub_type:
             frappe.throw(
                 _("Please select an Expense Sub-Type for row {0} (Development Allowance).").format(row.idx)
             )
