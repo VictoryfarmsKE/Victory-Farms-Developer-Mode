@@ -1,0 +1,106 @@
+{
+ "actions": [],
+ "creation": "2026-09-04 09:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "enforce",
+  "column_break_mode",
+  "tolerance_pct",
+  "tolerance_floor_kg",
+  "max_window_hours",
+  "section_break_weights",
+  "unit_weights_help",
+  "unit_weights"
+ ],
+ "fields": [
+  {
+   "default": "1",
+   "description": "Run the weighbridge comparison on driver confirmation",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "default": "0",
+   "description": "Block driver confirmation when a truck is outside tolerance. Leave off to record variances without blocking anyone.",
+   "fieldname": "enforce",
+   "fieldtype": "Check",
+   "label": "Enforce (block out-of-tolerance trucks)"
+  },
+  {
+   "fieldname": "column_break_mode",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "2",
+   "description": "Allowed variance as a percentage of the expected load",
+   "fieldname": "tolerance_pct",
+   "fieldtype": "Float",
+   "label": "Tolerance (%)",
+   "precision": "2"
+  },
+  {
+   "default": "25",
+   "description": "Minimum allowed variance in Kg. Used when the percentage works out smaller than this, so small loads are not flagged by scale noise.",
+   "fieldname": "tolerance_floor_kg",
+   "fieldtype": "Float",
+   "label": "Tolerance Floor (Kg)",
+   "precision": "3"
+  },
+  {
+   "default": "24",
+   "description": "Maximum hours between the empty and loaded readings for them to count as one truck visit",
+   "fieldname": "max_window_hours",
+   "fieldtype": "Int",
+   "label": "Maximum Visit Window (Hours)"
+  },
+  {
+   "fieldname": "section_break_weights",
+   "fieldtype": "Section Break",
+   "label": "Unit Weights"
+  },
+  {
+   "fieldname": "unit_weights_help",
+   "fieldtype": "HTML",
+   "options": "<p class=\"text-muted small\">Weight of one unit of anything that is not already measured in Kg &mdash; crates, packaging, tubs. Rows matched on Item Code win over rows matched on Item Group. Lines whose stock UOM is already Kg do not need an entry. Item master <code>weight_per_unit</code> is deliberately not used: on fish items it holds crate capacity, not weight.</p>"
+  },
+  {
+   "fieldname": "unit_weights",
+   "fieldtype": "Table",
+   "label": "Unit Weights",
+   "options": "Weighbridge Unit Weight"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-09-04 09:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Weighbridge Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Stock Manager"
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

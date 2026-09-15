@@ -21,7 +21,7 @@ from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
 MODULE = "VictoryFarmsDeveloper"
 DOCTYPE = "Stock Entry Detail"
-FIELD_ORDER_SETTER = "Stock Entry Detail-main-field_order"
+LAYOUT_DOCTYPES = ("Stock Entry Detail", "Stock Entry")
 
 CUSTOM_FIELDS = {
     DOCTYPE: [
@@ -51,10 +51,14 @@ STOCK_ENTRY_TYPE = {"name": "Fish Transfer From FLC To Dispatch", "purpose": "Ma
 def enforce():
     ensure_custom_fields()
     ensure_stock_entry_type()
-    restore_hidden_fields()
+
+    for doctype in LAYOUT_DOCTYPES:
+        restore_hidden_fields(doctype)
 
     frappe.db.commit()
-    frappe.clear_cache(doctype=DOCTYPE)
+
+    for doctype in LAYOUT_DOCTYPES:
+        frappe.clear_cache(doctype=doctype)
 
 
 def ensure_custom_fields():
@@ -79,8 +83,9 @@ def ensure_stock_entry_type():
     print("VictoryFarmsDeveloper: created Stock Entry Type {0}".format(STOCK_ENTRY_TYPE["name"]))
 
 
-def restore_hidden_fields():
-    value = frappe.db.get_value("Property Setter", FIELD_ORDER_SETTER, "value")
+def restore_hidden_fields(doctype):
+    setter = "{0}-main-field_order".format(doctype)
+    value = frappe.db.get_value("Property Setter", setter, "value")
     if not value:
         return
 
@@ -92,17 +97,21 @@ def restore_hidden_fields():
     if not isinstance(order, list):
         return
 
+    cleaned = [fieldname for fieldname in order if fieldname]
+    dropped = len(order) - len(cleaned)
+    order = cleaned
+
     anchors = {}
     missing = []
-    for field in frappe.get_meta(DOCTYPE).fields:
+    for field in frappe.get_meta(doctype).fields:
         if not field.fieldname or field.fieldname in order:
             continue
         missing.append(field.fieldname)
         anchors[field.fieldname] = frappe.db.get_value(
-            "Custom Field", {"dt": DOCTYPE, "fieldname": field.fieldname}, "insert_after"
+            "Custom Field", {"dt": doctype, "fieldname": field.fieldname}, "insert_after"
         )
 
-    if not missing:
+    if not missing and not dropped:
         return
 
     pending = list(missing)
@@ -123,14 +132,22 @@ def restore_hidden_fields():
 
     frappe.db.set_value(
         "Property Setter",
-        FIELD_ORDER_SETTER,
+        setter,
         "value",
         json.dumps(order),
         update_modified=False,
     )
 
-    print(
-        "VictoryFarmsDeveloper: restored {0} hidden field(s) on {1}: {2}".format(
-            len(missing), DOCTYPE, ", ".join(missing)
+    if dropped:
+        print(
+            "VictoryFarmsDeveloper: dropped {0} empty entry(s) from the {1} layout".format(
+                dropped, doctype
+            )
         )
-    )
+
+    if missing:
+        print(
+            "VictoryFarmsDeveloper: restored {0} hidden field(s) on {1}: {2}".format(
+                len(missing), doctype, ", ".join(missing)
+            )
+        )
