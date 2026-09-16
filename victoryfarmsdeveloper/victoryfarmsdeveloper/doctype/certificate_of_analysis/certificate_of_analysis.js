@@ -135,8 +135,13 @@ frappe.ui.form.on('Certificate of Analysis', {
 
 
 function load_analysis(frm) {
+    console.log("Selected Product:", frm.doc.product_description);
+
     const template =
         frm.analysis_templates?.[frm.doc.product_description] || [];
+
+    console.log("Template:", template);
+    console.log("Rows:", template.length);
 
     frm.clear_table('analysis');
 
@@ -150,6 +155,7 @@ function load_analysis(frm) {
 
     frm.refresh_field('analysis');
 }
+
 
 
 frappe.ui.form.on('CoA Analysis', {
