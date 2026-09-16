@@ -3,7 +3,7 @@ frappe.ui.form.on('Certificate of Analysis', {
         frm.analysis_templates = {
             "Whole, Gutted Tilapia": [
                 {
-                    physical_attribute: "General Appearance",
+                    physical_attribute: "General Appearance 555",
                     specification: "Shiny, Bright, Iridescent",
                     test_results: [
                         "Full bloom, right shining, iridescent",
