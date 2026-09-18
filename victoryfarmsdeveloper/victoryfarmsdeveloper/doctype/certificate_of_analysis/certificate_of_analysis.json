@@ -63,7 +63,7 @@
    "fieldtype": "Select",
    "label": "Product Description",
    "read_only": 0,
-    "options": "Whole, Gutted Tilapia\n Tilapia Fillet"
+    "options": "Whole, Gutted Tilapia\nTilapia Fillet"
   },
   {
    "default": " This product is Fish, an allergen",
