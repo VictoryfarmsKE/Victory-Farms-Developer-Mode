@@ -4,6 +4,11 @@
 
 frappe.query_reports["Pending Purchase Order Report"] = {
 	"filters": [
-
+		{
+			fieldname: "department",
+			label: __("Department"),
+			fieldtype: "Link",
+			options: "Department"
+		}
 	]
 };
