@@ -23,25 +23,7 @@ def get_columns():
             "options": "Purchase Order",
             "width": 160,
         },
-        {
-            "label": _("Creation Date"),
-            "fieldname": "creation",
-            "fieldtype": "Datetime",
-            "width": 160,
-        },
-        {
-            "label": _("Days Since Creation"),
-            "fieldname": "aging_days",
-            "fieldtype": "Int",
-            "width": 140,
-        },
-        {
-            "label": _("Supplier"),
-            "fieldname": "supplier",
-            "fieldtype": "Link",
-            "options": "Supplier",
-            "width": 180,
-        },
+
         {
             "label": _("Supplier Name"),
             "fieldname": "supplier_name",
@@ -84,6 +66,18 @@ def get_columns():
             "label": _("Grand Total"),
             "fieldname": "grand_total",
             "fieldtype": "Currency",
+            "width": 140,
+        },
+        {
+            "label": _("Creation Date"),
+            "fieldname": "creation",
+            "fieldtype": "Datetime",
+            "width": 160,
+        },
+        {
+            "label": _("Days Since Creation"),
+            "fieldname": "aging_days",
+            "fieldtype": "Int",
             "width": 140,
         },
     ]
