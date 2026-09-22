@@ -23,6 +23,30 @@ def get_columns():
             "options": "Purchase Order",
             "width": 160,
         },
+        {
+            "label": _("Created By"),
+            "fieldname": "created_by",
+            "fieldtype": "Data",
+            "width": 180,
+        },
+        {
+            "label": _("Creation Date"),
+            "fieldname": "creation",
+            "fieldtype": "Datetime",
+            "width": 160,
+        },
+        {
+            "label": _("Days Since Creation"),
+            "fieldname": "aging_days",
+            "fieldtype": "Int",
+            "width": 140,
+        },
+        {
+            "label": _("Approval Status"),
+            "fieldname": "workflow_state",
+            "fieldtype": "Data",
+            "width": 220,
+        },
 
         {
             "label": _("Supplier Name"),
@@ -50,36 +74,16 @@ def get_columns():
             "fieldtype": "Data",
             "width": 180,
         },
-        {
-            "label": _("Created By"),
-            "fieldname": "created_by",
-            "fieldtype": "Data",
-            "width": 180,
-        },
-        {
-            "label": _("Approval Status"),
-            "fieldname": "workflow_state",
-            "fieldtype": "Data",
-            "width": 220,
-        },
+
+
         {
             "label": _("Grand Total"),
             "fieldname": "grand_total",
             "fieldtype": "Currency",
             "width": 140,
         },
-        {
-            "label": _("Creation Date"),
-            "fieldname": "creation",
-            "fieldtype": "Datetime",
-            "width": 160,
-        },
-        {
-            "label": _("Days Since Creation"),
-            "fieldname": "aging_days",
-            "fieldtype": "Int",
-            "width": 140,
-        },
+
+
     ]
 
 
@@ -145,8 +149,6 @@ def get_data(filters):
             po.name AS purchase_order,
             po.creation,
             DATEDIFF(CURDATE(), DATE(po.creation)) AS aging_days,
-
-            po.supplier,
             po.supplier_name,
 
             po.custom_department AS department,
