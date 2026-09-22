@@ -109,6 +109,21 @@ def validate_beneficiary_fields(doc, method=None):
             )
 
 
+def set_paid_amount_from_beneficiaries(doc, method=None):
+    """Auto-calculate Paid Amount from beneficiary rows for Mpesa payments.
+
+    Other upload types (EFT, RTGS, International Payments) are left untouched.
+    """
+    if doc.get("custom_upload_type") != "Mpesa":
+        return
+
+    beneficiaries = doc.get("custom_beneficiaries") or []
+    total = flt(sum(flt(row.get("amount")) for row in beneficiaries))
+
+    if doc.paid_amount != total:
+        doc.paid_amount = total
+
+
 @frappe.whitelist()
 def upload_beneficiaries(file_url):
     """Parse an uploaded Excel/CSV file and return beneficiary rows.
