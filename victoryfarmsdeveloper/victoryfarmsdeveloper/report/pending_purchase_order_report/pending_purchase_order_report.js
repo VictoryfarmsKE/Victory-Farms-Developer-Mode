@@ -22,11 +22,14 @@ frappe.query_reports["Pending Purchase Order Report"] = {
             fieldtype: "Link",
             options: "User"
         },
+
         {
             fieldname: "created_by",
             label: __("Created By"),
-            fieldtype: "Link",
-            options: "User"
+            fieldtype: "MultiSelectList",
+            get_data: function(txt) {
+                return frappe.db.get_link_options("User", txt);
+                }
         }
     ]
 };

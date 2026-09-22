@@ -39,7 +39,7 @@ def get_columns():
             "label": _("Days Since Creation"),
             "fieldname": "aging_days",
             "fieldtype": "Int",
-            "width": 140,
+            "width": 180,
         },
         {
             "label": _("Approval Status"),
@@ -72,7 +72,7 @@ def get_columns():
             "label": _("Requester"),
             "fieldname": "requester",
             "fieldtype": "Data",
-            "width": 180,
+            "width": 140,
         },
 
 
@@ -137,11 +137,21 @@ def get_data(filters):
         values["requester"] = filters.requester
 
     if filters.get("created_by"):
-        conditions.append(
-            "po.owner = %(created_by)s"
-        )
-        values["created_by"] = filters.created_by
+        created_by = filters.get("created_by")
 
+        if isinstance(created_by, str):
+            created_by = [created_by]
+
+        placeholders = []
+
+        for idx, user in enumerate(created_by):
+            key = f"created_by_{idx}"
+            placeholders.append(f"%({key})s")
+            values[key] = user
+
+        conditions.append(
+            f"po.owner IN ({', '.join(placeholders)})"
+        )
     where_clause = " AND ".join(conditions)
 
     sql = f"""
