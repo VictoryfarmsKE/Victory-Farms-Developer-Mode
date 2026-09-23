@@ -43,7 +43,7 @@ def before_save_expense_claim(doc, method=None):
     if not _has_development_allowance_rows(doc):
         return
 
-    if not doc.payable_account:
+    if not doc.payable_account or doc.payable_account == 'N/A':
         company = doc.company or frappe.defaults.get_user_default("Company")
         if company:
             payable_account = frappe.get_cached_value(
