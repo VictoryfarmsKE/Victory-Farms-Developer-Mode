@@ -32,7 +32,7 @@ def _is_any_row_taxable(doc):
     )
 
 
-def before_save_expense_claim(doc, method=None):
+def validate_expense_claim(doc, method=None):
     """Prepare Development Allowance claims before saving.
 
     ERPNext requires payable_account on Expense Claim. For Development Allowance
@@ -67,6 +67,12 @@ def before_submit_expense_claim(doc, method=None):
     """Enforce mandatory attachment and sub-type for Development Allowance rows."""
     if not _has_development_allowance_rows(doc):
         return
+
+    # Set approval_status so ERPNext\u0027s on_submit validation passes
+    if doc.workflow_state == "Rejected":
+        doc.approval_status = "Rejected"
+    else:
+        doc.approval_status = "Approved"
 
     if not frappe.db.exists(
         "File",
