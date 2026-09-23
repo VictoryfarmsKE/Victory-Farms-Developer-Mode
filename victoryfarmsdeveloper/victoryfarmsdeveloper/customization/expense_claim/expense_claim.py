@@ -97,7 +97,9 @@ def on_expense_claim_update(doc, method=None):
     if doc.workflow_state == previous_workflow_state:
         return
 
-    if doc.workflow_state == "Approved":
+    if doc.workflow_state == "Submitted":
+        _notify_approver_on_submit(doc)
+    elif doc.workflow_state == "Approved":
         handle_approved_claim(doc)
         send_status_notification(doc, "approved")
     elif doc.workflow_state == "Rejected":
@@ -232,6 +234,43 @@ def send_status_notification(doc, status):
 
     frappe.sendmail(
         recipients=[employee_email],
+        subject=subject,
+        message=message,
+        reference_doctype=doc.doctype,
+        reference_name=doc.name,
+    )
+
+
+def _notify_approver_on_submit(doc):
+    """Send email to the approver when a Development Allowance claim is submitted."""
+    if not doc.expense_approver:
+        return
+
+    approver_email = frappe.db.get_value("User", doc.expense_approver, "email")
+    if not approver_email:
+        return
+
+    sub_type = _get_sub_type(doc) or "N/A"
+    subject = f"New Development Allowance Claim Pending Review: {doc.name}"
+    message = f"""
+    <p>Dear Approver,</p>
+    <p>A new Development Allowance claim <strong>{doc_name}</strong> has been submitted by <strong>{employee_name}</strong> and requires your review.</p>
+    <ul>
+        <li><strong>Sub-Type:</strong> {sub_type}</li>
+        <li><strong>Total Amount:</strong> {grand_total} {currency}</li>
+    </ul>
+    <p>Please review and take action.</p>
+    <p>Best regards,<br>HR System</p>
+    """.format(
+        doc_name=doc.name,
+        employee_name=doc.employee_name,
+        sub_type=sub_type,
+        grand_total=doc.grand_total,
+        currency=doc.currency or "",
+    )
+
+    frappe.sendmail(
+        recipients=[approver_email],
         subject=subject,
         message=message,
         reference_doctype=doc.doctype,
