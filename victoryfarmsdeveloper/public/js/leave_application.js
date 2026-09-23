@@ -39,6 +39,6 @@ frappe.templates["leave_application_dashboard"] = `
 	</tbody>
 </table>
 {% else %}
-<p style="margin-top: 30px;"> {{ __("No leaves have been allocated.") }} </p>
+<p style="margin-top: 30px;"> {{ __("No leaves have been allocated 777777.") }} </p>
 {% endif %}
 `;
