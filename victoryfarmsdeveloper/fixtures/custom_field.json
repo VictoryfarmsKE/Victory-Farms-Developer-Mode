@@ -2522,5 +2522,16 @@
         "translatable":  0,
         "unique":  0,
         "width":  null
+    },
+    {
+        "field_name":  "payable_account",
+        "property_type":  "Check",
+        "property":  "reqd",
+        "value":  "0",
+        "doc_type":  "Expense Claim",
+        "name":  "Expense Claim-payable_account-reqd",
+        "docstatus":  0,
+        "doctype":  "Property Setter",
+        "module":  "VictoryFarmsDeveloper"
     }
 ]

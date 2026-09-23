@@ -290,6 +290,11 @@ doc_events = {
     "Purchase Receipt": {
         "validate": "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.validate_purchase_receipt"
     },
+    "Expense Claim": {
+        "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.validate_expense_claim",
+        "before_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.before_submit_expense_claim",
+        "on_update": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.on_expense_claim_update"
+    },
     "Salary Slip": {
         "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.sync_additional_salary_notes",
         "on_update": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.sync_additional_salary_notes",
