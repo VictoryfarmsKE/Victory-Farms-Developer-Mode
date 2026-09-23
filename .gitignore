@@ -5,3 +5,10 @@
 tags
 node_modules
 __pycache__
+/.idea/.gitignore
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/vcs.xml
+/.idea/victoryfarmsdeveloper.iml
+/tatus
