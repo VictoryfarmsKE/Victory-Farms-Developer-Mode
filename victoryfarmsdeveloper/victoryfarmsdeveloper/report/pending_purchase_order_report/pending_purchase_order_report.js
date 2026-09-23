@@ -31,14 +31,5 @@ frappe.query_reports["Pending Purchase Order Report"] = {
                 return frappe.db.get_link_options("User", txt);
                 }
         },
-        {
-            fieldname: "page_length",
-            label: __("Show"),
-            fieldtype: "Select",
-            options: [
-                "50","100","250","500"
-            ],
-            default: "100"
-        }
     ]
 };

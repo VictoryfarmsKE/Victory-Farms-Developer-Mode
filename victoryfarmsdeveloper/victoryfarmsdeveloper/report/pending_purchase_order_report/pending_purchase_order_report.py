@@ -99,14 +99,7 @@ def get_data(filters):
         "pending_state": "Pending%",
         "current_user": current_user,
     }
-    page_length = int(filters.get("page_length") or 100)
 
-    allowed_page_lengths = [50, 100, 250, 500]
-
-    if page_length not in allowed_page_lengths:
-        page_length = 100
-
-    values["page_length"] = page_length
 
     # ---------------------------------------------------------
     # PERMISSION CONDITIONS
@@ -201,7 +194,6 @@ def get_data(filters):
 
         ORDER BY
             po.creation ASC
-            LIMIT %(page_length)s
     """
 
     return frappe.db.sql(sql, values, as_dict=True)
