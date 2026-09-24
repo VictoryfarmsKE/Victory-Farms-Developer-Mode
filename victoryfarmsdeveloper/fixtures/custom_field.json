@@ -571,7 +571,7 @@
   "name": "Project-custom_project_category",
   "no_copy": 0,
   "non_negative": 0,
-  "options": "\nHEAP I\nHEAP II\nHEAP III\nCommunity Projects\nAnchors & Cage Improvements\nChui Gardens\nSUVAC\nMLC\nMeru LC\nVLC\nSolar Plex\nHippo Hill\nNovel Plots",
+  "options": "\nHEAP II\nHatcheries & RAS\nFarm Non-Operational Infrastructure\nStrategic / Other Projects\nCommunity / ESG\nFarm Production Infrastructure\nLogistics Centres\nSUVAC & Processing\nSustainability & Utilities\nNovel Plots / HEAP Land Development\nHEAP III\nHEAP I",
   "permlevel": 0,
   "placeholder": null,
   "precision": "",
