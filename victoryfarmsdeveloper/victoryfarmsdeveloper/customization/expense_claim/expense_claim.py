@@ -1,4 +1,4 @@
-﻿import frappe
+import frappe
 from frappe import _
 from frappe.utils import today, getdate, add_months
 
@@ -238,13 +238,16 @@ def send_status_notification(doc, status):
 
     message += "<p>Best regards,<br>HR Team</p>"
 
-    frappe.sendmail(
-        recipients=[employee_email],
-        subject=subject,
-        message=message,
-        reference_doctype=doc.doctype,
-        reference_name=doc.name,
-    )
+    try:
+        frappe.sendmail(
+            recipients=[employee_email],
+            subject=subject,
+            message=message,
+            reference_doctype=doc.doctype,
+            reference_name=doc.name,
+        )
+    except Exception as e:
+        frappe.log_error(f"Failed to send status notification to employee: {e}")
 
 
 def _notify_approver_on_submit(doc):
@@ -269,13 +272,16 @@ def _notify_approver_on_submit(doc):
     <p>Best regards,<br>HR System</p>
     """
 
-    frappe.sendmail(
-        recipients=[approver_email],
-        subject=subject,
-        message=message,
-        reference_doctype=doc.doctype,
-        reference_name=doc.name,
-    )
+    try:
+        frappe.sendmail(
+            recipients=[approver_email],
+            subject=subject,
+            message=message,
+            reference_doctype=doc.doctype,
+            reference_name=doc.name,
+        )
+    except Exception as e:
+        frappe.log_error(f"Failed to send approver notification: {e}")
 
 
 def get_or_create_supplier():
