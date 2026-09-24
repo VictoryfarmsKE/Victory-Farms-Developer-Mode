@@ -260,20 +260,14 @@ def _notify_approver_on_submit(doc):
     subject = f"New Development Allowance Claim Pending Review: {doc.name}"
     message = f"""
     <p>Dear Approver,</p>
-    <p>A new Development Allowance claim <strong>{doc_name}</strong> has been submitted by <strong>{employee_name}</strong> and requires your review.</p>
+    <p>A new Development Allowance claim <strong>{doc.name}</strong> has been submitted by <strong>{doc.employee_name}</strong> and requires your review.</p>
     <ul>
         <li><strong>Sub-Type:</strong> {sub_type}</li>
-        <li><strong>Total Amount:</strong> {grand_total} {currency}</li>
+        <li><strong>Total Amount:</strong> {doc.grand_total} {doc.currency or ""}</li>
     </ul>
     <p>Please review and take action.</p>
     <p>Best regards,<br>HR System</p>
-    """.format(
-        doc_name=doc.name,
-        employee_name=doc.employee_name,
-        sub_type=sub_type,
-        grand_total=doc.grand_total,
-        currency=doc.currency or "",
-    )
+    """
 
     frappe.sendmail(
         recipients=[approver_email],
