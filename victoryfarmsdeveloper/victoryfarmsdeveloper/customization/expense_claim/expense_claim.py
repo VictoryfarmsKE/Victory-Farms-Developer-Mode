@@ -103,13 +103,13 @@ def on_expense_claim_update(doc, method=None):
     if doc.workflow_state == previous_workflow_state:
         return
 
-    if doc.workflow_state == "Submitted":
-        _notify_approver_on_submit(doc)
-    elif doc.workflow_state == "Approved":
+    # TODO: Re-enable email notifications once email account is configured
+    # if doc.workflow_state == "Submitted":
+    #     _notify_approver_on_submit(doc)
+    if doc.workflow_state == "Approved":
         handle_approved_claim(doc)
-        send_status_notification(doc, "approved")
-    elif doc.workflow_state == "Rejected":
-        send_status_notification(doc, "rejected")
+    # elif doc.workflow_state == "Rejected":
+    #     send_status_notification(doc, "rejected")
 
 
 def handle_approved_claim(doc):
