@@ -1,4 +1,4 @@
-﻿import frappe
+import frappe
 from frappe import _
 from frappe.utils import today, getdate, add_months
 
@@ -32,7 +32,7 @@ def _is_any_row_taxable(doc):
     )
 
 
-def before_save_expense_claim(doc, method=None):
+def validate_expense_claim(doc, method=None):
     """Prepare Development Allowance claims before saving.
 
     ERPNext requires payable_account on Expense Claim. For Development Allowance
@@ -67,6 +67,12 @@ def before_submit_expense_claim(doc, method=None):
     """Enforce mandatory attachment and sub-type for Development Allowance rows."""
     if not _has_development_allowance_rows(doc):
         return
+
+    # Set approval_status so ERPNext\u0027s on_submit validation passes
+    if doc.workflow_state == "Rejected":
+        doc.approval_status = "Rejected"
+    else:
+        doc.approval_status = "Approved"
 
     if not frappe.db.exists(
         "File",
@@ -232,13 +238,16 @@ def send_status_notification(doc, status):
 
     message += "<p>Best regards,<br>HR Team</p>"
 
-    frappe.sendmail(
-        recipients=[employee_email],
-        subject=subject,
-        message=message,
-        reference_doctype=doc.doctype,
-        reference_name=doc.name,
-    )
+    try:
+        frappe.sendmail(
+            recipients=[employee_email],
+            subject=subject,
+            message=message,
+            reference_doctype=doc.doctype,
+            reference_name=doc.name,
+        )
+    except Exception as e:
+        frappe.log_error(f"Failed to send status notification to employee: {e}")
 
 
 def _notify_approver_on_submit(doc):
@@ -254,28 +263,25 @@ def _notify_approver_on_submit(doc):
     subject = f"New Development Allowance Claim Pending Review: {doc.name}"
     message = f"""
     <p>Dear Approver,</p>
-    <p>A new Development Allowance claim <strong>{doc_name}</strong> has been submitted by <strong>{employee_name}</strong> and requires your review.</p>
+    <p>A new Development Allowance claim <strong>{doc.name}</strong> has been submitted by <strong>{doc.employee_name}</strong> and requires your review.</p>
     <ul>
         <li><strong>Sub-Type:</strong> {sub_type}</li>
-        <li><strong>Total Amount:</strong> {grand_total} {currency}</li>
+        <li><strong>Total Amount:</strong> {doc.grand_total} {doc.currency or ""}</li>
     </ul>
     <p>Please review and take action.</p>
     <p>Best regards,<br>HR System</p>
-    """.format(
-        doc_name=doc.name,
-        employee_name=doc.employee_name,
-        sub_type=sub_type,
-        grand_total=doc.grand_total,
-        currency=doc.currency or "",
-    )
+    """
 
-    frappe.sendmail(
-        recipients=[approver_email],
-        subject=subject,
-        message=message,
-        reference_doctype=doc.doctype,
-        reference_name=doc.name,
-    )
+    try:
+        frappe.sendmail(
+            recipients=[approver_email],
+            subject=subject,
+            message=message,
+            reference_doctype=doc.doctype,
+            reference_name=doc.name,
+        )
+    except Exception as e:
+        frappe.log_error(f"Failed to send approver notification: {e}")
 
 
 def get_or_create_supplier():
