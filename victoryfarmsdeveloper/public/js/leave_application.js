@@ -5,7 +5,7 @@ frappe.templates["leave_application_dashboard"] = `
 	<thead>
 		<tr>
 			<th style="width:  14%">{{ __("Leave Type") }}</th>
-			<th style="width: 14%" class="text-right">{{ __("Yearly Allocated Leave 999999") }}</th>
+			<th style="width: 14%" class="text-right">{{ __("Yearly Allocated Leave ") }}</th>
 			<th style="width: 14%" class="text-right">{{ __("Expired Leaves") }}</th>
 			<th style="width: 14%" class="text-right">{{ __("Used Leaves") }}</th>
 			<th style="width: 14%" class="text-right">{{ __("Leaves Pending Approval") }}</th>
@@ -39,6 +39,6 @@ frappe.templates["leave_application_dashboard"] = `
 	</tbody>
 </table>
 {% else %}
-<p style="margin-top: 30px;"> {{ __("No leaves have been allocated 777777.") }} </p>
+<p style="margin-top: 30px;"> {{ __("No leaves have been allocated.") }} </p>
 {% endif %}
 `;
