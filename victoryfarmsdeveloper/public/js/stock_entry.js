@@ -1,5 +1,5 @@
-// Processing Line is only recorded on harvesting and processing entries.
-const PROCESSING_LINE_TYPES = ["Harvesting of Fish", "Fish Processing", "Fish Processing SUVAC"];
+// Processing Line is only recorded on harvesting and processing at SUVAC.
+const PROCESSING_LINE_TYPES = ["Harvesting of Fish", "Fish Processing SUVAC"];
 
 function toggle_processing_line(frm) {
     const grid = frm.fields_dict.items && frm.fields_dict.items.grid;

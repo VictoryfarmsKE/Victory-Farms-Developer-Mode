@@ -21,7 +21,7 @@ frappe.query_reports["SUVAC Line Productivity"] = {
 			fieldname: "stock_entry_type",
 			label: __("Stock Entry Type"),
 			fieldtype: "Select",
-			options: ["", "Harvesting of Fish", "Fish Processing SUVAC", "Fish Processing"],
+			options: ["", "Harvesting of Fish", "Fish Processing SUVAC"],
 		},
 		{
 			fieldname: "processing_line",

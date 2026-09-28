@@ -5,7 +5,7 @@ import frappe
 from frappe import _
 from frappe.utils import flt
 
-LINE_TYPES = ("Harvesting of Fish", "Fish Processing SUVAC", "Fish Processing")
+LINE_TYPES = ("Harvesting of Fish", "Fish Processing SUVAC")
 
 
 def execute(filters=None):
