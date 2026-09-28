@@ -83,9 +83,10 @@ WORKFLOW_TRANSITIONS = [
 # Existing rules the Blast transfer must not use: they would skip the supervisor or ask for a driver.
 EXCLUDED_ACTIONS = ("Submit", "Send Transfer for Confirmation-Driver")
 
-# The Blast transfer has no driver, so none of the driver fields show on it.
-DRIVER_FIELDS = (
-    "Stock Entry-driver",
+DRIVER_FIELD = "Stock Entry-driver"
+
+# Only shown where the Driver field is, i.e. truck transfers, never on the Blast transfer.
+DRIVER_FOLLOWERS = (
     "Stock Entry-custom_drivers_name",
     "Stock Entry-custom_secondary_driver",
     "Stock Entry-custom_secondary_drivers_name",
@@ -144,31 +145,43 @@ def ensure_stock_entry_types():
 def ensure_driver_rule():
     exclusion = "doc.stock_entry_type != '{0}'".format(BLAST_TRANSFER)
 
-    for name in DRIVER_FIELDS:
-        field = frappe.db.get_value(
-            "Custom Field", name, ["depends_on", "mandatory_depends_on"], as_dict=True
-        )
-        if not field:
+    field = frappe.db.get_value(
+        "Custom Field", DRIVER_FIELD, ["depends_on", "mandatory_depends_on"], as_dict=True
+    )
+    if not field:
+        return
+
+    for key in ("depends_on", "mandatory_depends_on"):
+        value = (field[key] or "").strip()
+        if not value or BLAST_TRANSFER in value:
+            continue
+        if not value.startswith("eval:"):
+            print("VictoryFarmsDeveloper: left {0} {1} as is ({2})".format(DRIVER_FIELD, key, value))
             continue
 
-        for key in ("depends_on", "mandatory_depends_on"):
-            value = (field[key] or "").strip()
-            if BLAST_TRANSFER in value:
-                continue
+        field[key] = "{0} && {1}".format(value, exclusion)
+        frappe.db.set_value("Custom Field", DRIVER_FIELD, key, field[key])
+        print("VictoryFarmsDeveloper: {0} {1} now skips {2}".format(DRIVER_FIELD, key, BLAST_TRANSFER))
 
-            if not value:
-                # Only depends_on gains a rule; an empty mandatory rule stays empty.
-                if key != "depends_on":
-                    continue
-                value = "eval: {0}".format(exclusion)
-            elif value.startswith("eval:"):
-                value = "{0} && {1}".format(value, exclusion)
-            else:
-                print("VictoryFarmsDeveloper: left {0} {1} as is ({2})".format(name, key, value))
-                continue
+    driver_rule = (field.depends_on or "").strip()
+    if not driver_rule:
+        return
 
-            frappe.db.set_value("Custom Field", name, key, value)
-            print("VictoryFarmsDeveloper: {0} {1} now skips {2}".format(name, key, BLAST_TRANSFER))
+    # Empty, or the earlier Blast-only rule: safe to replace. Anything else was set on purpose.
+    replaceable = ("", "eval: {0}".format(exclusion))
+    for name in DRIVER_FOLLOWERS:
+        if not frappe.db.exists("Custom Field", name):
+            continue
+
+        current = (frappe.db.get_value("Custom Field", name, "depends_on") or "").strip()
+        if current == driver_rule:
+            continue
+        if current not in replaceable:
+            print("VictoryFarmsDeveloper: left {0} depends_on as is ({1})".format(name, current))
+            continue
+
+        frappe.db.set_value("Custom Field", name, "depends_on", driver_rule)
+        print("VictoryFarmsDeveloper: {0} now shows only with the Driver field".format(name))
 
 
 def ensure_workflow_rules():
