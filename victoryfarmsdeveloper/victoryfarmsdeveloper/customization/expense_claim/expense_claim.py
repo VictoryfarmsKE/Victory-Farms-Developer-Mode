@@ -54,10 +54,12 @@ def validate_expense_claim(doc, method=None):
 
     # Sync approval_status with the workflow state so ERPNext's standard
     # Expense Claim validation (which expects Approved/Rejected) does not block
-    # the workflow Submit/Approve/Reject actions.
-    if doc.workflow_state == "Rejected":
+    # the workflow Submit/Approve/Reject actions. workflow_state only exists
+    # when a Workflow is configured for Expense Claim on the site.
+    workflow_state = getattr(doc, "workflow_state", None)
+    if workflow_state == "Rejected":
         doc.approval_status = "Rejected"
-    elif doc.workflow_state in ("Submitted", "Approved"):
+    elif workflow_state in ("Submitted", "Approved"):
         doc.approval_status = "Approved"
     else:
         doc.approval_status = "Approved"
@@ -69,7 +71,7 @@ def before_submit_expense_claim(doc, method=None):
         return
 
     # Set approval_status so ERPNext\u0027s on_submit validation passes
-    if doc.workflow_state == "Rejected":
+    if getattr(doc, "workflow_state", None) == "Rejected":
         doc.approval_status = "Rejected"
     else:
         doc.approval_status = "Approved"
@@ -95,20 +97,22 @@ def on_expense_claim_update(doc, method=None):
     if not _has_development_allowance_rows(doc):
         return
 
-    if not doc.workflow_state:
+    workflow_state = getattr(doc, "workflow_state", None)
+    if not workflow_state:
         return
 
-    previous_workflow_state = doc.get_doc_before_save().workflow_state if doc.get_doc_before_save() else None
+    before_save = doc.get_doc_before_save()
+    previous_workflow_state = getattr(before_save, "workflow_state", None) if before_save else None
 
-    if doc.workflow_state == previous_workflow_state:
+    if workflow_state == previous_workflow_state:
         return
 
-    if doc.workflow_state == "Submitted":
+    if workflow_state == "Submitted":
         _notify_approver_on_submit(doc)
-    elif doc.workflow_state == "Approved":
+    elif workflow_state == "Approved":
         handle_approved_claim(doc)
         send_status_notification(doc, "approved")
-    elif doc.workflow_state == "Rejected":
+    elif workflow_state == "Rejected":
         send_status_notification(doc, "rejected")
 
 
