@@ -40,6 +40,9 @@
   },
   {
    "role": "System Manager"
+  },
+  {
+   "role": "PO-Report-User"
   }
  ]
 }
