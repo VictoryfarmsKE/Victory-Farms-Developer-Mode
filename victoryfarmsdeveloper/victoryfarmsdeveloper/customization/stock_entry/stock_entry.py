@@ -249,7 +249,7 @@ def make_stock_in_entry(source_name, target_doc=None):
     # Call the original function if no duplicate exists
     return original_make_stock_in_entry(source_name, target_doc)
 
-PROCESSING_LINE_TYPES = ("Harvesting of Fish", "Fish Processing", "Fish Processing SUVAC")
+PROCESSING_LINE_TYPES = ("Harvesting of Fish", "Fish Processing SUVAC")
 BLAST_TRANSFER = "Fish Transfer from Processing to SUVAC Blast"
 SUVAC_BLAST = "SUVAC Blast - VFL"
 SUVAC_COLD_ROOM = "SUVAC Cold Room - VFL"
