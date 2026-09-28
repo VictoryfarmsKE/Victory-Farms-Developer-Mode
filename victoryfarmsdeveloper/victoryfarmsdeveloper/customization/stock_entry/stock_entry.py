@@ -249,7 +249,65 @@ def make_stock_in_entry(source_name, target_doc=None):
     # Call the original function if no duplicate exists
     return original_make_stock_in_entry(source_name, target_doc)
 
+PROCESSING_LINE_TYPES = ("Harvesting of Fish", "Fish Processing", "Fish Processing SUVAC")
+BLAST_TRANSFER = "Fish Transfer from Processing to SUVAC Blast"
+SUVAC_BLAST = "SUVAC Blast - VFL"
+SUVAC_COLD_ROOM = "SUVAC Cold Room - VFL"
+
+
+def clear_processing_line(doc):
+    if doc.stock_entry_type in PROCESSING_LINE_TYPES:
+        return
+    for item in doc.items:
+        if item.get("custom_line"):
+            item.custom_line = None
+
+
+def set_blast_warehouses(doc):
+    # Truck warehouse is the blast freezer; the fish ends up in the cold room.
+    if doc.stock_entry_type != BLAST_TRANSFER:
+        return
+
+    doc.to_warehouse = doc.to_warehouse or SUVAC_BLAST
+    if not doc.destination_warehouse or doc.destination_warehouse == doc.to_warehouse:
+        doc.destination_warehouse = SUVAC_COLD_ROOM
+
+    for item in doc.items:
+        if not item.get("destination_warehouse") or item.destination_warehouse == doc.to_warehouse:
+            item.destination_warehouse = doc.destination_warehouse
+
+
+def on_submit_stock_entry(doc, method):
+    if doc.stock_entry_type != BLAST_TRANSFER or not doc.add_to_transit:
+        return
+
+    destination = doc.destination_warehouse or SUVAC_COLD_ROOM
+
+    # Fish is received into the cold room at the weight sent from processing.
+    receipt = make_stock_in_entry(doc.name)
+    receipt.stock_entry_type = "Material Transfer"
+    receipt.set_posting_time = 1
+    receipt.posting_date = doc.posting_date
+    receipt.posting_time = doc.posting_time
+    # Same header values the receipt form script sets on load, so it opens clean.
+    receipt.from_warehouse = doc.to_warehouse
+    receipt.to_warehouse = destination
+    receipt.destination_warehouse = destination
+    for item in receipt.items:
+        item.t_warehouse = destination
+    receipt.insert(ignore_permissions=True)
+
+    frappe.msgprint(
+        _("Draft receipt {0} created for {1}").format(
+            frappe.utils.get_link_to_form("Stock Entry", receipt.name), destination
+        )
+    )
+
+
 def before_save_stock_entry(doc, method):
+        clear_processing_line(doc)
+        set_blast_warehouses(doc)
+
         #Get previous workflow state
         previous_doc = doc.get_doc_before_save()
         previous_state = previous_doc.workflow_state if previous_doc else None

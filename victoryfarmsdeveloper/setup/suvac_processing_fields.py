@@ -12,6 +12,10 @@ runs last, on every migrate.
 
 `restore_hidden_fields` appends anything missing rather than replacing the list, so the
 ordering other apps intend is preserved.
+
+The SUVAC Blast transfer has no driver. `ensure_workflow_rules` adds its Warehouse Supervisor
+confirmation to the `Stock Transfer` workflow and keeps it off the driver and direct submit rules.
+Workflows live only in each site's database, so this runs on every migrate and only adds.
 """
 
 import json
@@ -28,7 +32,7 @@ CUSTOM_FIELDS = {
         {
             "fieldname": "custom_line",
             "label": "Processing Line",
-            "fieldtype": "Float",
+            "fieldtype": "Int",
             "insert_after": "fish_cage",
             "in_list_view": 1,
             "module": MODULE,
@@ -45,12 +49,54 @@ CUSTOM_FIELDS = {
     ]
 }
 
-STOCK_ENTRY_TYPE = {"name": "Fish Transfer From FLC To Dispatch", "purpose": "Material Transfer"}
+BLAST_TRANSFER = "Fish Transfer from Processing to SUVAC Blast"
+
+STOCK_ENTRY_TYPES = [
+    {"name": "Fish Transfer From FLC To Dispatch", "purpose": "Material Transfer"},
+    {"name": "Fish Processing SUVAC", "purpose": "Repack"},
+    {"name": BLAST_TRANSFER, "purpose": "Material Transfer", "add_to_transit": 1},
+    {"name": "Fish Transfer from Cold Room to SUVAC Dispatch Room", "purpose": "Material Transfer"},
+]
+
+WORKFLOW = "Stock Transfer"
+PENDING = "Pending Confirmation-Warehouse Supervisor"
+CONFIRMED = "Transfer Confirmed"
+IS_BLAST = 'doc.stock_entry_type == "{0}"'.format(BLAST_TRANSFER)
+NOT_BLAST = 'doc.stock_entry_type != "{0}"'.format(BLAST_TRANSFER)
+
+WORKFLOW_STATES = [
+    {"state": PENDING, "doc_status": "0", "allow_edit": "Warehouse Supervisor"},
+    {"state": CONFIRMED, "doc_status": "1", "allow_edit": "Warehouse Supervisor"},
+    {"state": "To Amend", "doc_status": "0", "allow_edit": "Stock - VF"},
+]
+
+WORKFLOW_TRANSITIONS = [
+    {"state": "Draft", "action": "Send for Confirmation", "next_state": PENDING, "allowed": "Stock - VF"},
+    {"state": "Draft", "action": "Send for Confirmation", "next_state": PENDING, "allowed": "Warehouse Supervisor"},
+    {"state": PENDING, "action": "Confirm", "next_state": CONFIRMED, "allowed": "Warehouse Supervisor"},
+    {"state": PENDING, "action": "Return for Amendment", "next_state": "To Amend", "allowed": "Warehouse Supervisor"},
+    {"state": "To Amend", "action": "Send for Confirmation", "next_state": PENDING, "allowed": "Stock - VF"},
+    {"state": "To Amend", "action": "Send for Confirmation", "next_state": PENDING, "allowed": "Warehouse Supervisor"},
+    {"state": CONFIRMED, "action": "Cancel", "next_state": "Cancelled", "allowed": "Warehouse Supervisor"},
+]
+
+# Existing rules the Blast transfer must not use: they would skip the supervisor or ask for a driver.
+EXCLUDED_ACTIONS = ("Submit", "Send Transfer for Confirmation-Driver")
+
+# The Blast transfer has no driver, so none of the driver fields show on it.
+DRIVER_FIELDS = (
+    "Stock Entry-driver",
+    "Stock Entry-custom_drivers_name",
+    "Stock Entry-custom_secondary_driver",
+    "Stock Entry-custom_secondary_drivers_name",
+)
 
 
 def enforce():
     ensure_custom_fields()
-    ensure_stock_entry_type()
+    ensure_stock_entry_types()
+    ensure_driver_rule()
+    ensure_workflow_rules()
 
     for doctype in LAYOUT_DOCTYPES:
         restore_hidden_fields(doctype)
@@ -62,7 +108,19 @@ def enforce():
 
 
 def ensure_custom_fields():
-    create_custom_fields(CUSTOM_FIELDS, ignore_validate=True)
+    fractional = frappe.db.sql(
+        "select count(*) from `tabStock Entry Detail` where custom_line != floor(custom_line)"
+    )[0][0] if frappe.db.has_column(DOCTYPE, "custom_line") else 0
+
+    fields = CUSTOM_FIELDS
+    if fractional:
+        # Switching to Int would round these, so keep Float until they are corrected.
+        fields = {DOCTYPE: [dict(f, fieldtype="Float") if f["fieldname"] == "custom_line" else f for f in CUSTOM_FIELDS[DOCTYPE]]}
+        print(
+            "VictoryFarmsDeveloper: Processing Line left as Float, {0} row(s) have decimals".format(fractional)
+        )
+
+    create_custom_fields(fields, ignore_validate=True)
 
     for field in CUSTOM_FIELDS[DOCTYPE]:
         name = frappe.db.get_value(
@@ -72,15 +130,118 @@ def ensure_custom_fields():
             frappe.db.set_value("Custom Field", name, "module", MODULE, update_modified=False)
 
 
-def ensure_stock_entry_type():
-    if frappe.db.exists("Stock Entry Type", STOCK_ENTRY_TYPE["name"]):
+def ensure_stock_entry_types():
+    for entry_type in STOCK_ENTRY_TYPES:
+        if frappe.db.exists("Stock Entry Type", entry_type["name"]):
+            continue
+
+        doc = frappe.new_doc("Stock Entry Type")
+        doc.update(entry_type)
+        doc.insert(ignore_permissions=True)
+        print("VictoryFarmsDeveloper: created Stock Entry Type {0}".format(entry_type["name"]))
+
+
+def ensure_driver_rule():
+    exclusion = "doc.stock_entry_type != '{0}'".format(BLAST_TRANSFER)
+
+    for name in DRIVER_FIELDS:
+        field = frappe.db.get_value(
+            "Custom Field", name, ["depends_on", "mandatory_depends_on"], as_dict=True
+        )
+        if not field:
+            continue
+
+        for key in ("depends_on", "mandatory_depends_on"):
+            value = (field[key] or "").strip()
+            if BLAST_TRANSFER in value:
+                continue
+
+            if not value:
+                # Only depends_on gains a rule; an empty mandatory rule stays empty.
+                if key != "depends_on":
+                    continue
+                value = "eval: {0}".format(exclusion)
+            elif value.startswith("eval:"):
+                value = "{0} && {1}".format(value, exclusion)
+            else:
+                print("VictoryFarmsDeveloper: left {0} {1} as is ({2})".format(name, key, value))
+                continue
+
+            frappe.db.set_value("Custom Field", name, key, value)
+            print("VictoryFarmsDeveloper: {0} {1} now skips {2}".format(name, key, BLAST_TRANSFER))
+
+
+def ensure_workflow_rules():
+    if not frappe.db.exists("Workflow", WORKFLOW):
         return
 
-    doc = frappe.new_doc("Stock Entry Type")
-    doc.name = STOCK_ENTRY_TYPE["name"]
-    doc.purpose = STOCK_ENTRY_TYPE["purpose"]
-    doc.insert(ignore_permissions=True)
-    print("VictoryFarmsDeveloper: created Stock Entry Type {0}".format(STOCK_ENTRY_TYPE["name"]))
+    # Rows are written directly: saving the Workflow would also back-fill workflow_state on old entries.
+    workflow = frappe.get_doc("Workflow", WORKFLOW)
+    added = 0
+
+    for state in {row["state"] for row in WORKFLOW_STATES}:
+        if not frappe.db.exists("Workflow State", state):
+            frappe.get_doc({"doctype": "Workflow State", "workflow_state_name": state}).insert(
+                ignore_permissions=True
+            )
+
+    for action in {row["action"] for row in WORKFLOW_TRANSITIONS}:
+        if not frappe.db.exists("Workflow Action Master", action):
+            frappe.get_doc({"doctype": "Workflow Action Master", "workflow_action_name": action}).insert(
+                ignore_permissions=True
+            )
+
+    existing_states = {(row.state, row.allow_edit) for row in workflow.states}
+    for row in WORKFLOW_STATES:
+        if (row["state"], row["allow_edit"]) in existing_states:
+            continue
+        add_child(workflow, "states", "Workflow Document State", row)
+        added += 1
+
+    existing_transitions = {
+        (row.state, row.action, row.next_state, row.allowed)
+        for row in workflow.transitions
+        if row.condition == IS_BLAST
+    }
+    for row in WORKFLOW_TRANSITIONS:
+        if (row["state"], row["action"], row["next_state"], row["allowed"]) in existing_transitions:
+            continue
+        add_child(workflow, "transitions", "Workflow Transition", dict(row, condition=IS_BLAST))
+        added += 1
+
+    excluded = 0
+    for row in workflow.transitions:
+        if row.state not in ("Draft", "To Amend") or row.action not in EXCLUDED_ACTIONS:
+            continue
+        condition = (row.condition or "").strip()
+        if BLAST_TRANSFER in condition or "outgoing_stock_entry != None" in condition:
+            continue
+        condition = "{0} and {1}".format(condition, NOT_BLAST) if condition else NOT_BLAST
+        frappe.db.set_value("Workflow Transition", row.name, "condition", condition, update_modified=False)
+        excluded += 1
+
+    if added or excluded:
+        frappe.clear_cache(doctype="Stock Entry")
+        print(
+            "VictoryFarmsDeveloper: {0} workflow: added {1} row(s), kept {2} rule(s) off {3}".format(
+                WORKFLOW, added, excluded, BLAST_TRANSFER
+            )
+        )
+
+
+def add_child(workflow, parentfield, doctype, values):
+    idx = frappe.db.count(doctype, {"parent": workflow.name, "parentfield": parentfield}) + 1
+    child = frappe.get_doc(
+        dict(
+            values,
+            doctype=doctype,
+            parent=workflow.name,
+            parenttype="Workflow",
+            parentfield=parentfield,
+            idx=idx,
+        )
+    )
+    child.db_insert()
 
 
 def restore_hidden_fields(doctype):
