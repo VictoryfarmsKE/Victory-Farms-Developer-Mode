@@ -1,1 +1,389 @@
-app_name = "victoryfarmsdeveloper"`napp_title = "VictoryFarmsDeveloper"`napp_publisher = "Christine K"`napp_description = "VictoryFarmsDeveloper"`napp_email = "christinek@victoryfarmskenya.com"`napp_license = "mit"`napp_include = ["erpnext"]`nrequired_apps = ["frappe", "erpnext"]`n`nfixtures = [`n    {"dt": "Client Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},`n    {"dt": "Server Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},`n    {"dt": "Custom Field", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},`n    {"dt": "Property Setter", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},`n]`n`n`n# Includes in <head>`n# ------------------`n`n# include js, css files in header of desk.html`n# app_include_css = "/assets/victoryfarmsdeveloper/css/victoryfarmsdeveloper.css"`n# app_include_js = "/assets/victoryfarmsdeveloper/js/victoryfarmsdeveloper.js"`n`n# include js, css files in header of web template`n# web_include_css = "/assets/victoryfarmsdeveloper/css/victoryfarmsdeveloper.css"`n# web_include_js = "/assets/victoryfarmsdeveloper/js/victoryfarmsdeveloper.js"`n`n# include custom scss in every website theme (without file extension ".scss")`n# website_theme_scss = "victoryfarmsdeveloper/public/scss/website"`n`n# include js, css files in header of web form`n# webform_include_js = {"doctype": "public/js/doctype.js"}`n# webform_include_css = {"doctype": "public/css/doctype.css"}`n`n# include js in page`n# page_js = {"page" : "public/js/file.js"}`napp_include_js = [`n    "/assets/victoryfarmsdeveloper/js/stock_entry.js"`n]`n`n# include js in doctype views`n# doctype_js = {"doctype" : "public/js/doctype.js"}`ndoctype_js = {`n    "Stock Entry": "victoryfarmsdeveloper/customization/stock_entry_item_break_down/stock_entry_item_break_down.js",`n    "Landed Cost Voucher": "victoryfarmsdeveloper/public/js/landed_cost_voucher.js",`n    "Leave Application": "public/js/leave_application.js",`n    "Payment Entry": "public/js/payment_entry.js"`n}`n# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}`ndoctype_list_js = {`n    "Leave Application" : "public/js/leave_application_list.js"}`n# doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}`n# doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}`n`n# Svg Icons`n# ------------------`n# include app icons in desk`n# app_include_icons = "victoryfarmsdeveloper/public/icons.svg"`n`n# Home Pages`n# ----------`n`n# application home page (will override Website Settings)`n# home_page = "login"`n`n# website user home page (by Role)`n# role_home_page = {`n# 	"Role": "home_page"`n# }`n`n# Generators`n# ----------`n`n# automatically create page for each record of this doctype`n# website_generators = ["Web Page"]`n`n# Jinja`n# ----------`n`n# add methods and filters to jinja environment`n# jinja = {`n# 	"methods": "victoryfarmsdeveloper.utils.jinja_methods",`n# 	"filters": "victoryfarmsdeveloper.utils.jinja_filters"`n# }`n`n# Installation`n# ------------`n`n# before_install = "victoryfarmsdeveloper.install.before_install"`n# after_install = "victoryfarmsdeveloper.install.after_install"`n`nafter_migrate = [`n    "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.enforce",`n    "victoryfarmsdeveloper.setup.suvac_processing_fields.enforce"`n]`n`n# Uninstallation`n# ------------`n`n# before_uninstall = "victoryfarmsdeveloper.uninstall.before_uninstall"`n# after_uninstall = "victoryfarmsdeveloper.uninstall.after_uninstall"`n`n# Integration Setup`n# ------------------`n# To set up dependencies/integrations with other apps`n# Name of the app being installed is passed as an argument`n`n# before_app_install = "victoryfarmsdeveloper.utils.before_app_install"`n# after_app_install = "victoryfarmsdeveloper.utils.after_app_install"`n`n# Integration Cleanup`n# -------------------`n# To clean up dependencies/integrations with other apps`n# Name of the app being uninstalled is passed as an argument`n`n# before_app_uninstall = "victoryfarmsdeveloper.utils.before_app_uninstall"`n# after_app_uninstall = "victoryfarmsdeveloper.utils.after_app_uninstall"`n`n# Desk Notifications`n# ------------------`n# See frappe.core.notifications.get_notification_config`n`nnotification_config = "victoryfarmsdeveloper.notifications.get_notification_config"`n`n# Permissions`n# -----------`n# Permissions evaluated in scripted ways`n`n# permission_query_conditions = {`n# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",`n# }`n#`n# has_permission = {`n# 	"Event": "frappe.desk.doctype.event.event.has_permission",`n# }`n`npermission_query_conditions = {`n    "Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal.appraisal.get_permission_query_conditions",`n    "Department Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.department_appraisal.department_appraisal.get_permission_query_conditions"`n}`n`nhas_permission = {`n    "Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal.appraisal.has_permission",`n    "Department Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.department_appraisal.department_appraisal.has_permission"`n}`n# DocType Class`n# ---------------`n# Override standard doctype classes`n`n# override_doctype_class = {`n# 	"ToDo": "custom_app.overrides.CustomToDo"`n# }`noverride_doctype_class = {`n    "Stock Entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry",`n    "Appraisal Cycle": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_cycle.appraisal_cycle.CustomAppraisalCycle",`n    "Appraisal Payout": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_payout.appraisal_payout.CustomAppraisalPayout",`n    "Landed Cost Voucher": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.landed_cost_voucher.landed_cost_voucher.CustomLandedCostVoucher",`n    "Employee Checkin": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.employee_checkin.employee_checkin.CustomEmployeeCheckin",`n    # "Leave Application": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.leave_application.leave_application.CustomLeaveApplication"`n}`n# Document Events`n# ---------------`n# Hook on document methods and events`n`n# doc_events = {`n# 	"*": {`n# 		"on_update": "method",`n# 		"on_cancel": "method",`n# 		"on_trash": "method"`n# 	}`n# }`n# doc_events = {`n#     "Stock Entry": {`n#         "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.on_submit"`n#     }`n# }`n`n# Scheduled Tasks`n# ---------------`n`n# scheduler_events = {`n# 	"all": [`n# 		"victoryfarmsdeveloper.tasks.all"`n# 	],`n# 	"daily": [`n# 		"victoryfarmsdeveloper.tasks.daily"`n# 	],`n# 	"hourly": [`n# 		"victoryfarmsdeveloper.tasks.hourly"`n# 	],`n# 	"weekly": [`n# 		"victoryfarmsdeveloper.tasks.weekly"`n# 	],`n# 	"monthly": [`n# 		"victoryfarmsdeveloper.tasks.monthly"`n# 	],`n# }`n`nscheduler_events = {`n    "daily": [`n        "victoryfarmsdeveloper.notifications.check_low_stock.check_branch_low_stock",`n        "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check",`n        "victoryfarmsdeveloper.notifications.leave_balance_update_check.process_checkins_without_shift",`n        "victoryfarmsdeveloper.notifications.scorecard.send_pending_appraisal_notifications"`n    ],`n    "cron": {`n        "0 7 * * *": [`n            "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check"`n        ],`n        "0 23 * * *": [`n            "victoryfarmsdeveloper.notifications.po_pending_approval.send_pending_po_notifications"`n        ],`n        # "0 12,15 * * *": [`n        #     "victoryfarmsdeveloper.notifications.check_low_stock.check_branch_low_stock"`n        # ],`n        "0 0 28-31 * *": [`n            "victoryfarmsdeveloper.victoryfarmsdeveloper.doctype.sacco_loan_deduction.sacco_loan_deduction.create_remaining_payments"`n        ],`n        "0 0 1 * *": [`n            "victoryfarmsdeveloper.notifications.leave_balance_update_check.create_long_weekend_leave_allocation"`n        ],`n        "30 8 25-31 * *": [`n            "victoryfarmsdeveloper.notifications.scorecard.send_pending_appraisal_notifications"`n        ],`n        "0 17 * * 0": [`n            "victoryfarmsdeveloper.notifications.po_pending_approval.notify_old_pos"`n        ],`n        # Generate LDCs on 15th of Mar/Jun/Sep/Dec at 05:30`n        "30 5 15 3,6,9,12 *": [`n            "victoryfarmsdeveloper.notifications.ldc.generate_quarterly_ldcs"`n        ],`n        # Send reminder on 26th of Mar/Jun/Sep/Dec at 06:30`n        "30 6 26 3,6,9,12 *": [`n            "victoryfarmsdeveloper.notifications.ldc.send_ldc_reminders"`n        ],`n        "59 23 28-31 * *": [`n            "victoryfarmsdeveloper.notifications.po_pending_approval.auto_freeze_old_pos"`n        ],`n        "0 5 * * *": [`n            "victoryfarmsdeveloper.victoryfarmsdeveloper.doctype.tardiness_record.tardiness_record.process_daily_attendance"`n        ],`n        "0 5 24 * *": [`n            "victoryfarmsdeveloper.victoryfarmsdeveloper.doctype.tardiness_record.tardiness_record.send_monthly_hr_tardiness_report"`n        ],`n        "10 6 * * *": [`n            "victoryfarmsdeveloper.notifications.scorecard.send_probation_review_notifications"`n        ],`n        # Daily valuation-rate fluctuation report to Finance at 06:00`n        "0 6 * * *": [`n            "victoryfarmsdeveloper.notifications.valuation_fluctuation.check_valuation_fluctuations"`n        ]`n    }`n}`n`n`ndoc_events = {`n    "Asset": {`n        "autoname": "victoryfarmsdeveloper.custom_scripts.server_scripts.asset.autoname"`n        # "validate": "victoryfarmsdeveloper.custom_scripts.server_scripts.asset.calculate_asset_value_from_purchase_receipt"`n    },`n    "Sales Invoice": {`n        "on_change": "victoryfarmsdeveloper.notifications.sales_invoice_status_change.sales_invoice_status_change"`n    },`n    "Purchase Order": {`n        "on_update": "victoryfarmsdeveloper.notifications.po_pending_approval.send_po_approved_notification"`n    },`n    "Leave Application": {`n        "on_update": "victoryfarmsdeveloper.notifications.leave_balance_update_check.queue_leave_balance_update_check"`n    },`n    "Appraisal": {`n        "on_update": "victoryfarmsdeveloper.notifications.scorecard.queue_appraisal_notifications"`n    },`n    "Stock Entry": {`n        "before_save": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_save_stock_entry",`n        "before_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_submit_stock_entry"`n    },`n    "Employee": {`n        "after_insert": "victoryfarmsdeveloper.custom_scripts.server_scripts.leave_allocation.create_leave_allocation_for_new_employee",`n        "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.employee.employee.validate_mandatory_fields"`n    },`n    "Payment Entry": {`n        "validate": [`n            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payment_entry.payment_entry.set_beneficiary_purpose_of_payment",`n            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payment_entry.payment_entry.set_paid_amount_from_beneficiaries",`n        ]`n    },`n    "Purchase Receipt": {`n        "validate": "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.validate_purchase_receipt"`n    },`n    "Expense Claim": {`n        "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.validate_expense_claim",`n        "before_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.before_submit_expense_claim",`n        "on_update": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.on_expense_claim_update"`n    },`n    "Salary Slip": {`n        "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.sync_additional_salary_notes",`n        "on_update": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.sync_additional_salary_notes",`n        "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.create_journal_entry_on_submit",`n        "on_cancel": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.unlink_journal_entry_on_cancel"`n       }`n}`n`n`n# Testing`n# -------`n`n# before_tests = "victoryfarmsdeveloper.install.before_tests"`n`n# Overriding Methods`n# ------------------------------`n#`n# override_whitelisted_methods = {`n# 	"frappe.desk.doctype.event.event.get_events": "victoryfarmsdeveloper.event.get_events"`n# }`noverride_whitelisted_methods = {`n    "erpnext.stock.doctype.stock_entry.stock_entry.make_stock_in_entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.make_stock_in_entry"`n}`n#`n# each overriding function accepts a `data` argument;`n# generated from the base implementation of the doctype dashboard,`n# along with any modifications made in other Frappe apps`noverride_doctype_dashboards = {`n    "Purchase Invoice": "victoryfarmsdeveloper.dashboard_overrides.get_dashboard_data_for_purchase_invoice",`n    "Travel Allowance Claim": "victoryfarmsdeveloper.dashboard_overrides.get_dashboard_data_for_travel_allowance_claim",`n}`n# override_doctype_dashboards = {`n# 	"Task": "victoryfarmsdeveloper.task.get_dashboard_data"`n# }`n# exempt linked doctypes from being automatically cancelled`n#`n# auto_cancel_exempted_doctypes = ["Auto Repeat"]`n`n# Ignore links to specified DocTypes when deleting documents`n# -----------------------------------------------------------`n`n# ignore_links_on_delete = ["Communication", "ToDo"]`n`n# Request Events`n# ----------------`n# before_request = ["victoryfarmsdeveloper.utils.before_request"]`n# after_request = ["victoryfarmsdeveloper.utils.after_request"]`n`n# Job Events`n# ----------`n# before_job = ["victoryfarmsdeveloper.utils.before_job"]`n# after_job = ["victoryfarmsdeveloper.utils.after_job"]`n`n# User Data Protection`n# --------------------`n`n# user_data_fields = [`n# 	{`n# 		"doctype": "{doctype_1}",`n# 		"filter_by": "{filter_by}",`n# 		"redact_fields": ["{field_1}", "{field_2}"],`n# 		"partial": 1,`n# 	},`n# 	{`n# 		"doctype": "{doctype_2}",`n# 		"filter_by": "{filter_by}",`n# 		"partial": 1,`n# 	},`n# 	{`n# 		"doctype": "{doctype_3}",`n# 		"strict": False,`n# 	},`n# 	{`n# 		"doctype": "{doctype_4}"`n# 	}`n# ]`n`n# Authentication and authorization`n# --------------------------------`n`n# auth_hooks = [`n# 	"victoryfarmsdeveloper.auth.validate"`n# ]`n`n# Automatically update python controller files with type annotations for this app.`n# export_python_type_annotations = True`n`n# default_log_clearing_doctypes = {`n# 	"Logging DocType Name": 30  # days to retain logs`n# }`n`n`n
+app_name = "victoryfarmsdeveloper"
+app_title = "VictoryFarmsDeveloper"
+app_publisher = "Christine K"
+app_description = "VictoryFarmsDeveloper"
+app_email = "christinek@victoryfarmskenya.com"
+app_license = "mit"
+app_include = ["erpnext"]
+required_apps = ["frappe", "erpnext"]
+
+fixtures = [
+    "Document Naming Settings",
+    {"dt": "Client Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+    {"dt": "Server Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+    {"dt": "Custom Field", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+    {"dt": "Property Setter", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+]
+
+
+# Includes in <head>
+# ------------------
+
+# include js, css files in header of desk.html
+# app_include_css = "/assets/victoryfarmsdeveloper/css/victoryfarmsdeveloper.css"
+# app_include_js = "/assets/victoryfarmsdeveloper/js/victoryfarmsdeveloper.js"
+
+# include js, css files in header of web template
+# web_include_css = "/assets/victoryfarmsdeveloper/css/victoryfarmsdeveloper.css"
+# web_include_js = "/assets/victoryfarmsdeveloper/js/victoryfarmsdeveloper.js"
+
+# include custom scss in every website theme (without file extension ".scss")
+# website_theme_scss = "victoryfarmsdeveloper/public/scss/website"
+
+# include js, css files in header of web form
+# webform_include_js = {"doctype": "public/js/doctype.js"}
+# webform_include_css = {"doctype": "public/css/doctype.css"}
+
+# include js in page
+# page_js = {"page" : "public/js/file.js"}
+app_include_js = [
+    "/assets/victoryfarmsdeveloper/js/stock_entry.js"
+]
+
+# include js in doctype views
+# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {
+    "Stock Entry": "victoryfarmsdeveloper/customization/stock_entry_item_break_down/stock_entry_item_break_down.js",
+    "Landed Cost Voucher": "victoryfarmsdeveloper/public/js/landed_cost_voucher.js",
+    "Leave Application": "public/js/leave_application.js",
+    "Payment Entry": "public/js/payment_entry.js"
+}
+# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
+doctype_list_js = {
+    "Leave Application" : "public/js/leave_application_list.js"}
+# doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
+# doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
+
+# Svg Icons
+# ------------------
+# include app icons in desk
+# app_include_icons = "victoryfarmsdeveloper/public/icons.svg"
+
+# Home Pages
+# ----------
+
+# application home page (will override Website Settings)
+# home_page = "login"
+
+# website user home page (by Role)
+# role_home_page = {
+# 	"Role": "home_page"
+# }
+
+# Generators
+# ----------
+
+# automatically create page for each record of this doctype
+# website_generators = ["Web Page"]
+
+# Jinja
+# ----------
+
+# add methods and filters to jinja environment
+# jinja = {
+# 	"methods": "victoryfarmsdeveloper.utils.jinja_methods",
+# 	"filters": "victoryfarmsdeveloper.utils.jinja_filters"
+# }
+
+# Installation
+# ------------
+
+# before_install = "victoryfarmsdeveloper.install.before_install"
+# after_install = "victoryfarmsdeveloper.install.after_install"
+
+after_migrate = [
+    "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.enforce",
+    "victoryfarmsdeveloper.setup.suvac_processing_fields.enforce",
+    "victoryfarmsdeveloper.setup.weighbridge_layout.enforce"
+]
+
+# Uninstallation
+# ------------
+
+# before_uninstall = "victoryfarmsdeveloper.uninstall.before_uninstall"
+# after_uninstall = "victoryfarmsdeveloper.uninstall.after_uninstall"
+
+# Integration Setup
+# ------------------
+# To set up dependencies/integrations with other apps
+# Name of the app being installed is passed as an argument
+
+# before_app_install = "victoryfarmsdeveloper.utils.before_app_install"
+# after_app_install = "victoryfarmsdeveloper.utils.after_app_install"
+
+# Integration Cleanup
+# -------------------
+# To clean up dependencies/integrations with other apps
+# Name of the app being uninstalled is passed as an argument
+
+# before_app_uninstall = "victoryfarmsdeveloper.utils.before_app_uninstall"
+# after_app_uninstall = "victoryfarmsdeveloper.utils.after_app_uninstall"
+
+# Desk Notifications
+# ------------------
+# See frappe.core.notifications.get_notification_config
+
+notification_config = "victoryfarmsdeveloper.notifications.get_notification_config"
+
+# Permissions
+# -----------
+# Permissions evaluated in scripted ways
+
+# permission_query_conditions = {
+# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
+# }
+#
+# has_permission = {
+# 	"Event": "frappe.desk.doctype.event.event.has_permission",
+# }
+
+permission_query_conditions = {
+    "Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal.appraisal.get_permission_query_conditions",
+    "Department Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.department_appraisal.department_appraisal.get_permission_query_conditions"
+}
+
+has_permission = {
+    "Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal.appraisal.has_permission",
+    "Department Appraisal": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.department_appraisal.department_appraisal.has_permission"
+}
+# DocType Class
+# ---------------
+# Override standard doctype classes
+
+# override_doctype_class = {
+# 	"ToDo": "custom_app.overrides.CustomToDo"
+# }
+override_doctype_class = {
+    "Stock Entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.CustomStockEntry",
+    "Appraisal Cycle": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_cycle.appraisal_cycle.CustomAppraisalCycle",
+    "Appraisal Payout": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.appraisal_payout.appraisal_payout.CustomAppraisalPayout",
+    "Landed Cost Voucher": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.landed_cost_voucher.landed_cost_voucher.CustomLandedCostVoucher",
+    "Employee Checkin": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.employee_checkin.employee_checkin.CustomEmployeeCheckin",
+    # "Leave Application": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.leave_application.leave_application.CustomLeaveApplication"
+}
+# Document Events
+# ---------------
+# Hook on document methods and events
+
+# doc_events = {
+# 	"*": {
+# 		"on_update": "method",
+# 		"on_cancel": "method",
+# 		"on_trash": "method"
+# 	}
+# }
+# doc_events = {
+#     "Stock Entry": {
+#         "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.on_submit"
+#     }
+# }
+
+# Scheduled Tasks
+# ---------------
+
+# scheduler_events = {
+# 	"all": [
+# 		"victoryfarmsdeveloper.tasks.all"
+# 	],
+# 	"daily": [
+# 		"victoryfarmsdeveloper.tasks.daily"
+# 	],
+# 	"hourly": [
+# 		"victoryfarmsdeveloper.tasks.hourly"
+# 	],
+# 	"weekly": [
+# 		"victoryfarmsdeveloper.tasks.weekly"
+# 	],
+# 	"monthly": [
+# 		"victoryfarmsdeveloper.tasks.monthly"
+# 	],
+# }
+
+scheduler_events = {
+    "daily": [
+        "victoryfarmsdeveloper.notifications.check_low_stock.check_branch_low_stock",
+        "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check",
+        "victoryfarmsdeveloper.notifications.leave_balance_update_check.process_checkins_without_shift",
+        "victoryfarmsdeveloper.notifications.scorecard.send_pending_appraisal_notifications"
+    ],
+    "cron": {
+        "0 7 * * *": [
+            "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check"
+        ],
+        "0 23 * * *": [
+            "victoryfarmsdeveloper.notifications.po_pending_approval.send_pending_po_notifications"
+        ],
+        # "0 12,15 * * *": [
+        #     "victoryfarmsdeveloper.notifications.check_low_stock.check_branch_low_stock"
+        # ],
+        "0 0 28-31 * *": [
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.doctype.sacco_loan_deduction.sacco_loan_deduction.create_remaining_payments"
+        ],
+        "0 0 1 * *": [
+            "victoryfarmsdeveloper.notifications.leave_balance_update_check.create_long_weekend_leave_allocation"
+        ],
+        "30 8 25-31 * *": [
+            "victoryfarmsdeveloper.notifications.scorecard.send_pending_appraisal_notifications"
+        ],
+        "0 17 * * 0": [
+            "victoryfarmsdeveloper.notifications.po_pending_approval.notify_old_pos"
+        ],
+        # Generate LDCs on 15th of Mar/Jun/Sep/Dec at 05:30
+        "30 5 15 3,6,9,12 *": [
+            "victoryfarmsdeveloper.notifications.ldc.generate_quarterly_ldcs"
+        ],
+        # Send reminder on 26th of Mar/Jun/Sep/Dec at 06:30
+        "30 6 26 3,6,9,12 *": [
+            "victoryfarmsdeveloper.notifications.ldc.send_ldc_reminders"
+        ],
+        "59 23 28-31 * *": [
+            "victoryfarmsdeveloper.notifications.po_pending_approval.auto_freeze_old_pos"
+        ],
+        "0 5 * * *": [
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.doctype.tardiness_record.tardiness_record.process_daily_attendance"
+        ],
+        "0 5 24 * *": [
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.doctype.tardiness_record.tardiness_record.send_monthly_hr_tardiness_report"
+        ],
+        "10 6 * * *": [
+            "victoryfarmsdeveloper.notifications.scorecard.send_probation_review_notifications"
+        ],
+        # Daily valuation-rate fluctuation report to Finance at 06:00
+        "0 6 * * *": [
+            "victoryfarmsdeveloper.notifications.valuation_fluctuation.check_valuation_fluctuations"
+        ]
+    }
+}
+
+
+doc_events = {
+    "Asset": {
+        "autoname": "victoryfarmsdeveloper.custom_scripts.server_scripts.asset.autoname"
+        # "validate": "victoryfarmsdeveloper.custom_scripts.server_scripts.asset.calculate_asset_value_from_purchase_receipt"
+    },
+    "Sales Invoice": {
+        "on_change": "victoryfarmsdeveloper.notifications.sales_invoice_status_change.sales_invoice_status_change"
+    },
+    "Purchase Order": {
+        "on_update": "victoryfarmsdeveloper.notifications.po_pending_approval.send_po_approved_notification"
+    },
+    "Leave Application": {
+        "on_update": "victoryfarmsdeveloper.notifications.leave_balance_update_check.queue_leave_balance_update_check"
+    },
+    "Appraisal": {
+        "on_update": "victoryfarmsdeveloper.notifications.scorecard.queue_appraisal_notifications"
+    },
+    "Stock Entry": {
+        "before_save": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_save_stock_entry",
+        "before_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_submit_stock_entry"
+    },
+    "Employee": {
+        "after_insert": "victoryfarmsdeveloper.custom_scripts.server_scripts.leave_allocation.create_leave_allocation_for_new_employee",
+        "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.employee.employee.validate_mandatory_fields"
+    },
+    "Payment Entry": {
+        "validate": [
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payment_entry.payment_entry.set_beneficiary_purpose_of_payment",
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payment_entry.payment_entry.set_paid_amount_from_beneficiaries",
+        ]
+    },
+    "Purchase Receipt": {
+        "validate": "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.validate_purchase_receipt"
+    },
+    "Expense Claim": {
+        "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.validate_expense_claim",
+        "before_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.before_submit_expense_claim",
+        "on_update": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.on_expense_claim_update"
+    },
+    "Salary Slip": {
+        "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.sync_additional_salary_notes",
+        "on_update": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.sync_additional_salary_notes",
+        "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.create_journal_entry_on_submit",
+        "on_cancel": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.unlink_journal_entry_on_cancel"
+       }
+}
+
+
+# Testing
+# -------
+
+# before_tests = "victoryfarmsdeveloper.install.before_tests"
+
+# Overriding Methods
+# ------------------------------
+#
+# override_whitelisted_methods = {
+# 	"frappe.desk.doctype.event.event.get_events": "victoryfarmsdeveloper.event.get_events"
+# }
+override_whitelisted_methods = {
+    "erpnext.stock.doctype.stock_entry.stock_entry.make_stock_in_entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.make_stock_in_entry"
+}
+#
+# each overriding function accepts a `data` argument;
+# generated from the base implementation of the doctype dashboard,
+# along with any modifications made in other Frappe apps
+override_doctype_dashboards = {
+    "Purchase Invoice": "victoryfarmsdeveloper.dashboard_overrides.get_dashboard_data_for_purchase_invoice",
+    "Travel Allowance Claim": "victoryfarmsdeveloper.dashboard_overrides.get_dashboard_data_for_travel_allowance_claim",
+}
+# override_doctype_dashboards = {
+# 	"Task": "victoryfarmsdeveloper.task.get_dashboard_data"
+# }
+# exempt linked doctypes from being automatically cancelled
+#
+# auto_cancel_exempted_doctypes = ["Auto Repeat"]
+
+# Ignore links to specified DocTypes when deleting documents
+# -----------------------------------------------------------
+
+# ignore_links_on_delete = ["Communication", "ToDo"]
+
+# Request Events
+# ----------------
+# before_request = ["victoryfarmsdeveloper.utils.before_request"]
+# after_request = ["victoryfarmsdeveloper.utils.after_request"]
+
+# Job Events
+# ----------
+# before_job = ["victoryfarmsdeveloper.utils.before_job"]
+# after_job = ["victoryfarmsdeveloper.utils.after_job"]
+
+# User Data Protection
+# --------------------
+
+# user_data_fields = [
+# 	{
+# 		"doctype": "{doctype_1}",
+# 		"filter_by": "{filter_by}",
+# 		"redact_fields": ["{field_1}", "{field_2}"],
+# 		"partial": 1,
+# 	},
+# 	{
+# 		"doctype": "{doctype_2}",
+# 		"filter_by": "{filter_by}",
+# 		"partial": 1,
+# 	},
+# 	{
+# 		"doctype": "{doctype_3}",
+# 		"strict": False,
+# 	},
+# 	{
+# 		"doctype": "{doctype_4}"
+# 	}
+# ]
+
+# Authentication and authorization
+# --------------------------------
+
+# auth_hooks = [
+# 	"victoryfarmsdeveloper.auth.validate"
+# ]
+
+# Automatically update python controller files with type annotations for this app.
+# export_python_type_annotations = True
+
+# default_log_clearing_doctypes = {
+# 	"Logging DocType Name": 30  # days to retain logs
+# }
+
+
