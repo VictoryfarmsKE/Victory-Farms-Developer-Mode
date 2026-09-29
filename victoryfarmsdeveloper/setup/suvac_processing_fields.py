@@ -233,21 +233,42 @@ def ensure_workflow_rules():
         frappe.db.set_value("Workflow Transition", row.name, "condition", condition, update_modified=False)
         excluded += 1
 
-    if added or excluded:
+    repaired = repair_row_defaults(workflow)
+
+    if added or excluded or repaired:
         frappe.clear_cache(doctype="Stock Entry")
         print(
-            "VictoryFarmsDeveloper: {0} workflow: added {1} row(s), kept {2} rule(s) off {3}".format(
-                WORKFLOW, added, excluded, BLAST_TRANSFER
-            )
+            "VictoryFarmsDeveloper: {0} workflow: added {1} row(s), kept {2} rule(s) off {3}, "
+            "fixed defaults on {4} row(s)".format(WORKFLOW, added, excluded, BLAST_TRANSFER, repaired)
         )
+
+
+def repair_row_defaults(workflow):
+    # Rows added before add_child used new_doc missed their defaults. Without self approval the
+    # person who created the transfer never sees Send for Confirmation.
+    repaired = 0
+
+    for row in workflow.transitions:
+        if row.condition == IS_BLAST and not row.allow_self_approval:
+            frappe.db.set_value("Workflow Transition", row.name, "allow_self_approval", 1, update_modified=False)
+            repaired += 1
+
+    ours = {(row["state"], row["allow_edit"]) for row in WORKFLOW_STATES}
+    for row in workflow.states:
+        if (row.state, row.allow_edit) in ours and not row.send_email:
+            frappe.db.set_value("Workflow Document State", row.name, "send_email", 1, update_modified=False)
+            repaired += 1
+
+    return repaired
 
 
 def add_child(workflow, parentfield, doctype, values):
     idx = frappe.db.count(doctype, {"parent": workflow.name, "parentfield": parentfield}) + 1
-    child = frappe.get_doc(
+    # new_doc fills the doctype defaults (allow_self_approval, send_email) that get_doc skips.
+    child = frappe.new_doc(doctype)
+    child.update(
         dict(
             values,
-            doctype=doctype,
             parent=workflow.name,
             parenttype="Workflow",
             parentfield=parentfield,
