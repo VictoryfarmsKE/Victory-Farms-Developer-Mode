@@ -222,6 +222,7 @@ def get_permission_condition(current_user, roles):
     full_access_roles = {
         "System Manager",
         "Executive Manager",
+        "PO-Report-User"
     }
 
     if roles.intersection(full_access_roles):
