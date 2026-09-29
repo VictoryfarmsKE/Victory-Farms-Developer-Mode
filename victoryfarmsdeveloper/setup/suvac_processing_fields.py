@@ -50,10 +50,11 @@ CUSTOM_FIELDS = {
 }
 
 BLAST_TRANSFER = "Fish Transfer from Processing to SUVAC Blast"
+SUVAC_PROCESSING = "Fish Processing SUVAC"
 
 STOCK_ENTRY_TYPES = [
     {"name": "Fish Transfer From FLC To Dispatch", "purpose": "Material Transfer"},
-    {"name": "Fish Processing SUVAC", "purpose": "Repack"},
+    {"name": SUVAC_PROCESSING, "purpose": "Repack"},
     {"name": BLAST_TRANSFER, "purpose": "Material Transfer", "add_to_transit": 1},
     {"name": "Fish Transfer from Cold Room to SUVAC Dispatch Room", "purpose": "Material Transfer"},
 ]
@@ -140,6 +141,25 @@ def ensure_stock_entry_types():
         doc.update(entry_type)
         doc.insert(ignore_permissions=True)
         print("VictoryFarmsDeveloper: created Stock Entry Type {0}".format(entry_type["name"]))
+
+    ensure_difference_account()
+
+
+def ensure_difference_account():
+    # SUVAC processing books its difference the same way as the old Fish Processing type on each site.
+    field = "custom_default_difference_account"
+    if not frappe.get_meta("Stock Entry Type").has_field(field):
+        return
+
+    if frappe.db.get_value("Stock Entry Type", SUVAC_PROCESSING, field):
+        return
+
+    account = frappe.db.get_value("Stock Entry Type", "Fish Processing", field)
+    if not account:
+        return
+
+    frappe.db.set_value("Stock Entry Type", SUVAC_PROCESSING, field, account)
+    print("VictoryFarmsDeveloper: {0} difference account set to {1}".format(SUVAC_PROCESSING, account))
 
 
 def ensure_driver_rule():
