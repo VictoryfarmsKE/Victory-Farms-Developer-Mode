@@ -36,14 +36,14 @@ fixtures = [
 
 # include js in page
 # page_js = {"page" : "public/js/file.js"}
-app_include_js = [
-    "/assets/victoryfarmsdeveloper/js/stock_entry.js"
-]
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 doctype_js = {
-    "Stock Entry": "victoryfarmsdeveloper/customization/stock_entry_item_break_down/stock_entry_item_break_down.js",
+    "Stock Entry": [
+        "victoryfarmsdeveloper/customization/stock_entry_item_break_down/stock_entry_item_break_down.js",
+        "public/js/stock_entry.js"
+    ],
     "Landed Cost Voucher": "victoryfarmsdeveloper/public/js/landed_cost_voucher.js",
     "Leave Application": "public/js/leave_application.js",
     "Payment Entry": "public/js/payment_entry.js"
