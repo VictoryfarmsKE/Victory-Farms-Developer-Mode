@@ -2,7 +2,7 @@ import frappe
 from erpnext.stock.doctype.stock_entry.stock_entry import StockEntry
 from frappe import _
 from erpnext.stock.doctype.stock_entry.stock_entry import make_stock_in_entry as original_make_stock_in_entry
-from frappe.utils import nowdate, flt
+from frappe.utils import cint, nowdate, flt
 from victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.weighbridge import check_weighbridge
 
 
@@ -263,6 +263,19 @@ def clear_processing_line(doc):
             item.custom_line = None
 
 
+def require_processing_line(doc):
+    # One entry per line, so every row needs the line it was harvested or processed on.
+    if doc.stock_entry_type not in PROCESSING_LINE_TYPES:
+        return
+
+    missing = [str(item.idx) for item in doc.items if cint(item.get("custom_line")) < 1]
+    if missing:
+        frappe.throw(
+            _("Enter the Processing Line (1 or more) on row(s) {0}").format(", ".join(missing)),
+            title=_("Processing Line required"),
+        )
+
+
 def set_blast_warehouses(doc):
     # Truck warehouse is the blast freezer; the fish ends up in the cold room.
     if doc.stock_entry_type != BLAST_TRANSFER:
@@ -306,6 +319,7 @@ def on_submit_stock_entry(doc, method):
 
 def before_save_stock_entry(doc, method):
         clear_processing_line(doc)
+        require_processing_line(doc)
         set_blast_warehouses(doc)
 
         #Get previous workflow state
