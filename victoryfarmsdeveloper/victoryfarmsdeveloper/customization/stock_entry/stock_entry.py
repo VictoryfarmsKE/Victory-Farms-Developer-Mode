@@ -250,6 +250,7 @@ def make_stock_in_entry(source_name, target_doc=None):
     return original_make_stock_in_entry(source_name, target_doc)
 
 PROCESSING_LINE_TYPES = ("Harvesting of Fish", "Fish Processing SUVAC")
+REQUIRED_LINE_TYPES = ("Fish Processing SUVAC",)
 BLAST_TRANSFER = "Fish Transfer from Processing to SUVAC Blast"
 SUVAC_BLAST = "SUVAC Blast - VFL"
 SUVAC_COLD_ROOM = "SUVAC Cold Room - VFL"
@@ -264,8 +265,7 @@ def clear_processing_line(doc):
 
 
 def require_processing_line(doc):
-    # One entry per line, so every row needs the line it was harvested or processed on.
-    if doc.stock_entry_type not in PROCESSING_LINE_TYPES:
+    if doc.stock_entry_type not in REQUIRED_LINE_TYPES:
         return
 
     missing = [str(item.idx) for item in doc.items if cint(item.get("custom_line")) < 1]
