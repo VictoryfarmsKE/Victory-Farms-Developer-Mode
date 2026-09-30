@@ -289,6 +289,7 @@ doc_events = {
     "Payment Entry": {
         "validate": [
             "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payment_entry.payment_entry.set_beneficiary_purpose_of_payment",
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payment_entry.payment_entry.set_beneficiary_total",
         ]
     },
     "Purchase Receipt": {
