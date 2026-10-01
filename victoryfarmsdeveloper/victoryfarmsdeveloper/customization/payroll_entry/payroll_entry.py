@@ -34,8 +34,6 @@ def create_journal_entry_on_submit(doc, method=None):
         fields=[
             "name",
             "gross_pay",
-            "cost_center",
-            "payroll_cost_center",
             "employee",
         ],
     )
@@ -192,11 +190,10 @@ def _je_line(
 
 
 def _resolve_cost_center(slip, employee_cost_centers, payroll_entry):
-    return (
-        slip.get("payroll_cost_center")
-        or slip.get("cost_center")
-        or employee_cost_centers.get(slip.get("employee"))
-        or getattr(payroll_entry, "cost_center", None)
+    """Salary Slip has no cost-center columns; resolve through the
+    employee's payroll cost center, falling back to the Payroll Entry's."""
+    return employee_cost_centers.get(slip.get("employee")) or getattr(
+        payroll_entry, "cost_center", None
     )
 
 
