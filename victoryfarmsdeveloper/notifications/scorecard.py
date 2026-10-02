@@ -4,6 +4,15 @@ from datetime import datetime, timedelta
 
 def send_pending_appraisal_notifications(batch_size=10):
     try:
+        today = frappe.utils.getdate()
+        if frappe.db.exists(
+            "Email Queue",
+            {
+                "subject": ["like", "REMINDER: Scorecard Submission%"],
+                "creation": [">", today],
+            },
+        ):
+            return
         current_cycle = datetime.today().strftime("%B %Y")
         pending_appraisals = frappe.get_all(
             "Appraisal",
@@ -157,6 +166,8 @@ def send_probation_review_notifications():
 
 
 def queue_appraisal_notifications(doc, method):
+    if not doc.has_value_changed("workflow_state"):
+        return
     if getattr(doc, "workflow_state", None) not in ["Approved", "To Amend", "Cancelled"]:
         frappe.enqueue(
             "victoryfarmsdeveloper.notifications.scorecard.send_pending_appraisal_notifications",
