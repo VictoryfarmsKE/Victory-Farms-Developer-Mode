@@ -166,6 +166,7 @@ def send_probation_review_notifications():
 
 
 def queue_appraisal_notifications(doc, method):
+    doc.load_doc_before_save()
     if not doc.has_value_changed("workflow_state"):
         return
     if getattr(doc, "workflow_state", None) not in ["Approved", "To Amend", "Cancelled"]:
