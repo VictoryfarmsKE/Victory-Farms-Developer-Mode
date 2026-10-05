@@ -8,7 +8,7 @@ def send_pending_appraisal_notifications(batch_size=10):
         if frappe.db.exists(
             "Email Queue",
             {
-                "subject": ["like", "REMINDER: Scorecard Submission%"],
+                "message": ["%Late Score Card Submission will reflect on the Manager's score card.%",],
                 "creation": [">", today],
             },
         ):
@@ -165,15 +165,15 @@ def send_probation_review_notifications():
         )
 
 
-def queue_appraisal_notifications(doc, method):
-    if not doc.has_value_changed("workflow_state"):
-        return
-    if getattr(doc, "workflow_state", None) not in ["Approved", "To Amend", "Cancelled"]:
-        frappe.enqueue(
-            "victoryfarmsdeveloper.notifications.scorecard.send_pending_appraisal_notifications",
-            queue="short",
-            timeout=600,
-            is_async=True,
-            job_name=f"Appraisal notification queue for {doc.name}"
-        )
+# def queue_appraisal_notifications(doc, method):
+#     if not doc.has_value_changed("workflow_state"):
+#         return
+#     if getattr(doc, "workflow_state", None) not in ["Approved", "To Amend", "Cancelled"]:
+#         frappe.enqueue(
+#             "victoryfarmsdeveloper.notifications.scorecard.send_pending_appraisal_notifications",
+#             queue="short",
+#             timeout=600,
+#             is_async=True,
+#             job_name=f"Appraisal notification queue for {doc.name}"
+#         )
 
