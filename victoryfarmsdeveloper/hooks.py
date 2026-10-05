@@ -202,7 +202,7 @@ scheduler_events = {
         "victoryfarmsdeveloper.notifications.check_low_stock.check_branch_low_stock",
         "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check",
         "victoryfarmsdeveloper.notifications.leave_balance_update_check.process_checkins_without_shift",
-        "victoryfarmsdeveloper.notifications.scorecard.send_pending_appraisal_notifications"
+        #"victoryfarmsdeveloper.notifications.scorecard.send_pending_appraisal_notifications"
     ],
     "cron": {
         "0 7 * * *": [
