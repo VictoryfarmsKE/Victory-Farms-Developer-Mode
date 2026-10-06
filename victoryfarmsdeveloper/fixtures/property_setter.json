@@ -118,5 +118,20 @@
   "property_type": "Text",
   "row_name": null,
   "value": ""
+ },
+ {
+  "default_value": null,
+  "doc_type": "Expense Claim",
+  "docstatus": 0,
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "payable_account",
+  "modified": "2026-09-14 00:00:00.000000",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Expense Claim-payable_account-reqd",
+  "property": "reqd",
+  "property_type": "Check",
+  "row_name": null,
+  "value": "0"
  }
 ]
