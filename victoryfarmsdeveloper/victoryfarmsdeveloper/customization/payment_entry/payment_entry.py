@@ -109,19 +109,17 @@ def validate_beneficiary_fields(doc, method=None):
             )
 
 
-def set_paid_amount_from_beneficiaries(doc, method=None):
-    """Auto-calculate Paid Amount from beneficiary rows for Mpesa payments.
+def set_beneficiary_total(doc, method=None):
+    """Compute Total Beneficiary Amount from beneficiary rows.
 
-    Other upload types (EFT, RTGS, International Payments) are left untouched.
+    Display-only total; paid_amount stays user-controlled and unallocated
+    amount follows standard ERPNext allocation behaviour.
     """
-    if doc.get("custom_upload_type") != "Mpesa":
-        return
-
     beneficiaries = doc.get("custom_beneficiaries") or []
     total = flt(sum(flt(row.get("amount")) for row in beneficiaries))
 
-    if doc.paid_amount != total:
-        doc.paid_amount = total
+    if doc.get("custom_beneficiary_total") != total:
+        doc.custom_beneficiary_total = total
 
 
 @frappe.whitelist()

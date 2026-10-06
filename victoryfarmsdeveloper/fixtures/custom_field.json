@@ -2035,6 +2035,21 @@
     {
         "docstatus":  0,
         "doctype":  "Custom Field",
+        "dt":  "Payment Entry",
+        "fieldname":  "custom_beneficiary_total",
+        "fieldtype":  "Currency",
+        "insert_after":  "custom_beneficiaries",
+        "label":  "Total Beneficiary Amount",
+        "options":  "KES",
+        "read_only":  1,
+        "reqd":  0,
+        "modified":  "2026-09-30 00:00:00.000000",
+        "module":  "VictoryFarmsDeveloper",
+        "name":  "Payment Entry-custom_beneficiary_total"
+    },
+    {
+        "docstatus":  0,
+        "doctype":  "Custom Field",
         "dt":  "Additional Salary",
         "fieldname":  "custom_note",
         "fieldtype":  "Small Text",
