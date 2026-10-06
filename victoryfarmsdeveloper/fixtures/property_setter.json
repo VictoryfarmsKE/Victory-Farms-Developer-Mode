@@ -1,6 +1,21 @@
 [
  {
   "default_value": null,
+  "doc_type": "Mpesa Payment Register",
+  "docstatus": 0,
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "transid",
+  "modified": "2026-10-06 00:00:00.000000",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Mpesa Payment Register-transid-search_index",
+  "property": "search_index",
+  "property_type": "Check",
+  "row_name": null,
+  "value": "1"
+ },
+ {
+  "default_value": null,
   "doc_type": "Employee",
   "docstatus": 0,
   "doctype": "Property Setter",
