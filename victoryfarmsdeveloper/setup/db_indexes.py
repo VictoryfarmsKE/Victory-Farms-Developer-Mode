@@ -6,6 +6,21 @@ FIELD_INDEXES = (
 	("POS Invoice", "pos_profile"),
 	("Mpesa Payment Register", "transid"),
 )
+COMPOSITE_INDEXES = (
+	(
+		"GL Entry",
+		"gl_month_summary_index",
+		(
+			"posting_date",
+			"docstatus",
+			"is_cancelled",
+			"account",
+			"cost_center",
+			"debit_in_account_currency",
+			"credit_in_account_currency",
+		),
+	),
+)
 
 
 def enforce():
@@ -17,6 +32,9 @@ def enforce():
 		for doctype, fieldname in FIELD_INDEXES:
 			if frappe.db.table_exists(doctype) and frappe.db.has_column(doctype, fieldname):
 				ensure_index(doctype, fieldname, f"{fieldname}_index")
+		for doctype, index_name, fieldnames in COMPOSITE_INDEXES:
+			if frappe.db.table_exists(doctype):
+				ensure_composite_index(doctype, index_name, fieldnames)
 	finally:
 		frappe.db.sql(f"SET SESSION lock_wait_timeout = {int(previous_wait)}")
 
@@ -39,6 +57,15 @@ def ensure_index(doctype, fieldname, index_name):
 		return
 	try:
 		frappe.db.add_index(doctype, [fieldname], index_name=index_name)
+	except Exception as e:
+		print(f"Skipped index {index_name} on {doctype}, will retry on next migrate: {e}")
+
+
+def ensure_composite_index(doctype, index_name, fieldnames):
+	if frappe.db.has_index(f"tab{doctype}", index_name):
+		return
+	try:
+		frappe.db.add_index(doctype, list(fieldnames), index_name=index_name)
 	except Exception as e:
 		print(f"Skipped index {index_name} on {doctype}, will retry on next migrate: {e}")
 
