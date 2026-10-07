@@ -32,6 +32,31 @@ def _is_any_row_taxable(doc):
     )
 
 
+EXPENSE_CLAIM_PRIVILEGED_ROLES = ("HR Manager", "Expense Approver", "System Manager")
+
+
+def _enforce_own_claim(doc):
+    """Restrict employees to filing expense claims only for themselves.
+
+    Users with privileged HR roles may file on behalf of other employees.
+    Everyone else must file against the Employee record linked to their
+    own user account.
+    """
+    if doc.is_new() is False:
+        return
+
+    if set(frappe.get_roles(frappe.session.user)) & set(EXPENSE_CLAIM_PRIVILEGED_ROLES):
+        return
+
+    own_employee = frappe.db.get_value(
+        "Employee", {"user_id": frappe.session.user}, "name"
+    )
+    if own_employee and doc.employee != own_employee:
+        frappe.throw(
+            _("You can only create an expense claim for yourself ({0}).").format(own_employee)
+        )
+
+
 def validate_expense_claim(doc, method=None):
     """Prepare Development Allowance claims before saving.
 
@@ -40,6 +65,8 @@ def validate_expense_claim(doc, method=None):
     Salary, so we auto-fill the company's default payable account to satisfy the
     validation without forcing the user to select one.
     """
+    _enforce_own_claim(doc)
+
     if not _has_development_allowance_rows(doc):
         return
 
