@@ -155,18 +155,21 @@ def create_journal_entry_on_submit(doc, method=None):
         }
     )
     je.insert(ignore_permissions=True)
-    je.submit()
 
 
 def cancel_journal_entry_on_cancel(doc, method=None):
-    """Cancel the consolidated Journal Entry created for this Payroll Entry."""
+    """Remove the consolidated Journal Entry created for this Payroll Entry:
+    cancel it if it was already submitted, delete it while still a draft."""
     remark = JE_REMARK_TEMPLATE.format(doc.name)
-    for je_name in frappe.get_all(
+    for je in frappe.get_all(
         "Journal Entry",
-        filters={"user_remark": remark, "docstatus": 1},
-        pluck="name",
+        filters={"user_remark": remark, "docstatus": ["<", 2]},
+        fields=["name", "docstatus"],
     ):
-        frappe.get_doc("Journal Entry", je_name).cancel()
+        if je.docstatus == 1:
+            frappe.get_doc("Journal Entry", je.name).cancel()
+        else:
+            frappe.delete_doc("Journal Entry", je.name, ignore_permissions=True)
 
 
 def _je_line(
