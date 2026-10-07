@@ -5,6 +5,7 @@ LOCK_WAIT_SECONDS = 60
 FIELD_INDEXES = (
 	("POS Invoice", "pos_profile"),
 	("Mpesa Payment Register", "transid"),
+	("Sales Invoice", "status"),
 )
 COMPOSITE_INDEXES = (
 	(
