@@ -29,6 +29,17 @@ function set_beneficiary_total(frm) {
     if (frm.doc.custom_beneficiary_total !== total) {
         frm.set_value('custom_beneficiary_total', total);
     }
+
+    // Default Paid Amount to the beneficiary total; it keeps tracking the
+    // total until the user types a different value manually, then it is
+    // never touched again.
+    const paid = flt(frm.doc.paid_amount);
+    if (!paid || paid === flt(frm.__beneficiary_total)) {
+        frm.__beneficiary_total = total;
+        if (total && paid !== total) {
+            frm.set_value('paid_amount', total);
+        }
+    }
 }
 
 frappe.ui.form.on('Payment Entry Reference', {
