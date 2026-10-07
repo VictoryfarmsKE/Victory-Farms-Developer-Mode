@@ -93,7 +93,8 @@ doctype_list_js = {
 after_migrate = [
     "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.enforce",
     "victoryfarmsdeveloper.setup.suvac_processing_fields.enforce",
-    "victoryfarmsdeveloper.setup.db_indexes.enforce"
+    "victoryfarmsdeveloper.setup.db_indexes.enforce",
+    "victoryfarmsdeveloper.setup.workspace_counts.check"
 ]
 
 # Uninstallation
@@ -313,7 +314,8 @@ doc_events = {
 # 	"frappe.desk.doctype.event.event.get_events": "victoryfarmsdeveloper.event.get_events"
 # }
 override_whitelisted_methods = {
-    "erpnext.stock.doctype.stock_entry.stock_entry.make_stock_in_entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.make_stock_in_entry"
+    "erpnext.stock.doctype.stock_entry.stock_entry.make_stock_in_entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.make_stock_in_entry",
+    "frappe.desk.reportview.get_count": "victoryfarmsdeveloper.setup.workspace_counts.get_count"
 }
 #
 # each overriding function accepts a `data` argument;
