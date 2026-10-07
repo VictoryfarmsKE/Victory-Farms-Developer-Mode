@@ -20,6 +20,11 @@ UPSTREAM_MARKERS = (
 	("erpnext", ("selling", "page", "point_of_sale", "pos_item_cart.js"), "make_customer_selector() {"),
 	("erpnext", ("selling", "page", "point_of_sale", "pos_item_cart.js"), "erpnext.PointOfSale.ItemCart = class"),
 	("frappe", ("public", "js", "frappe", "router.js"), 'return name.toLowerCase().replace(/ /g, "-");'),
+	(
+		"vf_pos_customizations",
+		("vf_pos_customizations", "page", "pos_payments", "pos_payments.js"),
+		"window.pr_customer_control = frappe.ui.form.make_control",
+	),
 )
 
 
@@ -194,5 +199,5 @@ def read_app_file(app, path):
 	try:
 		with open(frappe.get_app_path(app, *path)) as f:
 			return f.read()
-	except OSError:
+	except Exception:
 		return ""
