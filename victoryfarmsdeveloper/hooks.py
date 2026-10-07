@@ -205,6 +205,9 @@ scheduler_events = {
         "victoryfarmsdeveloper.notifications.leave_balance_update_check.process_checkins_without_shift",
     ],
     "cron": {
+        "*/5 * * * *": [
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.sms_settings.sms_settings.retry_failed_or_stuck_sms"
+        ],
         "0 7 * * *": [
             "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check"
         ],
