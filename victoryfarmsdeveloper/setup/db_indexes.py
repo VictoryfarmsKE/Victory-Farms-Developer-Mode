@@ -7,6 +7,9 @@ FIELD_INDEXES = (
 	("Mpesa Payment Register", "transid"),
 	("Sales Invoice", "status"),
 )
+FULLTEXT_INDEXES = (
+	("Customer", "ft_customer_name", "customer_name"),
+)
 COMPOSITE_INDEXES = (
 	(
 		"GL Entry",
@@ -36,6 +39,9 @@ def enforce():
 		for doctype, index_name, fieldnames in COMPOSITE_INDEXES:
 			if frappe.db.table_exists(doctype):
 				ensure_composite_index(doctype, index_name, fieldnames)
+		for doctype, index_name, fieldname in FULLTEXT_INDEXES:
+			if frappe.db.table_exists(doctype) and frappe.db.has_column(doctype, fieldname):
+				ensure_fulltext_index(doctype, index_name, fieldname)
 	finally:
 		frappe.db.sql(f"SET SESSION lock_wait_timeout = {int(previous_wait)}")
 
@@ -67,6 +73,15 @@ def ensure_composite_index(doctype, index_name, fieldnames):
 		return
 	try:
 		frappe.db.add_index(doctype, list(fieldnames), index_name=index_name)
+	except Exception as e:
+		print(f"Skipped index {index_name} on {doctype}, will retry on next migrate: {e}")
+
+
+def ensure_fulltext_index(doctype, index_name, fieldname):
+	if frappe.db.has_index(f"tab{doctype}", index_name):
+		return
+	try:
+		frappe.db.sql_ddl(f"ALTER TABLE `tab{doctype}` ADD FULLTEXT INDEX `{index_name}` (`{fieldname}`)")
 	except Exception as e:
 		print(f"Skipped index {index_name} on {doctype}, will retry on next migrate: {e}")
 

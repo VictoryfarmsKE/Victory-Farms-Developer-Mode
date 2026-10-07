@@ -35,6 +35,7 @@ fixtures = [
 
 # include js in page
 # page_js = {"page" : "public/js/file.js"}
+page_js = {"point-of-sale": "public/js/pos_customer_search_hint.js"}
 app_include_js = [
     "/assets/victoryfarmsdeveloper/js/stock_entry.js"
 ]
@@ -94,7 +95,8 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.enforce",
     "victoryfarmsdeveloper.setup.suvac_processing_fields.enforce",
     "victoryfarmsdeveloper.setup.db_indexes.enforce",
-    "victoryfarmsdeveloper.setup.workspace_counts.check"
+    "victoryfarmsdeveloper.setup.workspace_counts.check",
+    "victoryfarmsdeveloper.setup.till_customer_search.check"
 ]
 
 # Uninstallation
@@ -315,7 +317,8 @@ doc_events = {
 # }
 override_whitelisted_methods = {
     "erpnext.stock.doctype.stock_entry.stock_entry.make_stock_in_entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.make_stock_in_entry",
-    "frappe.desk.reportview.get_count": "victoryfarmsdeveloper.setup.workspace_counts.get_count"
+    "frappe.desk.reportview.get_count": "victoryfarmsdeveloper.setup.workspace_counts.get_count",
+    "frappe.desk.search.search_link": "victoryfarmsdeveloper.setup.till_customer_search.search_link"
 }
 #
 # each overriding function accepts a `data` argument;
