@@ -5,6 +5,7 @@ from frappe.utils import add_to_date, now_datetime, nowdate
 MAX_ATTEMPTS = 3
 STUCK_AFTER_MINUTES = 10
 RETRY_AFTER_MINUTES = 5
+RETRY_BATCH_SIZE = 200
 REQUEST_TIMEOUT = (5, 20)
 
 
@@ -32,7 +33,7 @@ def send_sms(receiver_list, msg, sender_name="", success_msg=True):
 def enqueue_delivery(delivery_name):
     frappe.enqueue(
         "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.sms_settings.sms_settings.deliver_sms",
-        queue="short" if getattr(frappe.local, "request", None) else "default",
+        queue="default",
         timeout=120,
         enqueue_after_commit=True,
         delivery_name=delivery_name,
@@ -83,12 +84,16 @@ def retry_failed_or_stuck_sms():
         "SMS Delivery",
         filters={"status": ("in", ["Queued", "Sending"]), "modified": ("<", stuck_before)},
         fields=["name", "attempts"],
+        order_by="modified asc",
+        limit=RETRY_BATCH_SIZE,
     )
     failed = frappe.get_all(
         "SMS Delivery",
         filters={"status": "Failed", "attempts": ("<", MAX_ATTEMPTS), "modified": ("<", retry_before)},
         fields=["name", "attempts"],
-    )
+        order_by="modified asc",
+        limit=RETRY_BATCH_SIZE - len(stuck),
+    ) if len(stuck) < RETRY_BATCH_SIZE else []
 
     for row in stuck + failed:
         if (row.attempts or 0) >= MAX_ATTEMPTS:
