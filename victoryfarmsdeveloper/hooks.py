@@ -383,3 +383,7 @@ override_doctype_dashboards = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+default_log_clearing_doctypes = {
+    "SMS Delivery": 30
+}
+
