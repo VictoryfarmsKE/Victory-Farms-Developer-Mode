@@ -35,7 +35,10 @@ fixtures = [
 
 # include js in page
 # page_js = {"page" : "public/js/file.js"}
-page_js = {"point-of-sale": "public/js/pos_customer_search_hint.js"}
+page_js = {
+    "point-of-sale": "public/js/pos_customer_search_hint.js",
+    "pos-payments": "public/js/pos_payments_customer_hint.js"
+}
 app_include_js = [
     "/assets/victoryfarmsdeveloper/js/stock_entry.js"
 ]
