@@ -389,3 +389,26 @@ override_doctype_dashboards = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+
+# Monkey patches
+# --------------
+
+# Payroll: the consolidated draft Journal Entry in
+# customization/payroll_entry replaces HRMS's built-in accrual JV, which
+# fires unconditionally inside submit_salary_slips_for_employees and has no
+# configuration switch. Skip it for Victory Farms Ltd only; every other
+# company keeps the stock behavior.
+try:
+	from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry
+
+	_stock_make_accrual_jv_entry = PayrollEntry.make_accrual_jv_entry
+
+	def _make_accrual_jv_entry_skip_vfl(self, *args, **kwargs):
+		if self.company == "Victory Farms Ltd":
+			return None
+		return _stock_make_accrual_jv_entry(self, *args, **kwargs)
+
+	PayrollEntry.make_accrual_jv_entry = _make_accrual_jv_entry_skip_vfl
+except ImportError:
+	pass
+
