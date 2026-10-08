@@ -36,14 +36,14 @@ fixtures = [
 
 # include js in page
 # page_js = {"page" : "public/js/file.js"}
-app_include_js = [
-    "/assets/victoryfarmsdeveloper/js/stock_entry.js"
-]
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 doctype_js = {
-    "Stock Entry": "victoryfarmsdeveloper/customization/stock_entry_item_break_down/stock_entry_item_break_down.js",
+    "Stock Entry": [
+        "victoryfarmsdeveloper/customization/stock_entry_item_break_down/stock_entry_item_break_down.js",
+        "public/js/stock_entry.js"
+    ],
     "Landed Cost Voucher": "victoryfarmsdeveloper/public/js/landed_cost_voucher.js",
     "Leave Application": "public/js/leave_application.js",
     "Payment Entry": "public/js/payment_entry.js"
@@ -94,7 +94,8 @@ doctype_list_js = {
 after_migrate = [
     "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.enforce",
     "victoryfarmsdeveloper.setup.suvac_processing_fields.enforce",
-    "victoryfarmsdeveloper.setup.weighbridge_layout.enforce"
+    "victoryfarmsdeveloper.setup.weighbridge_layout.enforce",
+    "victoryfarmsdeveloper.setup.processing_line_dimension.enforce"
 ]
 
 # Uninstallation
@@ -275,7 +276,8 @@ doc_events = {
     },
     "Stock Entry": {
         "before_save": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_save_stock_entry",
-        "before_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_submit_stock_entry"
+        "before_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.before_submit_stock_entry",
+        "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.on_submit_stock_entry"
     },
     "Employee": {
         "after_insert": "victoryfarmsdeveloper.custom_scripts.server_scripts.leave_allocation.create_leave_allocation_for_new_employee",
