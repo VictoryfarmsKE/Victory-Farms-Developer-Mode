@@ -4,6 +4,7 @@ from frappe import _
 from erpnext.stock.doctype.stock_entry.stock_entry import make_stock_in_entry as original_make_stock_in_entry
 from frappe.utils import cint, nowdate, flt
 from victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.weighbridge import check_weighbridge
+from victoryfarmsdeveloper.setup.processing_line_dimension import FIELDNAME, LINE_TYPES, TO_FIELDNAME, get_line
 
 
 class CustomStockEntry(StockEntry):
@@ -13,6 +14,7 @@ class CustomStockEntry(StockEntry):
     def validate(self):
         super().validate()
         self.apply_fixed_valuation_rate()
+        set_processing_line_dimension(self)
 
     def apply_fixed_valuation_rate(self):
         """When Gutted Fish-Tilapia transfers from a non-fixed zone (0) to a
@@ -262,6 +264,17 @@ def clear_processing_line(doc):
     for item in doc.items:
         if item.get("custom_line"):
             item.custom_line = None
+
+
+def set_processing_line_dimension(doc):
+    if not frappe.get_meta("Stock Entry Detail").has_field(FIELDNAME):
+        return
+
+    for item in doc.items:
+        number = cint(item.get("custom_line")) if doc.stock_entry_type in LINE_TYPES else 0
+        line = get_line(number) if number > 0 else None
+        item.set(FIELDNAME, line if item.s_warehouse else None)
+        item.set(TO_FIELDNAME, line if item.t_warehouse else None)
 
 
 def require_processing_line(doc):
