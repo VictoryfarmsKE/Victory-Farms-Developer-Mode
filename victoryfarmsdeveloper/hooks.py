@@ -300,6 +300,7 @@ doc_events = {
     "Salary Slip": {
         "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.sync_additional_salary_notes",
         "on_update": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.sync_additional_salary_notes",
+        "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payroll_entry.payroll_entry.create_journal_entry_if_last_slip"
        },
     "Payroll Entry": {
         "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payroll_entry.payroll_entry.create_journal_entry_on_submit",

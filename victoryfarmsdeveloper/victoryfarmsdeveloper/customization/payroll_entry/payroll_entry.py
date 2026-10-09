@@ -25,6 +25,14 @@ def create_journal_entry_on_submit(doc, method=None):
     if doc.docstatus != 1:
         return
 
+    # Guard: never create a second Journal Entry for the same Payroll Entry,
+    # regardless of which event triggered this function.
+    if frappe.db.exists(
+        "Journal Entry",
+        {"user_remark": JE_REMARK_TEMPLATE.format(doc.name), "docstatus": ["<", 2]},
+    ):
+        return
+
     company = doc.company
     payroll_payable_account = _get_payroll_payable_account(company)
 
@@ -170,6 +178,39 @@ def cancel_journal_entry_on_cancel(doc, method=None):
             frappe.get_doc("Journal Entry", je.name).cancel()
         else:
             frappe.delete_doc("Journal Entry", je.name, ignore_permissions=True)
+
+
+def create_journal_entry_if_last_slip(doc, method=None):
+    """Create the consolidated Journal Entry when the last Salary Slip of a
+    Payroll Entry is submitted.
+
+    Acts as a safety net for the Payroll Entry on_submit hook: in environments
+    where salary slips are submitted asynchronously (background jobs), the
+    Payroll Entry hook can fire before any slip is submitted and silently skip.
+    This handler runs on every Salary Slip submission and only proceeds once
+    every slip of the Payroll Entry is submitted and no JE exists yet.
+    """
+    if doc.docstatus != 1 or not doc.payroll_entry:
+        return
+
+    pe_name = doc.payroll_entry
+
+    # Journal Entry already created?
+    if frappe.db.exists(
+        "Journal Entry",
+        {"user_remark": JE_REMARK_TEMPLATE.format(pe_name), "docstatus": ["<", 2]},
+    ):
+        return
+
+    # Draft slips still remaining? Wait for the last one.
+    if frappe.db.count("Salary Slip", {"payroll_entry": pe_name, "docstatus": 0}):
+        return
+
+    payroll_entry = frappe.get_doc("Payroll Entry", pe_name)
+    if payroll_entry.docstatus != 1:
+        return
+
+    create_journal_entry_on_submit(payroll_entry)
 
 
 def _je_line(
