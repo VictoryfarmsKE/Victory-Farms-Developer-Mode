@@ -95,7 +95,8 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.enforce",
     "victoryfarmsdeveloper.setup.suvac_processing_fields.enforce",
     "victoryfarmsdeveloper.setup.weighbridge_layout.enforce",
-    "victoryfarmsdeveloper.setup.processing_line_dimension.enforce"
+    "victoryfarmsdeveloper.setup.processing_line_dimension.enforce",
+    "victoryfarmsdeveloper.setup.financial_statement_totals.check"
 ]
 
 # Uninstallation
