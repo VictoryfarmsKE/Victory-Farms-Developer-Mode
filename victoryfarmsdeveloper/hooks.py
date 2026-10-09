@@ -36,6 +36,10 @@ fixtures = [
 
 # include js in page
 # page_js = {"page" : "public/js/file.js"}
+page_js = {
+    "point-of-sale": "public/js/pos_customer_search_hint.js",
+    "pos-payments": "public/js/pos_payments_customer_hint.js"
+}
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
@@ -95,7 +99,11 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.purchase_receipt_field_rules.enforce",
     "victoryfarmsdeveloper.setup.suvac_processing_fields.enforce",
     "victoryfarmsdeveloper.setup.weighbridge_layout.enforce",
-    "victoryfarmsdeveloper.setup.processing_line_dimension.enforce"
+    "victoryfarmsdeveloper.setup.processing_line_dimension.enforce",
+    "victoryfarmsdeveloper.setup.db_indexes.enforce",
+    "victoryfarmsdeveloper.setup.workspace_counts.check",
+    "victoryfarmsdeveloper.setup.till_customer_search.check",
+    "victoryfarmsdeveloper.setup.financial_statement_totals.check"
 ]
 
 # Uninstallation
@@ -208,6 +216,9 @@ scheduler_events = {
         "victoryfarmsdeveloper.notifications.scorecard.send_pending_appraisal_notifications"
     ],
     "cron": {
+        "*/5 * * * *": [
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.sms_settings.sms_settings.retry_failed_or_stuck_sms"
+        ],
         "0 7 * * *": [
             "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check"
         ],
@@ -318,7 +329,9 @@ doc_events = {
 # 	"frappe.desk.doctype.event.event.get_events": "victoryfarmsdeveloper.event.get_events"
 # }
 override_whitelisted_methods = {
-    "erpnext.stock.doctype.stock_entry.stock_entry.make_stock_in_entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.make_stock_in_entry"
+    "erpnext.stock.doctype.stock_entry.stock_entry.make_stock_in_entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.make_stock_in_entry",
+    "frappe.desk.reportview.get_count": "victoryfarmsdeveloper.setup.workspace_counts.get_count",
+    "frappe.desk.search.search_link": "victoryfarmsdeveloper.setup.till_customer_search.search_link"
 }
 #
 # each overriding function accepts a `data` argument;
@@ -388,4 +401,6 @@ override_doctype_dashboards = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
-
+default_log_clearing_doctypes = {
+    "SMS Delivery": 30
+}
