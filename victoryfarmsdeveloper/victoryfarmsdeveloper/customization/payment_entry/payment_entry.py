@@ -109,6 +109,29 @@ def validate_beneficiary_fields(doc, method=None):
             )
 
 
+
+def set_beneficiary_total(doc, method=None):
+    """Compute Total Beneficiary Amount from beneficiary rows.
+
+    Also defaults paid_amount to the beneficiary total until the user
+    overrides it; unallocated amount follows standard ERPNext allocation
+    behaviour.
+    """
+    beneficiaries = doc.get("custom_beneficiaries") or []
+    total = flt(sum(flt(row.get("amount")) for row in beneficiaries))
+
+    previous_total = flt(doc.get("custom_beneficiary_total"))
+    if doc.get("custom_beneficiary_total") != total:
+        doc.custom_beneficiary_total = total
+
+    # paid_amount defaults to the beneficiary total and keeps tracking it
+    # until the user overrides it manually; untouched once it differs from
+    # the previous total.
+    paid = flt(doc.get("paid_amount"))
+    if total and (not paid or paid == previous_total):
+        doc.paid_amount = total
+
+
 @frappe.whitelist()
 def upload_beneficiaries(file_url):
     """Parse an uploaded Excel/CSV file and return beneficiary rows.

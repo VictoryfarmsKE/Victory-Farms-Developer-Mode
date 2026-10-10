@@ -1,12 +1,46 @@
 frappe.ui.form.on('Payment Entry', {
     refresh(frm) {
         set_beneficiary_purpose(frm);
+        set_beneficiary_total(frm);
         add_upload_beneficiaries_button(frm);
     },
     validate(frm) {
         set_beneficiary_purpose(frm);
     }
 });
+
+frappe.ui.form.on('Payment Entry Beneficiary', {
+    amount(frm) {
+        set_beneficiary_total(frm);
+    },
+    custom_beneficiaries_add(frm) {
+        set_beneficiary_total(frm);
+    },
+    custom_beneficiaries_remove(frm) {
+        set_beneficiary_total(frm);
+    }
+});
+
+function set_beneficiary_total(frm) {
+    const total = (frm.doc.custom_beneficiaries || []).reduce(
+        (sum, row) => sum + (flt(row.amount) || 0),
+        0
+    );
+    if (frm.doc.custom_beneficiary_total !== total) {
+        frm.set_value('custom_beneficiary_total', total);
+    }
+
+    // Default Paid Amount to the beneficiary total; it keeps tracking the
+    // total until the user types a different value manually, then it is
+    // never touched again.
+    const paid = flt(frm.doc.paid_amount);
+    if (!paid || paid === flt(frm.__beneficiary_total)) {
+        frm.__beneficiary_total = total;
+        if (total && paid !== total) {
+            frm.set_value('paid_amount', total);
+        }
+    }
+}
 
 frappe.ui.form.on('Payment Entry Reference', {
     reference_name(frm, cdt, cdn) {
@@ -143,6 +177,7 @@ function upload_beneficiaries(frm) {
                     });
 
                     set_beneficiary_purpose(frm);
+                    set_beneficiary_total(frm);
                     frm.refresh_field('custom_beneficiaries');
                     frappe.show_alert({
                         message: __('{0} beneficiary rows imported.', [rows.length]),
