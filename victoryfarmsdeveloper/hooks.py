@@ -339,7 +339,8 @@ doc_events = {
 override_whitelisted_methods = {
     "erpnext.stock.doctype.stock_entry.stock_entry.make_stock_in_entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.make_stock_in_entry",
     "frappe.desk.reportview.get_count": "victoryfarmsdeveloper.setup.workspace_counts.get_count",
-    "frappe.desk.search.search_link": "victoryfarmsdeveloper.setup.till_customer_search.search_link"
+    "frappe.desk.search.search_link": "victoryfarmsdeveloper.setup.till_customer_search.search_link",
+    "frappe.core.doctype.prepared_report.prepared_report.make_prepared_report": "victoryfarmsdeveloper.setup.report_runs.make_prepared_report"
 }
 #
 # each overriding function accepts a `data` argument;
