@@ -12,3 +12,9 @@ try:
     install_financial_statement_totals()
 except Exception:
     pass
+
+try:
+    from victoryfarmsdeveloper.setup.employee_saves import install as install_employee_saves
+    install_employee_saves()
+except Exception:
+    pass
