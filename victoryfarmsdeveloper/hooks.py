@@ -103,7 +103,8 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.financial_statement_totals.check",
     "victoryfarmsdeveloper.setup.processing_line_dimension.enforce",
     "victoryfarmsdeveloper.setup.employee_saves.check",
-    "victoryfarmsdeveloper.setup.stock_warehouse_filter.check"
+    "victoryfarmsdeveloper.setup.stock_warehouse_filter.check",
+    "victoryfarmsdeveloper.setup.general_ledger_opening.check"
 ]
 
 before_request = ["victoryfarmsdeveloper.setup.patches.install_all"]
