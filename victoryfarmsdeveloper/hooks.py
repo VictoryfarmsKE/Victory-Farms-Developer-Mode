@@ -105,6 +105,9 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.employee_saves.check"
 ]
 
+before_request = ["victoryfarmsdeveloper.setup.patches.install_all"]
+before_job = ["victoryfarmsdeveloper.setup.patches.install_all"]
+
 # Uninstallation
 # ------------
 
