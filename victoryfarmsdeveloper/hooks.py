@@ -105,7 +105,8 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.till_customer_search.check",
     "victoryfarmsdeveloper.setup.financial_statement_totals.check",
     "victoryfarmsdeveloper.setup.employee_saves.check",
-    "victoryfarmsdeveloper.setup.stock_warehouse_filter.check"
+    "victoryfarmsdeveloper.setup.stock_warehouse_filter.check",
+    "victoryfarmsdeveloper.setup.pos_closing_cancels.check"
 ]
 
 before_request = ["victoryfarmsdeveloper.setup.patches.install_all"]
@@ -221,6 +222,9 @@ scheduler_events = {
         "victoryfarmsdeveloper.notifications.scorecard.send_pending_appraisal_notifications"
     ],
     "cron": {
+        "0 21 * * *": [
+            "victoryfarmsdeveloper.setup.pos_closing_cancels.run_held_cancels"
+        ],
         "*/5 * * * *": [
             "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.sms_settings.sms_settings.retry_failed_or_stuck_sms"
         ],
