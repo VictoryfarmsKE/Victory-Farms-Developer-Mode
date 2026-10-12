@@ -105,7 +105,8 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.workspace_counts.check",
     "victoryfarmsdeveloper.setup.till_customer_search.check",
     "victoryfarmsdeveloper.setup.employee_saves.check",
-    "victoryfarmsdeveloper.setup.stock_warehouse_filter.check"
+    "victoryfarmsdeveloper.setup.stock_warehouse_filter.check",
+    "victoryfarmsdeveloper.setup.general_ledger_opening.check"
 ]
 
 before_request = ["victoryfarmsdeveloper.setup.patches.install_all"]
