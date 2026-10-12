@@ -104,7 +104,8 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.db_indexes.enforce",
     "victoryfarmsdeveloper.setup.workspace_counts.check",
     "victoryfarmsdeveloper.setup.till_customer_search.check",
-    "victoryfarmsdeveloper.setup.employee_saves.check"
+    "victoryfarmsdeveloper.setup.employee_saves.check",
+    "victoryfarmsdeveloper.setup.stock_warehouse_filter.check"
 ]
 
 before_request = ["victoryfarmsdeveloper.setup.patches.install_all"]
