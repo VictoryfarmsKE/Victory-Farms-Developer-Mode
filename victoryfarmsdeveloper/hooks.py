@@ -103,8 +103,13 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.db_indexes.enforce",
     "victoryfarmsdeveloper.setup.workspace_counts.check",
     "victoryfarmsdeveloper.setup.till_customer_search.check",
-    "victoryfarmsdeveloper.setup.financial_statement_totals.check"
+    "victoryfarmsdeveloper.setup.financial_statement_totals.check",
+    "victoryfarmsdeveloper.setup.employee_saves.check",
+    "victoryfarmsdeveloper.setup.stock_warehouse_filter.check"
 ]
+
+before_request = ["victoryfarmsdeveloper.setup.patches.install_all"]
+before_job = ["victoryfarmsdeveloper.setup.patches.install_all"]
 
 # Uninstallation
 # ------------
@@ -331,7 +336,8 @@ doc_events = {
 override_whitelisted_methods = {
     "erpnext.stock.doctype.stock_entry.stock_entry.make_stock_in_entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.make_stock_in_entry",
     "frappe.desk.reportview.get_count": "victoryfarmsdeveloper.setup.workspace_counts.get_count",
-    "frappe.desk.search.search_link": "victoryfarmsdeveloper.setup.till_customer_search.search_link"
+    "frappe.desk.search.search_link": "victoryfarmsdeveloper.setup.till_customer_search.search_link",
+    "frappe.core.doctype.prepared_report.prepared_report.make_prepared_report": "victoryfarmsdeveloper.setup.report_runs.make_prepared_report"
 }
 #
 # each overriding function accepts a `data` argument;
