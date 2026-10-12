@@ -101,7 +101,8 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.workspace_counts.check",
     "victoryfarmsdeveloper.setup.till_customer_search.check",
     "victoryfarmsdeveloper.setup.financial_statement_totals.check",
-    "victoryfarmsdeveloper.setup.processing_line_dimension.enforce"
+    "victoryfarmsdeveloper.setup.processing_line_dimension.enforce",
+    "victoryfarmsdeveloper.setup.employee_saves.check"
 ]
 
 # Uninstallation
