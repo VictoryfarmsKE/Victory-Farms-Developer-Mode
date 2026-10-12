@@ -75,6 +75,7 @@ def is_installed():
 
 
 def check():
+	install()
 	if is_installed():
 		return []
 	problems = [
