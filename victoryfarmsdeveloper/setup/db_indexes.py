@@ -24,6 +24,11 @@ COMPOSITE_INDEXES = (
 			"credit_in_account_currency",
 		),
 	),
+	(
+		"GL Entry",
+		"gl_account_date_totals_index",
+		("account", "company", "is_cancelled", "posting_date", "docstatus", "debit", "credit"),
+	),
 )
 
 
