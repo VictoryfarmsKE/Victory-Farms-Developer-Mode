@@ -29,7 +29,8 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 		)
 		self.get_columns()
 		self.get_data(args)
-		return self.columns, self.data
+		currencies = {row.currency for row in self.data}
+		return self.columns, self.data, None, None, None, len(currencies) > 1
 
 	def get_columns(self):
 		self.columns = []
@@ -62,35 +63,36 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 
 		# Total outstanding
 		self.add_column(
-			label=_("Outstanding Amount"), fieldname="outstanding", fieldtype="Currency", width=140
+			label=_("Outstanding Amount"), fieldname="outstanding", fieldtype="Currency", options="currency", width=140
 		)
 
 		self.add_column(
-			label=_("0-30"), fieldname="aged_0_30", fieldtype="Currency", width=120
+			label=_("0-30"), fieldname="aged_0_30", fieldtype="Currency", options="currency", width=120
 		)
 		self.add_column(
-			label=_("31-60"), fieldname="aged_31_60", fieldtype="Currency", width=120
+			label=_("31-60"), fieldname="aged_31_60", fieldtype="Currency", options="currency", width=120
 		)
 		self.add_column(
-			label=_("61-90"), fieldname="aged_61_90", fieldtype="Currency", width=120
+			label=_("61-90"), fieldname="aged_61_90", fieldtype="Currency", options="currency", width=120
 		)
 		self.add_column(
-			label=_("91-120"), fieldname="aged_91_120", fieldtype="Currency", width=120
+			label=_("91-120"), fieldname="aged_91_120", fieldtype="Currency", options="currency", width=120
 		)
 		self.add_column(
-			label=_("121 and above"), fieldname="aged_121_above", fieldtype="Currency", width=130
+			label=_("121 and above"), fieldname="aged_121_above", fieldtype="Currency", options="currency", width=130
 		)
 
 		self.add_column(
 			label=_("0-7"),
 			fieldname="overdue_0_7",
 			fieldtype="Currency",
+			options="currency",
 			width=180,
 		)
-		self.add_column(label=_("8-15"), fieldname="overdue_8_15", fieldtype="Currency", width=130)
-		self.add_column(label=_("16-30"), fieldname="overdue_16_30", fieldtype="Currency", width=130)
-		self.add_column(label=_("31-45"), fieldname="overdue_31_45", fieldtype="Currency", width=130)
-		self.add_column(label=_("45 and above"), fieldname="overdue_45_above", fieldtype="Currency", width=150)
+		self.add_column(label=_("8-15"), fieldname="overdue_8_15", fieldtype="Currency", options="currency", width=130)
+		self.add_column(label=_("16-30"), fieldname="overdue_16_30", fieldtype="Currency", options="currency", width=130)
+		self.add_column(label=_("31-45"), fieldname="overdue_31_45", fieldtype="Currency", options="currency", width=130)
+		self.add_column(label=_("45 and above"), fieldname="overdue_45_above", fieldtype="Currency", options="currency", width=150)
 		self.add_column(
 			label=_("Supplier Group"),
 			fieldname="supplier_group",
@@ -116,7 +118,7 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 
 		supplier_credit_map = self.supplier_credit_map
 
-		for party, party_dict in self.party_total.items():
+		for (party, currency), party_dict in self.party_total.items():
 			if flt(party_dict.outstanding) == 0:
 				continue
 
@@ -149,19 +151,20 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 		report_date = getdate(self.filters.report_date)
 
 		for d in self.receivables:
-			if d.party not in self.party_total:
+			key = (d.party, d.get("currency"))
+			if key not in self.party_total:
 				self.init_party_total(d)
 
 			outstanding = flt(d.get("outstanding"))
 			if outstanding == 0:
 				continue
 
-			self.party_total[d.party].outstanding += outstanding
+			self.party_total[key].outstanding += outstanding
 
 			if d.get("supplier_group"):
-				self.party_total[d.party].supplier_group = d.get("supplier_group")
+				self.party_total[key].supplier_group = d.get("supplier_group")
 			if d.get("currency"):
-				self.party_total[d.party].currency = d.get("currency")
+				self.party_total[key].currency = d.get("currency")
 
 			bill_date = getdate(d.get("bill_date"))
 			due_date = getdate(d.get("due_date"))
@@ -170,15 +173,15 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 			age = max(date_diff(report_date, bill_date), 0)
 
 			if age <= 30:
-				self.party_total[d.party].aged_0_30 += outstanding
+				self.party_total[key].aged_0_30 += outstanding
 			elif age <= 60:
-				self.party_total[d.party].aged_31_60 += outstanding
+				self.party_total[key].aged_31_60 += outstanding
 			elif age <= 90:
-				self.party_total[d.party].aged_61_90 += outstanding
+				self.party_total[key].aged_61_90 += outstanding
 			elif age <= 120:
-				self.party_total[d.party].aged_91_120 += outstanding
+				self.party_total[key].aged_91_120 += outstanding
 			else:
-				self.party_total[d.party].aged_121_above += outstanding
+				self.party_total[key].aged_121_above += outstanding
 
 			# --- Section B: Overdue Balance (due_date = due_date + credit_days) ---
 			# credit_days = 0
@@ -194,25 +197,25 @@ class AccountsPayableSummaryExtended(AccountsReceivableSummary):
 				days_overdue = max(date_diff(report_date, due_date), 0)
 
 				if days_overdue <= 7:
-					self.party_total[d.party].overdue_0_7 += outstanding
+					self.party_total[key].overdue_0_7 += outstanding
 				elif days_overdue <= 15:
-					self.party_total[d.party].overdue_8_15 += outstanding
+					self.party_total[key].overdue_8_15 += outstanding
 				elif days_overdue <= 30:
-					self.party_total[d.party].overdue_16_30 += outstanding
+					self.party_total[key].overdue_16_30 += outstanding
 				elif days_overdue <= 45:
-					self.party_total[d.party].overdue_31_45 += outstanding
+					self.party_total[key].overdue_31_45 += outstanding
 				else:
-					self.party_total[d.party].overdue_45_above += outstanding
+					self.party_total[key].overdue_45_above += outstanding
 
 	def init_party_total(self, row):
-		self.party_total[row.party] = frappe._dict(
+		self.party_total[(row.party, row.get("currency"))] = frappe._dict(
 			{
 				"party_type": row.party_type,
 				"outstanding": 0.0,
 				"credit_days": 0,
 				"credit_limit": 0.0,
 				"supplier_group": "",
-				"currency": "",
+				"currency": row.get("currency") or "",
 				# Section A - Aged Balance
 				"aged_0_30": 0.0,
 				"aged_31_60": 0.0,
