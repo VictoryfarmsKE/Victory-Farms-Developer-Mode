@@ -5,6 +5,7 @@ from victoryfarmsdeveloper.setup import (
 	financial_statement_totals,
 	general_ledger_opening,
 	pos_closing_commits,
+	quick_reports,
 	stock_warehouse_filter,
 )
 
@@ -20,3 +21,4 @@ def install_once():
 	stock_warehouse_filter.install()
 	general_ledger_opening.install()
 	pos_closing_commits.install()
+	quick_reports.install()
