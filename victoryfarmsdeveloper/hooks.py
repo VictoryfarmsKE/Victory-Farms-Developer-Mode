@@ -104,6 +104,7 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.processing_line_dimension.enforce",
     "victoryfarmsdeveloper.setup.employee_saves.check",
     "victoryfarmsdeveloper.setup.stock_warehouse_filter.check",
+    "victoryfarmsdeveloper.setup.general_ledger_opening.check",
     "victoryfarmsdeveloper.setup.pos_closing_cancels.check"
 ]
 

@@ -17,6 +17,21 @@ frappe.query_reports["Accounts Payable Summary Extended"] = {
             default: frappe.datetime.get_today(),
         },
         {
+            fieldname: "party_account",
+            label: __("Payable Account"),
+            fieldtype: "Link",
+            options: "Account",
+            get_query: () => {
+                return {
+                    filters: {
+                        company: frappe.query_report.get_filter_value("company"),
+                        account_type: "Payable",
+                        is_group: 0,
+                    },
+                };
+            },
+        },
+        {
             fieldname: "ageing_based_on",
             label: __("Ageing Based On"),
             fieldtype: "Select",
@@ -105,6 +120,11 @@ frappe.query_reports["Accounts Payable Summary Extended"] = {
         {
             fieldname: "show_gl_balance",
             label: __("Show GL Balance"),
+            fieldtype: "Check",
+        },
+        {
+            fieldname: "in_party_currency",
+            label: __("In Party Currency"),
             fieldtype: "Check",
         },
     ],

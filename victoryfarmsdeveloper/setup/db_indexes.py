@@ -2,6 +2,7 @@ import frappe
 
 LARGE_TABLE_ROWS = 100_000
 LOCK_WAIT_SECONDS = 60
+REORDER_LOCK_WAIT_SECONDS = 10
 FIELD_INDEXES = (
 	("POS Invoice", "pos_profile"),
 	("Mpesa Payment Register", "transid"),
@@ -24,6 +25,14 @@ COMPOSITE_INDEXES = (
 			"credit_in_account_currency",
 		),
 	),
+	(
+		"GL Entry",
+		"gl_account_date_totals_index",
+		("account", "company", "is_cancelled", "posting_date", "docstatus", "debit", "credit"),
+	),
+)
+ORDERED_INDEXES = (
+	("GL Entry", "posting_date_company_index", ("posting_date", "company")),
 )
 
 
@@ -39,6 +48,9 @@ def enforce():
 		for doctype, index_name, fieldnames in COMPOSITE_INDEXES:
 			if frappe.db.table_exists(doctype):
 				ensure_composite_index(doctype, index_name, fieldnames)
+		for doctype, index_name, fieldnames in ORDERED_INDEXES:
+			if frappe.db.table_exists(doctype):
+				ensure_index_order(doctype, index_name, fieldnames)
 		for doctype, index_name, fieldname in FULLTEXT_INDEXES:
 			if frappe.db.table_exists(doctype) and frappe.db.has_column(doctype, fieldname):
 				ensure_fulltext_index(doctype, index_name, fieldname)
@@ -75,6 +87,27 @@ def ensure_composite_index(doctype, index_name, fieldnames):
 		frappe.db.add_index(doctype, list(fieldnames), index_name=index_name)
 	except Exception as e:
 		print(f"Skipped index {index_name} on {doctype}, will retry on next migrate: {e}")
+
+
+def ensure_index_order(doctype, index_name, fieldnames):
+	if index_columns(doctype, index_name) in ([], list(fieldnames)):
+		return
+	columns = ", ".join(f"`{fieldname}`" for fieldname in fieldnames)
+	frappe.db.sql(f"SET SESSION lock_wait_timeout = {REORDER_LOCK_WAIT_SECONDS}")
+	try:
+		frappe.db.sql_ddl(
+			f"ALTER TABLE `tab{doctype}` DROP INDEX `{index_name}`, ADD INDEX `{index_name}` ({columns}), "
+			"ALGORITHM=INPLACE, LOCK=NONE"
+		)
+	except Exception as e:
+		print(f"Skipped reordering index {index_name} on {doctype}, will retry on next migrate: {e}")
+	finally:
+		frappe.db.sql(f"SET SESSION lock_wait_timeout = {LOCK_WAIT_SECONDS}")
+
+
+def index_columns(doctype, index_name):
+	rows = frappe.db.sql(f"SHOW INDEX FROM `tab{doctype}` WHERE Key_name = %s", (index_name,), as_dict=1)
+	return [row.Column_name for row in sorted(rows, key=lambda row: row.Seq_in_index)]
 
 
 def ensure_fulltext_index(doctype, index_name, fieldname):
