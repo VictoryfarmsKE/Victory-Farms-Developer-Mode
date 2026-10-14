@@ -14,6 +14,11 @@ def sales_invoice_status_change(doc, method):
         frappe.db.set_value("Sales Invoice", doc.name, "sms_sent", 1)
         frappe.db.commit()
 
+def get_etims_receipt_url(invoice_name):
+    if not frappe.db.exists("DocType", "eTIMS Sales Invoice"):
+        return None
+    return frappe.db.get_value("eTIMS Sales Invoice", {"trader_invoice_number": invoice_name}, "receipt_url")
+
 def send_sms_notification(doc):
     """ Sends an SMS when a Sales Invoice is marked as Paid. """
     try:
@@ -51,6 +56,9 @@ def send_sms_notification(doc):
         items_header = f'<br />Items :: <br />'
         total_qty = f'<br />Total Qty :: {str(rounded_total_qty)}<br />'
         total_amount = f'Grand Total :: {doc.currency} {frappe.utils.fmt_money(doc.rounded_total)}<br />'
+
+        etims_url = get_etims_receipt_url(doc.name)
+        etims_receipt = f'eTIMS Receipt :: {etims_url}<br />' if etims_url else ''
         
         # Terms and conditions
         terms_info1 = 'Pre-payment of goods is not allowed. <br />'
@@ -73,10 +81,11 @@ def send_sms_notification(doc):
                 f'Status :: Redeemed<br />{pos_profile}{items_header}{text_items}'
                 f'for {doc.loyalty_points} points<br /><br />Total Qty :: {str(rounded_total_qty)}<br /><br />'
                 f'Loyalty Points Balance :: {loyalty_points_balance}<br /><br />'
+                f'{etims_receipt}'
                 f'Thank you - Victory Farms.'
             )
         else:
-            base_message = f'{customer_name}{invoice_no}{invoice_date}{invoice_time}{invoice_status}{pos_profile}{items_header}{text_items}{total_qty}{total_amount}{terms_info}'
+            base_message = f'{customer_name}{invoice_no}{invoice_date}{invoice_time}{invoice_status}{pos_profile}{items_header}{text_items}{total_qty}{total_amount}{etims_receipt}{terms_info}'
             message = base_message + loyalty_program + loyalty_points_msg if doc.loyalty_program else base_message
 
         message = message.replace('<br />', '\n')
