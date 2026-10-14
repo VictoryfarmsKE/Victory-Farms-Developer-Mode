@@ -129,14 +129,17 @@ def on_expense_claim_update(doc, method=None):
 
     if doc.workflow_state == previous_workflow_state:
         return
+    # Email notifications are handled by Notification records configured in the
+    # site UI. Reimbursement document creation (Purchase Order / Additional
+    # Salary) is now a manual HR action via the UI, not automatic on approval.
 
-    if doc.workflow_state == "Submitted":
-        _notify_approver_on_submit(doc)
-    elif doc.workflow_state == "Approved":
-        handle_approved_claim(doc)
-        send_status_notification(doc, "approved")
-    elif doc.workflow_state == "Rejected":
-        send_status_notification(doc, "rejected")
+    # if doc.workflow_state == "Submitted":
+    #     _notify_approver_on_submit(doc)
+    # elif doc.workflow_state == "Approved":
+    #     handle_approved_claim(doc)
+    #     send_status_notification(doc, "approved")
+    # elif doc.workflow_state == "Rejected":
+    #     send_status_notification(doc, "rejected")
 
 
 def handle_approved_claim(doc):
@@ -236,79 +239,79 @@ def get_payroll_date(submission_date):
     return submission_date
 
 
-def send_status_notification(doc, status):
-    """Send email notification to the requester when claim is approved or rejected."""
-    employee_email = frappe.db.get_value("Employee", doc.employee, "prefered_email")
-    if not employee_email:
-        return
+# def send_status_notification(doc, status):
+#     """Send email notification to the requester when claim is approved or rejected."""
+#     employee_email = frappe.db.get_value("Employee", doc.employee, "prefered_email")
+#     if not employee_email:
+#         return
 
-    subject = f"Development Allowance Claim {status.title()}: {doc.name}"
-    message = f"""
-    <p>Dear {doc.employee_name},</p>
-    <p>Your Development Allowance claim <strong>{doc.name}</strong> has been <strong>{status}</strong>.</p>
-    """
+#     subject = f"Development Allowance Claim {status.title()}: {doc.name}"
+#     message = f"""
+#     <p>Dear {doc.employee_name},</p>
+#     <p>Your Development Allowance claim <strong>{doc.name}</strong> has been <strong>{status}</strong>.</p>
+#     """
 
-    if status == "approved":
-        if _is_any_row_taxable(doc):
-            message += f"""
-            <p>An Additional Salary draft has been created for payroll processing.</p>
-            """
-        else:
-            message += f"""
-            <p>A Purchase Order has been created for reimbursement.</p>
-            """
+#     if status == "approved":
+#         if _is_any_row_taxable(doc):
+#             message += f"""
+#             <p>An Additional Salary draft has been created for payroll processing.</p>
+#             """
+#         else:
+#             message += f"""
+#             <p>A Purchase Order has been created for reimbursement.</p>
+#             """
 
-    if doc.custom_hr_remarks:
-        message += f"""
-        <p><strong>HR Remarks:</strong> {doc.custom_hr_remarks}</p>
-        """
+#     if doc.custom_hr_remarks:
+#         message += f"""
+#         <p><strong>HR Remarks:</strong> {doc.custom_hr_remarks}</p>
+#         """
 
-    message += "<p>Best regards,<br>HR Team</p>"
+#     message += "<p>Best regards,<br>HR Team</p>"
 
-    try:
-        frappe.sendmail(
-            recipients=[employee_email],
-            subject=subject,
-            message=message,
-            reference_doctype=doc.doctype,
-            reference_name=doc.name,
-        )
-    except Exception as e:
-        frappe.log_error(f"Failed to send status notification to employee: {e}")
+#     try:
+#         frappe.sendmail(
+#             recipients=[employee_email],
+#             subject=subject,
+#             message=message,
+#             reference_doctype=doc.doctype,
+#             reference_name=doc.name,
+#         )
+#     except Exception as e:
+#         frappe.log_error(f"Failed to send status notification to employee: {e}")
 
 
-def _notify_approver_on_submit(doc):
-    """Send email to the approver when a Development Allowance claim is submitted."""
-    if not doc.expense_approver:
-        return
+# def _notify_approver_on_submit(doc):
+#     """Send email to the approver when a Development Allowance claim is submitted."""
+#     if not doc.expense_approver:
+#         return
 
-    approver_email = frappe.db.get_value("User", doc.expense_approver, "email")
-    if not approver_email:
-        return
+#     approver_email = frappe.db.get_value("User", doc.expense_approver, "email")
+#     if not approver_email:
+#         return
 
-    sub_type = _get_sub_type(doc) or "N/A"
-    subject = f"New Development Allowance Claim Pending Review: {doc.name}"
-    message = f"""
-    <p>Dear Approver,</p>
-    <p>A new Development Allowance claim <strong>{doc.name}</strong> has been submitted by <strong>{doc.employee_name}</strong> and requires your review.</p>
-    <ul>
-        <li><strong>Sub-Type:</strong> {sub_type}</li>
-        <li><strong>Total Amount:</strong> {doc.grand_total} {doc.currency or ""}</li>
-    </ul>
-    <p>Please review and take action.</p>
-    <p>Best regards,<br>HR System</p>
-    """
+#     sub_type = _get_sub_type(doc) or "N/A"
+#     subject = f"New Development Allowance Claim Pending Review: {doc.name}"
+#     message = f"""
+#     <p>Dear Approver,</p>
+#     <p>A new Development Allowance claim <strong>{doc.name}</strong> has been submitted by <strong>{doc.employee_name}</strong> and requires your review.</p>
+#     <ul>
+#         <li><strong>Sub-Type:</strong> {sub_type}</li>
+#         <li><strong>Total Amount:</strong> {doc.grand_total} {doc.currency or ""}</li>
+#     </ul>
+#     <p>Please review and take action.</p>
+#     <p>Best regards,<br>HR System</p>
+#     """
 
-    try:
-        frappe.sendmail(
-            recipients=[approver_email],
-            subject=subject,
-            message=message,
-            reference_doctype=doc.doctype,
-            reference_name=doc.name,
-        )
-    except Exception as e:
-        frappe.log_error(f"Failed to send approver notification: {e}")
+#     try:
+#         frappe.sendmail(
+#             recipients=[approver_email],
+#             subject=subject,
+#             message=message,
+#             reference_doctype=doc.doctype,
+#             reference_name=doc.name,
+#         )
+#     except Exception as e:
+#         frappe.log_error(f"Failed to send approver notification: {e}")
 
 
 def get_or_create_supplier():
