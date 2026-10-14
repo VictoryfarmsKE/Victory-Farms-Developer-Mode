@@ -106,7 +106,8 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.till_customer_search.check",
     "victoryfarmsdeveloper.setup.employee_saves.check",
     "victoryfarmsdeveloper.setup.stock_warehouse_filter.check",
-    "victoryfarmsdeveloper.setup.general_ledger_opening.check"
+    "victoryfarmsdeveloper.setup.general_ledger_opening.check",
+    "victoryfarmsdeveloper.setup.pos_closing_commits.check"
 ]
 
 before_request = ["victoryfarmsdeveloper.setup.patches.install_all"]
