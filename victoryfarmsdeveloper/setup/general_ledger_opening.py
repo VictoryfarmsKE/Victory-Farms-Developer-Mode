@@ -80,9 +80,20 @@ def get_gl_entries(filters, accounting_dimensions):
 
 
 def period_index(filters):
-	if date_diff(nowdate(), filters.get("from_date")) <= RECENT_DAYS:
+	if date_diff(nowdate(), filters.get("from_date")) <= RECENT_DAYS and date_index_leads():
 		return "force index (posting_date_company_index)"
 	return ""
+
+
+def date_index_leads():
+	first_column = frappe.db.sql(
+		"""
+		show index from `tabGL Entry`
+		where Key_name = 'posting_date_company_index' and Seq_in_index = 1
+	""",
+		as_dict=1,
+	)
+	return bool(first_column) and first_column[0].Column_name == "posting_date"
 
 
 def selected_columns(filters, accounting_dimensions):
