@@ -41,39 +41,76 @@ class CustomEmployeeCheckin(EmployeeCheckin):
                 "employee": self.employee,
                 "shift_type": self.shift,
                 "start_date": ["<=", self.time],
-                "shift_location": ["is", "set"],
                 "docstatus": 1,
                 "status": "Active",
             },
             or_filters=[["end_date", ">=", self.time], ["end_date", "is", "not set"]],
-            pluck="shift_location",
+            fields=["name", "shift_location"],
         )
 
-        # If no shift location is configured, allow check-in without coordinates
-        if not assignment_locations:
-            return
+        # Build a list of allowed locations using the primary Shift Location and any configured Additional Locations
+        allowed_locations = []
 
-        checkin_radius, latitude, longitude = frappe.db.get_value(
-            "Shift Location", assignment_locations[0], ["checkin_radius", "latitude", "longitude"]
-        )
+        for assignment in assignment_locations:
 
-        # If checkin_radius is not set or zero, skip validation
-        if not checkin_radius or checkin_radius <= 0:
-            return
+            if assignment.shift_location:
+                allowed_locations.append(
+                    assignment.shift_location
+                )
 
-        # Only require coordinates when shift location has a checkin radius configured
-        if not (self.latitude and self.longitude):
-            frappe.throw(
-                _("Latitude and longitude values are required for checking in at this shift location.")
+            shift_assignment = frappe.get_doc(
+                "Shift Assignment",
+                assignment.name
             )
 
-        distance = get_distance_between_coordinates(
-            latitude, longitude, self.latitude, self.longitude
+            for row in (shift_assignment.custom_additional_locations or []):
+                if row.location:
+                    allowed_locations.append(
+                        row.location
+                    )
+
+        # Remove duplicates while preserving order
+        allowed_locations = list(
+            dict.fromkeys(allowed_locations)
         )
-        if distance > checkin_radius:
-            frappe.throw(
-                _("You must be within {0} meters of your shift location to check in.").format(
-                    checkin_radius
-                ),
-                exc=CheckinRadiusExceededError,
+
+        # If no location is configured, allow check-in without coordinates
+        if not allowed_locations:
+            return
+
+        # Check each approved location and allow check-in
+        # if the employee is within any configured radius
+        for location in allowed_locations:
+
+            checkin_radius, latitude, longitude = frappe.db.get_value(
+                "Shift Location",
+                location,
+                ["checkin_radius", "latitude", "longitude"],
             )
+
+            # If checkin_radius is not set or zero, skip validation
+            if not checkin_radius or checkin_radius <= 0:
+                return
+
+            # Only require coordinates when shift location has a checkin radius configured
+            if not (self.latitude and self.longitude):
+                frappe.throw(
+                    _("Latitude and longitude values are required for checking in at this shift location.")
+                )
+
+            # Latitude and longitude are provided, validate distance
+            distance = get_distance_between_coordinates(
+                latitude,
+                longitude,
+                self.latitude,
+                self.longitude,
+            )
+
+            # Allow check-in if employee is within any approved location radius
+            if distance <= checkin_radius:
+                return
+
+        frappe.throw(
+            _("You are outside the allowed check-in radius."),
+            exc=CheckinRadiusExceededError,
+        )
