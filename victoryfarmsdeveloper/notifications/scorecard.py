@@ -178,3 +178,143 @@ def queue_appraisal_notifications(doc, method):
             job_name=f"Appraisal notification queue for {doc.name}"
         )
 
+
+def send_pending_appraisal_notifications_summary():
+    """
+    Send summary notifications to managers for pending appraisals.
+    Groups all pending appraisals by manager and sends one summary email per manager.
+    Triggered on 19th, 23rd, 27th, and 30th of each month at 8:30 AM.
+    """
+    try:
+        today = frappe.utils.getdate()
+        day = today.day
+
+        # Only run on 19th, 23rd, 27th, or 30th
+        if day not in [19, 23, 27, 30]:
+            return
+
+        # Check if already sent today (prevent duplicates)
+        if frappe.db.exists(
+            "Email Queue",
+            {
+                "subject": ["like", "Action Required: % Pending Appraisal Approval(s)%"],
+                "creation": [">", today],
+            },
+        ):
+            return
+
+        current_cycle = datetime.today().strftime("%B %Y")
+        pending_appraisals = frappe.get_all(
+            "Appraisal",
+            filters={
+                "workflow_state": ["not in", ["Approved", "To Amend", "Cancelled"]],
+                "appraisal_cycle": current_cycle
+            },
+            fields=["name", "workflow_state", "employee"]
+        )
+
+        if not pending_appraisals:
+            return
+
+        # Group appraisals by manager
+        manager_appraisals = {}
+        for appraisal in pending_appraisals:
+            doc = frappe.get_doc("Appraisal", appraisal.name)
+            workflow = frappe.get_doc("Workflow", {"name": "Individual Appraisal"})
+
+            for state in workflow.states:
+                if state.state == doc.workflow_state:
+                    role = state.allow_edit
+                    manager = get_manager_for_role(doc.employee, role)
+                    if manager:
+                        if manager not in manager_appraisals:
+                            manager_appraisals[manager] = []
+                        manager_appraisals[manager].append(doc)
+                    break
+
+        # Send summary email per manager
+        for manager_user, appraisals in manager_appraisals.items():
+            send_summary_email(manager_user, appraisals)
+
+    except Exception as e:
+        frappe.log_error(f"General error: {e}", "Appraisal Summary Notification Debug")
+
+
+def get_manager_for_role(employee, role):
+    """
+    Find the manager for a given employee and role by traversing the reports_to chain.
+    Returns the user_id of the first eligible manager, or None if not found.
+    """
+    current_employee = employee
+    for _ in range(5):
+        reports_to = frappe.db.get_value("Employee", current_employee, "reports_to")
+        if not reports_to:
+            break
+        user_id = frappe.db.get_value("Employee", reports_to, "user_id")
+        has_role = frappe.db.exists("Has Role", {"role": role, "parent": user_id, "parenttype": "User"})
+        is_enabled = frappe.db.get_value("User", user_id, "enabled") == 1
+        is_sys_mgr = frappe.db.exists("Has Role", {"role": "System Manager", "parent": user_id, "parenttype": "User"})
+        if has_role and is_enabled and not is_sys_mgr:
+            return user_id
+        current_employee = reports_to
+    return None
+
+
+def send_summary_email(manager_user, appraisals):
+    """
+    Send a summary email to a manager with all their pending appraisals.
+    """
+    try:
+        manager_name = frappe.db.get_value("User", manager_user, "first_name")
+
+        # Build HTML table
+        rows = ""
+        for appraisal in appraisals:
+            employee_name = frappe.db.get_value("Employee", appraisal.employee, "employee_name")
+            department = frappe.db.get_value("Employee", appraisal.employee, "department")
+            url = frappe.utils.get_url_to_form("Appraisal", appraisal.name)
+
+            rows += f"""
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;">{employee_name}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">{department}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">{appraisal.workflow_state}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">
+                        <a href="{url}">Review Appraisal</a>
+                    </td>
+                </tr>
+            """
+
+        message_table = f"""
+            <table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
+                <thead>
+                    <tr style="background-color: #f2f2f2;">
+                        <th style="padding: 8px; border: 1px solid #ddd;">Employee</th>
+                        <th style="padding: 8px; border: 1px solid #ddd;">Department</th>
+                        <th style="padding: 8px; border: 1px solid #ddd;">Status</th>
+                        <th style="padding: 8px; border: 1px solid #ddd;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {rows}
+                </tbody>
+            </table>
+        """
+
+        frappe.sendmail(
+            recipients=[manager_user],
+            subject=f"Action Required: {len(appraisals)} Pending Appraisal Approval(s) - {manager_name}",
+            message=f"""
+                Hello {manager_name},<br><br>
+                You have {len(appraisals)} appraisal approval(s) pending your review.<br><br>
+                {message_table}
+                <br><br>
+                Please complete these appraisals by the end of the month.<br><br>
+                VF HR
+            """,
+            now=True
+        )
+
+    except Exception as e:
+        frappe.log_error(f"Email error for {manager_user}: {e}", "Appraisal Summary Notification Debug")
+
