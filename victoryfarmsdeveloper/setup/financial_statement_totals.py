@@ -2,9 +2,14 @@ import hashlib
 import inspect
 
 import frappe
+from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import get_accounting_dimensions
 from erpnext.accounts.report import financial_statements
+from frappe import _
 from frappe.query_builder.functions import Sum
+from frappe.utils import cstr
 from pypika.terms import ExistsCriterion
+
+from victoryfarmsdeveloper.setup import gl_day_totals
 
 DAILY_TOTAL_ROOT_TYPES = ("Income", "Expense")
 EXPECTED_SOURCE_SHA256 = "a5b1c6048d581c94ffd432c5209f74d98b0b888f8869de1e4421ed75417790d6"
@@ -27,6 +32,18 @@ def get_accounting_entries(
 	if root_lft and root_rgt and not root_belongs_to_company(root_lft, root_rgt, filters.company):
 		return []
 
+	if doctype == "GL Entry" and not group_by_account and day_totals_cover(filters):
+		return entries_from_day_totals(
+			from_date,
+			to_date,
+			filters,
+			root_lft,
+			root_rgt,
+			root_type,
+			ignore_closing_entries,
+			ignore_opening_entries,
+		)
+
 	if doctype != "GL Entry" or group_by_account or root_type not in DAILY_TOTAL_ROOT_TYPES:
 		return original_get_accounting_entries(
 			doctype,
@@ -42,6 +59,30 @@ def get_accounting_entries(
 			group_by_account=group_by_account,
 		)
 
+	return daily_gl_totals(
+		from_date,
+		to_date,
+		filters,
+		root_lft,
+		root_rgt,
+		root_type,
+		ignore_closing_entries,
+		ignore_opening_entries,
+	)
+
+
+def daily_gl_totals(
+	from_date,
+	to_date,
+	filters,
+	root_lft,
+	root_rgt,
+	root_type,
+	ignore_closing_entries,
+	ignore_opening_entries,
+	posting_dates=None,
+):
+	doctype = "GL Entry"
 	gl_entry = frappe.qb.DocType(doctype)
 	query = (
 		frappe.qb.from_(gl_entry)
@@ -59,11 +100,14 @@ def get_accounting_entries(
 		.where(gl_entry.company == filters.company)
 		.where(gl_entry.is_cancelled == 0)
 		.where(gl_entry.posting_date <= to_date)
-		.force_index("posting_date_company_index")
 	)
 
-	ignore_is_opening = frappe.db.get_single_value("Accounts Settings", "ignore_is_opening_check_for_reporting")
-	if ignore_opening_entries and not ignore_is_opening:
+	if posting_dates is None:
+		query = query.force_index("posting_date_company_index")
+	else:
+		query = query.where(gl_entry.posting_date.isin(posting_dates))
+
+	if ignore_opening_entries and not ignore_is_opening_check():
 		query = query.where(gl_entry.is_opening == "No")
 
 	query = financial_statements.apply_additional_conditions(
@@ -87,6 +131,126 @@ def get_accounting_entries(
 	query += " GROUP BY `account`, `posting_date`, `is_opening`, `fiscal_year`, `account_currency`"
 
 	return frappe.db.sql(query, params, as_dict=True)
+
+
+def day_totals_cover(filters):
+	if not filters or filters.get("project") or not gl_day_totals.is_ready():
+		return False
+
+	if any(filters.get(dimension.fieldname) for dimension in get_accounting_dimensions(as_list=False)):
+		return False
+
+	from frappe.desk.reportview import build_match_conditions
+
+	return not build_match_conditions("GL Entry")
+
+
+def entries_from_day_totals(
+	from_date,
+	to_date,
+	filters,
+	root_lft,
+	root_rgt,
+	root_type,
+	ignore_closing_entries,
+	ignore_opening_entries,
+):
+	live_dates = sorted(
+		d
+		for d in gl_day_totals.live_dates(filters.company)
+		if d <= frappe.utils.getdate(to_date) and (not from_date or d >= frappe.utils.getdate(from_date))
+	)
+
+	totals = frappe.qb.Table(gl_day_totals.TABLE)
+	query = (
+		frappe.qb.from_(totals)
+		.select(
+			totals.account,
+			Sum(totals.debit).as_("debit"),
+			Sum(totals.credit).as_("credit"),
+			Sum(totals.debit_in_account_currency).as_("debit_in_account_currency"),
+			Sum(totals.credit_in_account_currency).as_("credit_in_account_currency"),
+			totals.account_currency,
+			totals.posting_date,
+			totals.is_opening,
+			totals.fiscal_year,
+		)
+		.where(totals.company == filters.company)
+		.where(totals.posting_date <= to_date)
+		.groupby(totals.account, totals.posting_date, totals.is_opening, totals.fiscal_year, totals.account_currency)
+	)
+
+	if from_date:
+		query = query.where(totals.posting_date >= from_date)
+
+	if live_dates:
+		query = query.where(totals.posting_date.notin(live_dates))
+
+	if ignore_opening_entries and not ignore_is_opening_check():
+		query = query.where(totals.is_opening == "No")
+
+	if ignore_closing_entries:
+		query = query.where(totals.is_closing == 0)
+
+	if filters.get("cost_center"):
+		filters.cost_center = financial_statements.get_cost_centers_with_children(filters.cost_center)
+		query = query.where(totals.cost_center.isin(filters.cost_center))
+
+	query = query.where(totals.finance_book.isin(finance_books(filters)))
+
+	if (root_lft and root_rgt) or root_type:
+		accounts = leaf_accounts(root_lft, root_rgt, root_type)
+		if not accounts:
+			return []
+		query = query.where(totals.account.isin(accounts))
+
+	entries = [blank_to_none(row) for row in query.run(as_dict=True)]
+
+	if live_dates:
+		entries += daily_gl_totals(
+			from_date,
+			to_date,
+			filters,
+			root_lft,
+			root_rgt,
+			root_type,
+			ignore_closing_entries,
+			ignore_opening_entries,
+			posting_dates=live_dates,
+		)
+
+	return entries
+
+
+def finance_books(filters):
+	books = [cstr(filters.finance_book), ""]
+	if filters.get("include_default_book_entries"):
+		company_fb = frappe.get_cached_value("Company", filters.company, "default_finance_book")
+		if filters.finance_book and company_fb and cstr(filters.finance_book) != cstr(company_fb):
+			frappe.throw(_("To use a different finance book, please uncheck 'Include Default FB Entries'"))
+		books.append(cstr(company_fb))
+	return list(dict.fromkeys(books))
+
+
+def leaf_accounts(root_lft, root_rgt, root_type):
+	filters = {"is_group": 0}
+	if root_lft and root_rgt:
+		filters["lft"] = (">=", root_lft)
+		filters["rgt"] = ("<=", root_rgt)
+	if root_type:
+		filters["root_type"] = root_type
+	return frappe.get_all("Account", filters=filters, pluck="name")
+
+
+def blank_to_none(row):
+	for fieldname in ("account_currency", "is_opening", "fiscal_year"):
+		if row.get(fieldname) == "":
+			row[fieldname] = None
+	return row
+
+
+def ignore_is_opening_check():
+	return frappe.db.get_single_value("Accounts Settings", "ignore_is_opening_check_for_reporting")
 
 
 def root_belongs_to_company(root_lft, root_rgt, company):

@@ -103,6 +103,7 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.db_indexes.enforce",
     "victoryfarmsdeveloper.setup.workspace_counts.check",
     "victoryfarmsdeveloper.setup.till_customer_search.check",
+    "victoryfarmsdeveloper.setup.gl_day_totals.ensure_table",
     "victoryfarmsdeveloper.setup.financial_statement_totals.check",
     "victoryfarmsdeveloper.setup.employee_saves.check",
     "victoryfarmsdeveloper.setup.stock_warehouse_filter.check",
@@ -224,7 +225,11 @@ scheduler_events = {
     ],
     "cron": {
         "*/5 * * * *": [
-            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.sms_settings.sms_settings.retry_failed_or_stuck_sms"
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.sms_settings.sms_settings.retry_failed_or_stuck_sms",
+            "victoryfarmsdeveloper.setup.gl_day_totals.refresh"
+        ],
+        "45 4 * * *": [
+            "victoryfarmsdeveloper.setup.gl_day_totals.enqueue_verify"
         ],
         "0 7 * * *": [
             "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check"
