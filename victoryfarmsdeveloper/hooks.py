@@ -13,6 +13,8 @@ fixtures = [
     {"dt": "Server Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Custom Field", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Property Setter", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+    {"dt": "Workflow", "filters": [["name", "=", "Job Requisition Approval"]]},
+    {"dt": "Workflow State", "filters": [["workflow_state_name", "in", ["Department Head Approved", "HR Operations Director Approved", "Gate 1 Approved", "Returned with Feedback"]]]},
 ]
 
 
@@ -323,6 +325,9 @@ doc_events = {
     "Payroll Entry": {
         "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payroll_entry.payroll_entry.create_journal_entry_on_submit",
         "on_cancel": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payroll_entry.payroll_entry.cancel_journal_entry_on_cancel"
+       },
+    "Job Requisition": {
+        "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.job_requisition.job_requisition.validate_job_requisition"
        }
 }
 
