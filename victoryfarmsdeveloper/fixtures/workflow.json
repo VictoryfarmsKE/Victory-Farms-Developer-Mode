@@ -1,0 +1,139 @@
+[
+    {
+        "doctype": "Workflow",
+        "document_type": "Job Requisition",
+        "is_active": 1,
+        "module": "VictoryFarmsDeveloper",
+        "name": "Job Requisition Approval",
+        "override_status": 0,
+        "send_email_alert": 1,
+        "states": [
+            {
+                "allow_edit": "HR User",
+                "doc_status": "0",
+                "doctype": "Workflow Document State",
+                "parent": "Job Requisition Approval",
+                "parentfield": "states",
+                "parenttype": "Workflow",
+                "state": "Draft"
+            },
+            {
+                "allow_edit": "HR Manager",
+                "doc_status": "0",
+                "doctype": "Workflow Document State",
+                "parent": "Job Requisition Approval",
+                "parentfield": "states",
+                "parenttype": "Workflow",
+                "state": "Department Head Approved"
+            },
+            {
+                "allow_edit": "HR Manager",
+                "doc_status": "0",
+                "doctype": "Workflow Document State",
+                "parent": "Job Requisition Approval",
+                "parentfield": "states",
+                "parenttype": "Workflow",
+                "state": "HR Operations Director Approved"
+            },
+            {
+                "allow_edit": "HR Manager",
+                "doc_status": "0",
+                "doctype": "Workflow Document State",
+                "parent": "Job Requisition Approval",
+                "parentfield": "states",
+                "parenttype": "Workflow",
+                "state": "Gate 1 Approved"
+            },
+            {
+                "allow_edit": "HR User",
+                "doc_status": "0",
+                "doctype": "Workflow Document State",
+                "parent": "Job Requisition Approval",
+                "parentfield": "states",
+                "parenttype": "Workflow",
+                "state": "Returned with Feedback"
+            }
+        ],
+        "transitions": [
+            {
+                "action": "Approve as Department Head",
+                "allow_self_approval": 1,
+                "allowed": "HR Manager",
+                "doctype": "Workflow Transition",
+                "next_state": "Department Head Approved",
+                "parent": "Job Requisition Approval",
+                "parentfield": "transitions",
+                "parenttype": "Workflow",
+                "state": "Draft"
+            },
+            {
+                "action": "Return with Feedback",
+                "allow_self_approval": 1,
+                "allowed": "HR Manager",
+                "doctype": "Workflow Transition",
+                "next_state": "Returned with Feedback",
+                "parent": "Job Requisition Approval",
+                "parentfield": "transitions",
+                "parenttype": "Workflow",
+                "state": "Draft"
+            },
+            {
+                "action": "Approve as HR Operations Director",
+                "allow_self_approval": 1,
+                "allowed": "HR Manager",
+                "doctype": "Workflow Transition",
+                "next_state": "HR Operations Director Approved",
+                "parent": "Job Requisition Approval",
+                "parentfield": "transitions",
+                "parenttype": "Workflow",
+                "state": "Department Head Approved"
+            },
+            {
+                "action": "Return with Feedback",
+                "allow_self_approval": 1,
+                "allowed": "HR Manager",
+                "doctype": "Workflow Transition",
+                "next_state": "Returned with Feedback",
+                "parent": "Job Requisition Approval",
+                "parentfield": "transitions",
+                "parenttype": "Workflow",
+                "state": "Department Head Approved"
+            },
+            {
+                "action": "Gate 1 - Approve",
+                "allow_self_approval": 1,
+                "allowed": "HR Manager",
+                "doctype": "Workflow Transition",
+                "next_state": "Gate 1 Approved",
+                "parent": "Job Requisition Approval",
+                "parentfield": "transitions",
+                "parenttype": "Workflow",
+                "state": "HR Operations Director Approved"
+            },
+            {
+                "action": "Return with Feedback",
+                "allow_self_approval": 1,
+                "allowed": "HR Manager",
+                "doctype": "Workflow Transition",
+                "next_state": "Returned with Feedback",
+                "parent": "Job Requisition Approval",
+                "parentfield": "transitions",
+                "parenttype": "Workflow",
+                "state": "HR Operations Director Approved"
+            },
+            {
+                "action": "Resubmit",
+                "allow_self_approval": 1,
+                "allowed": "HR User",
+                "doctype": "Workflow Transition",
+                "next_state": "Draft",
+                "parent": "Job Requisition Approval",
+                "parentfield": "transitions",
+                "parenttype": "Workflow",
+                "state": "Returned with Feedback"
+            }
+        ],
+        "workflow_name": "Job Requisition Approval",
+        "workflow_state_field": "workflow_state"
+    }
+]
