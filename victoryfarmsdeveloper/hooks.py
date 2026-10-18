@@ -104,6 +104,7 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.processing_line_dimension.enforce",
     "victoryfarmsdeveloper.setup.gl_day_totals.ensure_table",
     "victoryfarmsdeveloper.setup.financial_statement_totals.check",
+    "victoryfarmsdeveloper.setup.trial_balance_totals.check",
     "victoryfarmsdeveloper.setup.db_indexes.enforce",
     "victoryfarmsdeveloper.setup.workspace_counts.check",
     "victoryfarmsdeveloper.setup.till_customer_search.check",

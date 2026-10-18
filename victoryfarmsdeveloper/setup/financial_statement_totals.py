@@ -5,7 +5,8 @@ import frappe
 from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import get_accounting_dimensions
 from erpnext.accounts.report import financial_statements
 from frappe import _
-from frappe.query_builder.functions import Sum
+from frappe.query_builder import Field
+from frappe.query_builder.functions import Max, Sum
 from frappe.utils import cstr
 from pypika.terms import ExistsCriterion
 
@@ -32,17 +33,29 @@ def get_accounting_entries(
 	if root_lft and root_rgt and not root_belongs_to_company(root_lft, root_rgt, filters.company):
 		return []
 
-	if doctype == "GL Entry" and not group_by_account and day_totals_cover(filters):
-		return entries_from_day_totals(
-			from_date,
-			to_date,
-			filters,
-			root_lft,
-			root_rgt,
-			root_type,
-			ignore_closing_entries,
-			ignore_opening_entries,
-		)
+	if doctype == "GL Entry" and day_totals_cover(filters):
+		if not group_by_account:
+			return entries_from_day_totals(
+				from_date,
+				to_date,
+				filters,
+				root_lft,
+				root_rgt,
+				root_type,
+				ignore_closing_entries,
+				ignore_opening_entries,
+			)
+		if group_by_account and grouped_totals_allowed(filters):
+			return entries_by_account_from_day_totals(
+				from_date,
+				to_date,
+				filters,
+				root_lft,
+				root_rgt,
+				root_type,
+				ignore_closing_entries,
+				ignore_opening_entries,
+			)
 
 	if doctype != "GL Entry" or group_by_account or root_type not in DAILY_TOTAL_ROOT_TYPES:
 		return original_get_accounting_entries(
@@ -145,7 +158,22 @@ def day_totals_cover(filters):
 	return not build_match_conditions("GL Entry")
 
 
-def entries_from_day_totals(
+def grouped_totals_allowed(filters):
+	from victoryfarmsdeveloper.setup import trial_balance_totals
+
+	return trial_balance_totals.is_installed() and not filters.get("presentation_currency")
+
+
+def live_dates_between(company, from_date, to_date):
+	return sorted(
+		d
+		for d in gl_day_totals.live_dates(company)
+		if d <= frappe.utils.getdate(to_date) and (not from_date or d >= frappe.utils.getdate(from_date))
+	)
+
+
+def day_totals_query(
+	totals,
 	from_date,
 	to_date,
 	filters,
@@ -154,30 +182,10 @@ def entries_from_day_totals(
 	root_type,
 	ignore_closing_entries,
 	ignore_opening_entries,
+	live_dates,
 ):
-	live_dates = sorted(
-		d
-		for d in gl_day_totals.live_dates(filters.company)
-		if d <= frappe.utils.getdate(to_date) and (not from_date or d >= frappe.utils.getdate(from_date))
-	)
-
-	totals = frappe.qb.Table(gl_day_totals.TABLE)
 	query = (
-		frappe.qb.from_(totals)
-		.select(
-			totals.account,
-			Sum(totals.debit).as_("debit"),
-			Sum(totals.credit).as_("credit"),
-			Sum(totals.debit_in_account_currency).as_("debit_in_account_currency"),
-			Sum(totals.credit_in_account_currency).as_("credit_in_account_currency"),
-			totals.account_currency,
-			totals.posting_date,
-			totals.is_opening,
-			totals.fiscal_year,
-		)
-		.where(totals.company == filters.company)
-		.where(totals.posting_date <= to_date)
-		.groupby(totals.account, totals.posting_date, totals.is_opening, totals.fiscal_year, totals.account_currency)
+		frappe.qb.from_(totals).where(totals.company == filters.company).where(totals.posting_date <= to_date)
 	)
 
 	if from_date:
@@ -201,8 +209,51 @@ def entries_from_day_totals(
 	if (root_lft and root_rgt) or root_type:
 		accounts = leaf_accounts(root_lft, root_rgt, root_type)
 		if not accounts:
-			return []
+			return None
 		query = query.where(totals.account.isin(accounts))
+
+	return query
+
+
+def entries_from_day_totals(
+	from_date,
+	to_date,
+	filters,
+	root_lft,
+	root_rgt,
+	root_type,
+	ignore_closing_entries,
+	ignore_opening_entries,
+):
+	live_dates = live_dates_between(filters.company, from_date, to_date)
+
+	totals = frappe.qb.Table(gl_day_totals.TABLE)
+	query = day_totals_query(
+		totals,
+		from_date,
+		to_date,
+		filters,
+		root_lft,
+		root_rgt,
+		root_type,
+		ignore_closing_entries,
+		ignore_opening_entries,
+		live_dates,
+	)
+	if query is None:
+		return []
+
+	query = query.select(
+		totals.account,
+		Sum(totals.debit).as_("debit"),
+		Sum(totals.credit).as_("credit"),
+		Sum(totals.debit_in_account_currency).as_("debit_in_account_currency"),
+		Sum(totals.credit_in_account_currency).as_("credit_in_account_currency"),
+		totals.account_currency,
+		totals.posting_date,
+		totals.is_opening,
+		totals.fiscal_year,
+	).groupby(totals.account, totals.posting_date, totals.is_opening, totals.fiscal_year, totals.account_currency)
 
 	entries = [blank_to_none(row) for row in query.run(as_dict=True)]
 
@@ -218,8 +269,100 @@ def entries_from_day_totals(
 			ignore_opening_entries,
 			posting_dates=live_dates,
 		)
+		entries.sort(key=grouped_order)
 
 	return entries
+
+
+def grouped_order(entry):
+	return (
+		entry.posting_date,
+		cstr(entry.is_opening),
+		cstr(entry.fiscal_year),
+		cstr(entry.account_currency),
+	)
+
+
+def entries_by_account_from_day_totals(
+	from_date,
+	to_date,
+	filters,
+	root_lft,
+	root_rgt,
+	root_type,
+	ignore_closing_entries,
+	ignore_opening_entries,
+):
+	live_dates = live_dates_between(filters.company, from_date, to_date)
+
+	totals = frappe.qb.Table(gl_day_totals.TABLE)
+	query = day_totals_query(
+		totals,
+		from_date,
+		to_date,
+		filters,
+		root_lft,
+		root_rgt,
+		root_type,
+		ignore_closing_entries,
+		ignore_opening_entries,
+		live_dates,
+	)
+	if query is None:
+		return []
+	query = query.select(*amount_columns(totals))
+
+	if live_dates:
+		gl_entry = frappe.qb.DocType("GL Entry")
+		live = (
+			frappe.qb.from_(gl_entry)
+			.select(*amount_columns(gl_entry))
+			.where(gl_entry.company == filters.company)
+			.where(gl_entry.is_cancelled == 0)
+			.where(gl_entry.posting_date <= to_date)
+			.where(gl_entry.posting_date.isin(live_dates))
+		)
+		if ignore_opening_entries and not ignore_is_opening_check():
+			live = live.where(gl_entry.is_opening == "No")
+		live = financial_statements.apply_additional_conditions(
+			"GL Entry", live, from_date, ignore_closing_entries, filters
+		)
+		if (root_lft and root_rgt) or root_type:
+			live = live.where(
+				ExistsCriterion(
+					financial_statements.get_account_filter_query(root_lft, root_rgt, root_type, gl_entry)
+				)
+			)
+		query = query.union_all(live)
+
+	return summed_by_account(query, ("posting_date", "is_opening", "fiscal_year"))
+
+
+def amount_columns(table):
+	return (
+		table.account,
+		table.account_currency,
+		table.posting_date,
+		table.is_opening,
+		table.fiscal_year,
+		table.debit,
+		table.credit,
+		table.debit_in_account_currency,
+		table.credit_in_account_currency,
+	)
+
+
+def summed_by_account(query, extra_fields=()):
+	rows = frappe.qb.from_(query).select(
+		Field("account"),
+		Max(Field("account_currency")).as_("account_currency"),
+		*(Max(Field(fieldname)).as_(fieldname) for fieldname in extra_fields),
+		Sum(Field("debit")).as_("debit"),
+		Sum(Field("credit")).as_("credit"),
+		Sum(Field("debit_in_account_currency")).as_("debit_in_account_currency"),
+		Sum(Field("credit_in_account_currency")).as_("credit_in_account_currency"),
+	).groupby(Field("account"))
+	return [blank_to_none(row) for row in rows.run(as_dict=True)]
 
 
 def finance_books(filters):
