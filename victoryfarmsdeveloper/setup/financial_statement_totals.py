@@ -1,5 +1,6 @@
 import hashlib
 import inspect
+import re
 
 import frappe
 from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import get_accounting_dimensions
@@ -8,11 +9,12 @@ from frappe import _
 from frappe.query_builder import Field
 from frappe.query_builder.functions import Max, Sum
 from frappe.utils import cstr
-from pypika.terms import ExistsCriterion
+from pypika.terms import Criterion, ExistsCriterion
 
 from victoryfarmsdeveloper.setup import gl_day_totals
 
 DAILY_TOTAL_ROOT_TYPES = ("Income", "Expense")
+TOTALS_MATCH_FIELDS = ("company", "account", "cost_center", "finance_book")
 EXPECTED_SOURCE_SHA256 = "a5b1c6048d581c94ffd432c5209f74d98b0b888f8869de1e4421ed75417790d6"
 original_get_accounting_entries = financial_statements.get_accounting_entries
 
@@ -153,9 +155,33 @@ def day_totals_cover(filters):
 	if any(filters.get(dimension.fieldname) for dimension in get_accounting_dimensions(as_list=False)):
 		return False
 
+	return totals_match_conditions() is not None
+
+
+def gl_match_conditions():
 	from frappe.desk.reportview import build_match_conditions
 
-	return not build_match_conditions("GL Entry")
+	return build_match_conditions("GL Entry")
+
+
+def totals_match_conditions():
+	conditions = gl_match_conditions()
+	if not conditions:
+		return ""
+	fields = set(re.findall(r"`tabGL Entry`\.`(\w+)`", conditions))
+	rest = re.sub(r"`tabGL Entry`\.`\w+`", "", conditions)
+	if "`" in rest or not fields <= set(TOTALS_MATCH_FIELDS):
+		return None
+	return conditions.replace("`tabGL Entry`.", f"`{gl_day_totals.TABLE}`.")
+
+
+class RawCondition(Criterion):
+	def __init__(self, sql):
+		super().__init__()
+		self.sql = sql
+
+	def get_sql(self, **kwargs):
+		return f"({self.sql})"
 
 
 def grouped_totals_allowed(filters):
@@ -211,6 +237,10 @@ def day_totals_query(
 		if not accounts:
 			return None
 		query = query.where(totals.account.isin(accounts))
+
+	match_conditions = totals_match_conditions()
+	if match_conditions:
+		query = query.where(RawCondition(match_conditions))
 
 	return query
 
@@ -333,6 +363,9 @@ def entries_by_account_from_day_totals(
 					financial_statements.get_account_filter_query(root_lft, root_rgt, root_type, gl_entry)
 				)
 			)
+		match_conditions = gl_match_conditions()
+		if match_conditions:
+			live = live.where(RawCondition(match_conditions))
 		query = query.union_all(live)
 
 	return summed_by_account(query, ("posting_date", "is_opening", "fiscal_year"))
