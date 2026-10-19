@@ -211,6 +211,7 @@ EGG_PRICE_PER_KG = 1200  # KES, fixed for all partners
 HAPA_AREA_SQM = 80  # m2 per hapa net
 
 # Pond -> number of hapas (source: Pond Flipping Schedule)
+# Used as fallback when the Pond DocType has no matching record.
 HAPA_COUNTS = {
     "B11": 15,
     "H1-02": 15,
@@ -219,7 +220,24 @@ HAPA_COUNTS = {
     "H2-07": 4,
     "H2-04": 10,
     "H2-06": 9,
+    "H0-10": 17,
 }
+
+
+def get_hapa_counts():
+    """Return pond -> hapa_count mapping.
+
+    Reads from the **Pond** DocType first; falls back to the hardcoded
+    HAPA_COUNTS dict for any pond not found in the DocType.
+    """
+    counts = dict(HAPA_COUNTS)  # start with fallback
+    try:
+        for row in frappe.get_all("Pond", fields=["pond_name", "number_of_hapas"]):
+            if row.pond_name and row.number_of_hapas:
+                counts[row.pond_name] = int(row.number_of_hapas)
+    except Exception:
+        pass  # Pond DocType may not exist yet (pre-migration)
+    return counts
 
 
 def _format_mobile(raw):
@@ -309,6 +327,7 @@ def send_daily_egg_collection_summary():
     year_start = frappe.utils.get_year_start(today)
 
     # ---- build & send one message per client ------------------------------
+    hapa_map = get_hapa_counts()
     sent = []
     failed = []
 
@@ -324,7 +343,7 @@ def send_daily_egg_collection_summary():
         # Hapa efficiency (only meaningful when ponds are in the map)
         efficiencies = []
         for pd_ in data["ponds"]:
-            nh = HAPA_COUNTS.get(pd_["pond"], 0)
+            nh = hapa_map.get(pd_["pond"], 0)
             if nh > 0:
                 efficiencies.append(pd_["eggs"] / (nh * HAPA_AREA_SQM))
         avg_efficiency = (
