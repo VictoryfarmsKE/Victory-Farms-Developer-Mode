@@ -135,11 +135,10 @@ def on_expense_claim_update(doc, method=None):
 
     # if doc.workflow_state == "Submitted":
     #     _notify_approver_on_submit(doc)
-    # elif doc.workflow_state == "Approved":
-    #     handle_approved_claim(doc)
-    #     send_status_notification(doc, "approved")
-    # elif doc.workflow_state == "Rejected":
-    #     send_status_notification(doc, "rejected")
+    if doc.workflow_state == "Approved":
+        handle_approved_claim(doc)
+    elif doc.workflow_state == "Rejected":
+        handle_rejected_claim(doc)
 
 
 def handle_approved_claim(doc):
@@ -148,6 +147,36 @@ def handle_approved_claim(doc):
         create_additional_salary(doc)
     else:
         create_purchase_order(doc)
+
+
+def handle_rejected_claim(doc):
+    """Handle rejected claims by creating activity log entry and sending notification."""
+    # Create activity log entry for rejection
+    create_workflow_comment(doc, "Rejected")
+
+    # Send email notification (with error handling for unconfigured email)
+    send_status_notification(doc, "rejected")
+
+
+def create_workflow_comment(doc, status):
+    """Create a workflow comment/activity log entry for the claim."""
+    comment_content = f"Workflow State: {status}"
+
+    if doc.custom_hr_remarks:
+        comment_content += f"\n\nHR Remarks: {doc.custom_hr_remarks}"
+
+    try:
+        comment = frappe.get_doc({
+            "doctype": "Comment",
+            "comment_type": "Workflow",
+            "reference_doctype": doc.doctype,
+            "reference_name": doc.name,
+            "content": comment_content,
+            "comment_email": frappe.session.user,
+        })
+        comment.insert(ignore_permissions=True)
+    except Exception as e:
+        frappe.log_error(f"Failed to create workflow comment: {e}")
 
 
 def create_purchase_order(doc):
