@@ -79,14 +79,8 @@ def validate_expense_claim(doc, method=None):
             if payable_account:
                 doc.payable_account = payable_account
 
-    # Sync approval_status with the workflow state so ERPNext's standard
-    # Expense Claim validation (which expects Approved/Rejected) does not block
-    # the workflow Submit/Approve/Reject actions.
-    if doc.workflow_state == "Rejected":
-        doc.approval_status = "Rejected"
-    elif doc.workflow_state in ("Submitted", "Approved"):
-        doc.approval_status = "Approved"
-    else:
+    # Only set default approval_status if not already set
+    if not doc.approval_status:
         doc.approval_status = "Approved"
 
 
@@ -122,22 +116,22 @@ def on_expense_claim_update(doc, method=None):
     if not _has_development_allowance_rows(doc):
         return
 
-    if not doc.workflow_state:
+    if not doc.approval_status:
         return
 
-    previous_workflow_state = doc.get_doc_before_save().workflow_state if doc.get_doc_before_save() else None
+    previous_approval_status = doc.get_doc_before_save().approval_status if doc.get_doc_before_save() else None
 
-    if doc.workflow_state == previous_workflow_state:
+    if doc.approval_status == previous_approval_status:
         return
     # Email notifications are handled by Notification records configured in the
     # site UI. Reimbursement document creation (Purchase Order / Additional
     # Salary) is now a manual HR action via the UI, not automatic on approval.
 
-    # if doc.workflow_state == "Submitted":
+    # if doc.approval_status == "Submitted":
     #     _notify_approver_on_submit(doc)
-    if doc.workflow_state == "Approved":
+    if doc.approval_status == "Approved":
         handle_approved_claim(doc)
-    elif doc.workflow_state == "Rejected":
+    elif doc.approval_status == "Rejected":
         handle_rejected_claim(doc)
 
 
