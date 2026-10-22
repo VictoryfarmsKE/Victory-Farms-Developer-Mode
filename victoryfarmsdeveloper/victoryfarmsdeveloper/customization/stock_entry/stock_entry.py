@@ -249,6 +249,13 @@ def make_stock_in_entry(source_name, target_doc=None):
         )
 
     # Call the original function if no duplicate exists
+    #hide end transit button after creating stock in entry
+    frappe.db.set_value(
+    "Stock Entry",
+    source_name,
+    "custom_end_transit_clicked",
+    1
+)
     return original_make_stock_in_entry(source_name, target_doc)
 
 PROCESSING_LINE_TYPES = ("Harvesting of Fish", "Fish Processing SUVAC")
