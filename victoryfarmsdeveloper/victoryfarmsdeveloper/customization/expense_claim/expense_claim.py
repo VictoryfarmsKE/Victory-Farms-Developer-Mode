@@ -79,21 +79,11 @@ def validate_expense_claim(doc, method=None):
             if payable_account:
                 doc.payable_account = payable_account
 
-    # Only set default approval_status if not already set
-    if not doc.approval_status:
-        doc.approval_status = "Approved"
-
-
+    
 def before_submit_expense_claim(doc, method=None):
     """Enforce mandatory attachment and sub-type for Development Allowance rows."""
     if not _has_development_allowance_rows(doc):
         return
-
-    # Set approval_status so ERPNext\u0027s on_submit validation passes
-    if doc.workflow_state == "Rejected":
-        doc.approval_status = "Rejected"
-    else:
-        doc.approval_status = "Approved"
 
     if not frappe.db.exists(
         "File",
