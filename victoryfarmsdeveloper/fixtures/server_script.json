@@ -150,5 +150,17 @@
   "reference_doctype": "Purchase Receipt",
   "script": "# Purchase Taxes and Charges Template is mandatory only when Type is Feeds.\n# Landed Costs is never mandatory and is deliberately not validated here.\n# 'feed' is matched case-insensitively so both 'Feed' and 'Feeds' work.\ntype_value = (doc.get(\"custom_type\") or \"\").strip()\n\nif type_value and \"feed\" in type_value.lower():\n    if not doc.get(\"taxes_and_charges\"):\n        frappe.throw(\n            \"Purchase Taxes and Charges Template is mandatory when Type is \"\n            + type_value\n        )",
   "script_type": "DocType Event"
- }
+ },
+    {
+        "allow_guest":  0,
+        "disabled":  0,
+        "doctype":  "Server Script",
+        "doctype_event":  "After Insert",
+        "event_frequency":  "All",
+        "module":  "VictoryFarmsDeveloper",
+        "name":  "Job Applicant Intake Emails",
+        "reference_doctype":  "Job Applicant",
+        "script":  "position = None\nif doc.job_title:\n    position = frappe.db.get_value(\"Job Opening\", doc.job_title, \"job_title\") or doc.job_title\nposition = position or \"the advertised position\"\napplicant = doc.applicant_name or \"Applicant\"\nfirst_name = applicant.split(\" \")[0]\n\nta_message = (\n    \"Hello Talent Acquisition,\u003cbr\u003e\u003cbr\u003e\"\n    \"A new application has been received via the careers portal.\u003cbr\u003e\u003cbr\u003e\"\n    \"\u003cb\u003eApplicant:\u003c/b\u003e {}\u003cbr\u003e\"\n    \"\u003cb\u003eEmail:\u003c/b\u003e {}\u003cbr\u003e\"\n    \"\u003cb\u003ePhone:\u003c/b\u003e {}\u003cbr\u003e\"\n    \"\u003cb\u003ePosition:\u003c/b\u003e {}\u003cbr\u003e\"\n    \"\u003cb\u003eSource:\u003c/b\u003e {}\u003cbr\u003e\u003cbr\u003e\"\n    \"Review the application here: {}\u003cbr\u003e\u003cbr\u003e\"\n    \"Regards,\u003cbr\u003eVictory Farms Careers Portal\"\n).format(\n    applicant,\n    doc.email_id or \"-\",\n    doc.phone_number or \"-\",\n    position,\n    doc.source or \"-\",\n    frappe.utils.get_url(\"/app/job-applicant/\" + doc.name),\n)\n\nack_message = (\n    \"Dear {},\u003cbr\u003e\u003cbr\u003e\"\n    \"Thank you for taking the time to apply for the \u003cb\u003e{}\u003c/b\u003e position at Victory Farms. \"\n    \"We have received your application and our Talent Acquisition team will review it carefully.\u003cbr\u003e\u003cbr\u003e\"\n    \"Applications are reviewed on a rolling basis, and we will reach out to you directly \"\n    \"if your profile matches what we are looking for.\u003cbr\u003e\u003cbr\u003e\"\n    \"We appreciate your interest in joining Victory Farms.\u003cbr\u003e\u003cbr\u003e\"\n    \"Warm regards,\u003cbr\u003e\"\n    \"Talent Acquisition Team\u003cbr\u003e\"\n    \"Victory Farms\"\n).format(first_name, position)\n\ntry:\n    frappe.sendmail(\n        recipients=[\"recruit@victoryfarmskenya.com\"],\n        subject=\"New application: {} - {}\".format(position, applicant),\n        message=ta_message,\n        now=True,\n    )\nexcept Exception as e:\n    frappe.log_error(title=\"Job Applicant TA Notification\", message=\"Failed for {}: {}\".format(doc.name, e))\n\ntry:\n    if doc.email_id:\n        frappe.sendmail(\n            recipients=[doc.email_id],\n            subject=\"Thank you for applying to Victory Farms - {}\".format(position),\n            message=ack_message,\n            now=True,\n        )\nexcept Exception as e:\n    frappe.log_error(title=\"Job Applicant Acknowledgement\", message=\"Failed for {}: {}\".format(doc.name, e))",
+        "script_type":  "DocType Event"
+    }
 ]
