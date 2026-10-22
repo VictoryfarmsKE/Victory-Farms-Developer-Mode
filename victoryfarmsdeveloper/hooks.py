@@ -15,6 +15,7 @@ fixtures = [
     {"dt": "Property Setter", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Workflow", "filters": [["name", "=", "Job Requisition Approval"]]},
     {"dt": "Workflow State", "filters": [["workflow_state_name", "in", ["Department Head Approved", "HR Operations Director Approved", "Gate 1 Approved", "Returned with Feedback"]]]},
+    {"dt": "Web Form", "filters": [["name", "=", "job-application"]]},
 ]
 
 
