@@ -256,7 +256,6 @@ def make_stock_in_entry(source_name, target_doc=None):
     "custom_end_transit_clicked",
     1
     )
-    frappe.db.commit()
     return original_make_stock_in_entry(source_name, target_doc)
 
 PROCESSING_LINE_TYPES = ("Harvesting of Fish", "Fish Processing SUVAC")
