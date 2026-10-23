@@ -310,6 +310,7 @@ doc_events = {
         "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.employee.employee.validate_mandatory_fields"
     },
     "Payment Entry": {
+        "before_validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payment_entry.bank_cross_rate.apply_bank_cross_rate",
         "validate": [
             "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payment_entry.payment_entry.set_beneficiary_purpose_of_payment",
             "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payment_entry.payment_entry.set_beneficiary_total",
