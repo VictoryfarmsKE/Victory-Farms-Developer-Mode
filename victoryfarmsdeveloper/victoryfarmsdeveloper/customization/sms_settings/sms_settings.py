@@ -201,3 +201,227 @@ def validate_receiver_nos(receiver_list):
         throw(_("Please enter valid mobile nos"))
 
     return validated_receiver_list
+
+
+# ---------------------------------------------------------------------------
+# Daily consolidated egg-collection SMS
+# ---------------------------------------------------------------------------
+
+EGG_PRICE_PER_KG = 1200  # KES, fixed for all partners
+HAPA_AREA_SQM = 80  # m2 per hapa net
+
+# Pond -> number of hapas (source: Pond Flipping Schedule)
+# Used as fallback when the Pond DocType has no matching record.
+HAPA_COUNTS = {
+    "B11": 15,
+    "H1-02": 15,
+    "B8": 16,
+    "H0-07": 18,
+    "H2-07": 4,
+    "H2-04": 10,
+    "H2-06": 9,
+    "H0-10": 17,
+}
+
+
+def get_hapa_counts():
+    """Return pond -> hapa_count mapping.
+
+    Reads from the **Pond** DocType first; falls back to the hardcoded
+    HAPA_COUNTS dict for any pond not found in the DocType.
+    """
+    counts = dict(HAPA_COUNTS)  # start with fallback
+    try:
+        for row in frappe.get_all("Pond", fields=["pond_name", "number_of_hapas"]):
+            if row.pond_name and row.number_of_hapas:
+                counts[row.pond_name] = int(row.number_of_hapas)
+    except Exception:
+        pass  # Pond DocType may not exist yet (pre-migration)
+    return counts
+
+
+def _format_mobile(raw):
+    """Normalise a Kenyan mobile number to 254XXXXXXXXX format."""
+    if not raw:
+        return None
+    cleaned = raw.replace(" ", "").replace("-", "").replace("(", "").replace(")", "")
+    if cleaned.startswith("0"):
+        return "254" + cleaned[1:]
+    if cleaned.startswith("+254"):
+        return cleaned[1:]
+    if cleaned.startswith("254"):
+        return cleaned
+    return cleaned
+
+
+@frappe.whitelist()
+def send_daily_egg_collection_summary():
+    """Scheduled at 18:00 daily.
+
+    Queries every submitted "Egg collection" Project Update for today,
+    groups them by client and sends **one** consolidated SMS per client.
+    Works the same whether the partner has 1 pond or 10.
+    """
+    today = nowdate()
+
+    records = frappe.db.sql(
+        """
+        SELECT custom_client,
+               custom_client_mobile,
+               custom_pond,
+               custom_number_of_eggs_collected,
+               custom_additional_notes,
+               custom_project_name,
+               date
+        FROM `tabProject Update`
+        WHERE custom_activity = 'Egg collection'
+          AND docstatus = 1
+          AND date = %s
+          AND custom_client IS NOT NULL
+          AND custom_client != ''
+        """,
+        today,
+        as_dict=True,
+    )
+
+    if not records:
+        frappe.log_error(
+            "No egg-collection records for " + today, "Daily SMS Summary"
+        )
+        return "No egg-collection records for " + today
+
+    # ---- group by client --------------------------------------------------
+    clients = {}
+    for r in records:
+        client = r.custom_client
+        if client not in clients:
+            clients[client] = {
+                "mobile": r.custom_client_mobile,
+                "ponds": [],
+                "total_eggs": 0.0,
+                "project": r.custom_project_name or "Victory Farm Project",
+                "date": r.date,
+            }
+        eggs = float(r.custom_number_of_eggs_collected or 0)
+        clients[client]["ponds"].append(
+            {"pond": r.custom_pond or "N/A", "eggs": eggs}
+        )
+        clients[client]["total_eggs"] += eggs
+
+    # ---- MTD / YTD helper -------------------------------------------------
+    def _sum_eggs(client_name, from_date):
+        result = frappe.db.sql(
+            """
+            SELECT SUM(custom_number_of_eggs_collected)
+            FROM `tabProject Update`
+            WHERE custom_client = %s
+              AND custom_activity = 'Egg collection'
+              AND docstatus = 1
+              AND date >= %s
+            """,
+            (client_name, from_date),
+        )
+        return float(result[0][0] or 0)
+
+    month_start = frappe.utils.get_first_day(today)
+    year_start = frappe.utils.get_year_start(today)
+
+    # ---- build & send one message per client ------------------------------
+    hapa_map = get_hapa_counts()
+    sent = []
+    failed = []
+
+    for client_name, data in clients.items():
+        mobile = _format_mobile(data["mobile"])
+        if not mobile:
+            failed.append(client_name + " (no mobile)")
+            continue
+
+        total_eggs = data["total_eggs"]
+        earnings = total_eggs * EGG_PRICE_PER_KG
+
+        # Hapa efficiency (only meaningful when ponds are in the map)
+        efficiencies = []
+        for pd_ in data["ponds"]:
+            nh = hapa_map.get(pd_["pond"], 0)
+            if nh > 0:
+                efficiencies.append(pd_["eggs"] / (nh * HAPA_AREA_SQM))
+        avg_efficiency = (
+            round(sum(efficiencies) / len(efficiencies), 2)
+            if efficiencies
+            else None
+        )
+
+        mtd_eggs = _sum_eggs(client_name, month_start)
+        ytd_eggs = _sum_eggs(client_name, year_start)
+
+        # ---- compose message ----
+        msg = (
+            "Hello "
+            + client_name
+            + ", thank you for being a valued Victory Pond Partner."
+            + " We are dedicated to growing together.\n\n"
+        )
+        msg += (
+            "Today's collections ("
+            + frappe.utils.format_date(data["date"])
+            + "):\n\n"
+        )
+
+        for pd_ in data["ponds"]:
+            msg += (
+                "Pond " + pd_["pond"] + ": "
+                + str(round(pd_["eggs"], 3)) + " Kg\n"
+            )
+
+        msg += (
+            "\nTotal collected today: " + str(round(total_eggs, 2)) + " Kg\n"
+        )
+        msg += "Earning you: KES " + str(round(earnings, 2)) + "\n"
+
+        if avg_efficiency is not None:
+            msg += (
+                "Hapa Efficiency (avg): "
+                + str(avg_efficiency)
+                + " g/m2\n"
+            )
+
+        msg += (
+            "\nMonth to date: " + str(round(mtd_eggs, 2)) + " kg eggs\n"
+        )
+        msg += "Year to date: " + str(round(ytd_eggs, 2)) + " kg eggs\n\n"
+
+        msg += (
+            "Your partnership is important to both our development."
+            " We welcome you to join the harvesting for Verification"
+            " and transparency of the process.\n\n"
+        )
+        msg += (
+            "Thank you again for partnering with us in feeding"
+            " families with Fresh Kenyan Tilapia."
+        )
+
+        # ---- send ----
+        try:
+            send_sms(receiver_list=[mobile], msg=msg)
+            sent.append(client_name)
+        except Exception as e:
+            frappe.log_error(
+                "Daily summary SMS failed for "
+                + client_name
+                + ": "
+                + str(e),
+                "Daily SMS Error",
+            )
+            failed.append(client_name)
+
+    summary = (
+        "Daily egg SMS summary for "
+        + today
+        + ". Sent: "
+        + str(len(sent))
+        + ". Failed: "
+        + str(len(failed))
+    )
+    frappe.log_error(summary, "Daily SMS Summary")
+    return summary

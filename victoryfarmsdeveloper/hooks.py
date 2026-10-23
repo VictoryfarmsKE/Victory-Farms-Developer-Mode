@@ -264,6 +264,9 @@ scheduler_events = {
         "0 5 * * *": [
             "victoryfarmsdeveloper.victoryfarmsdeveloper.doctype.tardiness_record.tardiness_record.process_daily_attendance"
         ],
+        "0 18 * * *": [
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.sms_settings.sms_settings.send_daily_egg_collection_summary"
+        ],
         "0 5 24 * *": [
             "victoryfarmsdeveloper.victoryfarmsdeveloper.doctype.tardiness_record.tardiness_record.send_monthly_hr_tardiness_report"
         ],
