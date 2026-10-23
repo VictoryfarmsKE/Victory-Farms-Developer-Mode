@@ -125,10 +125,12 @@ def create_journal_entry_on_submit(doc, method=None):
     for account, amount in sorted(employer_debits.items()):
         if amount:
             accounts.append(_je_line(account, debit=amount))
-    for account, amount in sorted(credit_totals.items()):
-        if amount:
-            accounts.append(_je_line(account, credit=amount))
-    for account, amount in sorted(employer_credits.items()):
+    # Merge employee and employer credits so each liability account gets one line
+    merged_credits = {}
+    for source in (credit_totals, employer_credits):
+        for account, amount in source.items():
+            merged_credits[account] = merged_credits.get(account, 0) + amount
+    for account, amount in sorted(merged_credits.items()):
         if amount:
             accounts.append(_je_line(account, credit=amount))
 
