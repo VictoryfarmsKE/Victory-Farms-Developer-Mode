@@ -90,10 +90,17 @@ def _sync_approval_status(doc):
     hidden from users, so it is derived from workflow_state here. The real
     approve/reject decision lives in workflow_state.
     """
+    previous = doc.approval_status
     if doc.workflow_state == "Rejected":
         doc.approval_status = "Rejected"
     elif doc.workflow_state and doc.workflow_state != "Draft":
         doc.approval_status = "Approved"
+
+    if doc.approval_status != previous and doc.docstatus != 2:
+        # HRMS computed these before our hook ran, using the old value:
+        # rejected claims get a zero sanctioned amount and the Rejected status.
+        doc.calculate_total_amount()
+        doc.set_status()
 
 
 def before_submit_expense_claim(doc, method=None):
