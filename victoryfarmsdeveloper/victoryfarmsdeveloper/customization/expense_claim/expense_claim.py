@@ -79,11 +79,32 @@ def validate_expense_claim(doc, method=None):
             if payable_account:
                 doc.payable_account = payable_account
 
-    
+    _sync_approval_status(doc)
+
+
+def _sync_approval_status(doc):
+    """Keep HRMS's internal approval_status in step with the workflow state.
+
+    HRMS ExpenseClaim.on_submit throws "Approval Status must be 'Approved' or
+    'Rejected'" while approval_status is still its default "Draft". The field is
+    hidden from users, so it is derived from workflow_state here. The real
+    approve/reject decision lives in workflow_state.
+    """
+    if doc.workflow_state == "Rejected":
+        doc.approval_status = "Rejected"
+    elif doc.workflow_state and doc.workflow_state != "Draft":
+        doc.approval_status = "Approved"
+
+
 def before_submit_expense_claim(doc, method=None):
     """Enforce mandatory attachment and sub-type for Development Allowance rows."""
     if not _has_development_allowance_rows(doc):
         return
+
+    _sync_approval_status(doc)
+    # Safety net when no workflow state is set: never leave "Draft" at submit.
+    if doc.approval_status == "Draft":
+        doc.approval_status = "Approved"
 
     if not frappe.db.exists(
         "File",
@@ -106,22 +127,20 @@ def on_expense_claim_update(doc, method=None):
     if not _has_development_allowance_rows(doc):
         return
 
-    if not doc.approval_status:
+    if not doc.workflow_state:
         return
 
-    previous_approval_status = doc.get_doc_before_save().approval_status if doc.get_doc_before_save() else None
+    before = doc.get_doc_before_save()
+    previous_workflow_state = before.workflow_state if before else None
 
-    if doc.approval_status == previous_approval_status:
+    if doc.workflow_state == previous_workflow_state:
         return
     # Email notifications are handled by Notification records configured in the
     # site UI. Reimbursement document creation (Purchase Order / Additional
-    # Salary) is now a manual HR action via the UI, not automatic on approval.
+    # Salary) is a manual HR action via the UI, not automatic on approval, so
+    # handle_approved_claim is intentionally not called here.
 
-    # if doc.approval_status == "Submitted":
-    #     _notify_approver_on_submit(doc)
-    if doc.approval_status == "Approved":
-        handle_approved_claim(doc)
-    elif doc.approval_status == "Rejected":
+    if doc.workflow_state == "Rejected":
         handle_rejected_claim(doc)
 
 
@@ -134,12 +153,11 @@ def handle_approved_claim(doc):
 
 
 def handle_rejected_claim(doc):
-    """Handle rejected claims by creating activity log entry and sending notification."""
-    # Create activity log entry for rejection
-    create_workflow_comment(doc, "Rejected")
+    """Record the rejection (with HR remarks) in the claim's activity log.
 
-    # Send email notification (with error handling for unconfigured email)
-    send_status_notification(doc, "rejected")
+    The email to the employee is sent by the site's Notification records.
+    """
+    create_workflow_comment(doc, "Rejected")
 
 
 def create_workflow_comment(doc, status):
