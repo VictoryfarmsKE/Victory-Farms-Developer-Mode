@@ -79,7 +79,22 @@ def validate_expense_claim(doc, method=None):
             if payable_account:
                 doc.payable_account = payable_account
 
+    _require_hr_remarks_on_decision(doc)
     _sync_approval_status(doc)
+
+
+def _require_hr_remarks_on_decision(doc):
+    """The Payroll Officer must explain an approval or rejection.
+
+    The form asks for the remarks in a dialog when Approve/Reject is clicked;
+    this enforces it for every other path (API, bulk actions) as well. The
+    applicant is never asked for remarks.
+    """
+    before = doc.get_doc_before_save()
+    if not before or before.workflow_state != "Submitted":
+        return
+    if doc.workflow_state in ("Approved", "Rejected") and not (doc.custom_hr_remarks or "").strip():
+        frappe.throw(_("HR Remarks are required to approve or reject a claim."))
 
 
 def _sync_approval_status(doc):
@@ -147,7 +162,9 @@ def on_expense_claim_update(doc, method=None):
     # Salary) is a manual HR action via the UI, not automatic on approval, so
     # handle_approved_claim is intentionally not called here.
 
-    if doc.workflow_state == "Rejected":
+    if doc.workflow_state == "Approved":
+        create_workflow_comment(doc, "Approved")
+    elif doc.workflow_state == "Rejected":
         handle_rejected_claim(doc)
 
 
