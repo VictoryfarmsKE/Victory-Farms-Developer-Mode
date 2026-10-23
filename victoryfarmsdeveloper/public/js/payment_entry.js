@@ -3,11 +3,28 @@ frappe.ui.form.on('Payment Entry', {
         set_beneficiary_purpose(frm);
         set_beneficiary_total(frm);
         add_upload_beneficiaries_button(frm);
+        set_bank_cross_rate_hint(frm);
     },
     validate(frm) {
         set_beneficiary_purpose(frm);
+    },
+    paid_from_account_currency(frm) {
+        set_bank_cross_rate_hint(frm);
+    },
+    paid_to_account_currency(frm) {
+        set_bank_cross_rate_hint(frm);
     }
 });
+
+function set_bank_cross_rate_hint(frm) {
+    const from = frm.doc.paid_from_account_currency;
+    const to = frm.doc.paid_to_account_currency;
+    frm.set_df_property(
+        'custom_bank_cross_rate',
+        'description',
+        from && to ? `1 ${to} = [?] ${from}` : ''
+    );
+}
 
 frappe.ui.form.on('Payment Entry Beneficiary', {
     amount(frm) {
