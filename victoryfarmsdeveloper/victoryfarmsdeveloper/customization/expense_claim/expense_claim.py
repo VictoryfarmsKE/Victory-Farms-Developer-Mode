@@ -79,15 +79,43 @@ def validate_expense_claim(doc, method=None):
             if payable_account:
                 doc.payable_account = payable_account
 
-    # Sync approval_status with the workflow state so ERPNext's standard
-    # Expense Claim validation (which expects Approved/Rejected) does not block
-    # the workflow Submit/Approve/Reject actions.
+    _require_hr_remarks_on_decision(doc)
+    _sync_approval_status(doc)
+
+
+def _require_hr_remarks_on_decision(doc):
+    """The Payroll Officer must explain an approval or rejection.
+
+    The form asks for the remarks in a dialog when Approve/Reject is clicked;
+    this enforces it for every other path (API, bulk actions) as well. The
+    applicant is never asked for remarks.
+    """
+    before = doc.get_doc_before_save()
+    if not before or before.workflow_state != "Submitted":
+        return
+    if doc.workflow_state in ("Approved", "Rejected") and not (doc.custom_hr_remarks or "").strip():
+        frappe.throw(_("HR Remarks are required to approve or reject a claim."))
+
+
+def _sync_approval_status(doc):
+    """Keep HRMS's internal approval_status in step with the workflow state.
+
+    HRMS ExpenseClaim.on_submit throws "Approval Status must be 'Approved' or
+    'Rejected'" while approval_status is still its default "Draft". The field is
+    hidden from users, so it is derived from workflow_state here. The real
+    approve/reject decision lives in workflow_state.
+    """
+    previous = doc.approval_status
     if doc.workflow_state == "Rejected":
         doc.approval_status = "Rejected"
-    elif doc.workflow_state in ("Submitted", "Approved"):
+    elif doc.workflow_state and doc.workflow_state != "Draft":
         doc.approval_status = "Approved"
-    else:
-        doc.approval_status = "Approved"
+
+    if doc.approval_status != previous and doc.docstatus != 2:
+        # HRMS computed these before our hook ran, using the old value:
+        # rejected claims get a zero sanctioned amount and the Rejected status.
+        doc.calculate_total_amount()
+        doc.set_status()
 
 
 def before_submit_expense_claim(doc, method=None):
@@ -95,10 +123,9 @@ def before_submit_expense_claim(doc, method=None):
     if not _has_development_allowance_rows(doc):
         return
 
-    # Set approval_status so ERPNext\u0027s on_submit validation passes
-    if doc.workflow_state == "Rejected":
-        doc.approval_status = "Rejected"
-    else:
+    _sync_approval_status(doc)
+    # Safety net when no workflow state is set: never leave "Draft" at submit.
+    if doc.approval_status == "Draft":
         doc.approval_status = "Approved"
 
     if not frappe.db.exists(
@@ -125,18 +152,20 @@ def on_expense_claim_update(doc, method=None):
     if not doc.workflow_state:
         return
 
-    previous_workflow_state = doc.get_doc_before_save().workflow_state if doc.get_doc_before_save() else None
+    before = doc.get_doc_before_save()
+    previous_workflow_state = before.workflow_state if before else None
 
     if doc.workflow_state == previous_workflow_state:
         return
+    # Email notifications are handled by Notification records configured in the
+    # site UI. Reimbursement document creation (Purchase Order / Additional
+    # Salary) is a manual HR action via the UI, not automatic on approval, so
+    # handle_approved_claim is intentionally not called here.
 
-    # TODO: Re-enable email notifications once email account is configured
-    # if doc.workflow_state == "Submitted":
-    #     _notify_approver_on_submit(doc)
     if doc.workflow_state == "Approved":
-        handle_approved_claim(doc)
-    # elif doc.workflow_state == "Rejected":
-    #     send_status_notification(doc, "rejected")
+        create_workflow_comment(doc, "Approved")
+    elif doc.workflow_state == "Rejected":
+        handle_rejected_claim(doc)
 
 
 def handle_approved_claim(doc):
@@ -145,6 +174,35 @@ def handle_approved_claim(doc):
         create_additional_salary(doc)
     else:
         create_purchase_order(doc)
+
+
+def handle_rejected_claim(doc):
+    """Record the rejection (with HR remarks) in the claim's activity log.
+
+    The email to the employee is sent by the site's Notification records.
+    """
+    create_workflow_comment(doc, "Rejected")
+
+
+def create_workflow_comment(doc, status):
+    """Create a workflow comment/activity log entry for the claim."""
+    comment_content = f"Workflow State: {status}"
+
+    if doc.custom_hr_remarks:
+        comment_content += f"\n\nHR Remarks: {doc.custom_hr_remarks}"
+
+    try:
+        comment = frappe.get_doc({
+            "doctype": "Comment",
+            "comment_type": "Workflow",
+            "reference_doctype": doc.doctype,
+            "reference_name": doc.name,
+            "content": comment_content,
+            "comment_email": frappe.session.user,
+        })
+        comment.insert(ignore_permissions=True)
+    except Exception as e:
+        frappe.log_error(f"Failed to create workflow comment: {e}")
 
 
 def create_purchase_order(doc):
@@ -236,79 +294,79 @@ def get_payroll_date(submission_date):
     return submission_date
 
 
-def send_status_notification(doc, status):
-    """Send email notification to the requester when claim is approved or rejected."""
-    employee_email = frappe.db.get_value("Employee", doc.employee, "prefered_email")
-    if not employee_email:
-        return
+# def send_status_notification(doc, status):
+#     """Send email notification to the requester when claim is approved or rejected."""
+#     employee_email = frappe.db.get_value("Employee", doc.employee, "prefered_email")
+#     if not employee_email:
+#         return
 
-    subject = f"Development Allowance Claim {status.title()}: {doc.name}"
-    message = f"""
-    <p>Dear {doc.employee_name},</p>
-    <p>Your Development Allowance claim <strong>{doc.name}</strong> has been <strong>{status}</strong>.</p>
-    """
+#     subject = f"Development Allowance Claim {status.title()}: {doc.name}"
+#     message = f"""
+#     <p>Dear {doc.employee_name},</p>
+#     <p>Your Development Allowance claim <strong>{doc.name}</strong> has been <strong>{status}</strong>.</p>
+#     """
 
-    if status == "approved":
-        if _is_any_row_taxable(doc):
-            message += f"""
-            <p>An Additional Salary draft has been created for payroll processing.</p>
-            """
-        else:
-            message += f"""
-            <p>A Purchase Order has been created for reimbursement.</p>
-            """
+#     if status == "approved":
+#         if _is_any_row_taxable(doc):
+#             message += f"""
+#             <p>An Additional Salary draft has been created for payroll processing.</p>
+#             """
+#         else:
+#             message += f"""
+#             <p>A Purchase Order has been created for reimbursement.</p>
+#             """
 
-    if doc.custom_hr_remarks:
-        message += f"""
-        <p><strong>HR Remarks:</strong> {doc.custom_hr_remarks}</p>
-        """
+#     if doc.custom_hr_remarks:
+#         message += f"""
+#         <p><strong>HR Remarks:</strong> {doc.custom_hr_remarks}</p>
+#         """
 
-    message += "<p>Best regards,<br>HR Team</p>"
+#     message += "<p>Best regards,<br>HR Team</p>"
 
-    try:
-        frappe.sendmail(
-            recipients=[employee_email],
-            subject=subject,
-            message=message,
-            reference_doctype=doc.doctype,
-            reference_name=doc.name,
-        )
-    except Exception as e:
-        frappe.log_error(f"Failed to send status notification to employee: {e}")
+#     try:
+#         frappe.sendmail(
+#             recipients=[employee_email],
+#             subject=subject,
+#             message=message,
+#             reference_doctype=doc.doctype,
+#             reference_name=doc.name,
+#         )
+#     except Exception as e:
+#         frappe.log_error(f"Failed to send status notification to employee: {e}")
 
 
-def _notify_approver_on_submit(doc):
-    """Send email to the approver when a Development Allowance claim is submitted."""
-    if not doc.expense_approver:
-        return
+# def _notify_approver_on_submit(doc):
+#     """Send email to the approver when a Development Allowance claim is submitted."""
+#     if not doc.expense_approver:
+#         return
 
-    approver_email = frappe.db.get_value("User", doc.expense_approver, "email")
-    if not approver_email:
-        return
+#     approver_email = frappe.db.get_value("User", doc.expense_approver, "email")
+#     if not approver_email:
+#         return
 
-    sub_type = _get_sub_type(doc) or "N/A"
-    subject = f"New Development Allowance Claim Pending Review: {doc.name}"
-    message = f"""
-    <p>Dear Approver,</p>
-    <p>A new Development Allowance claim <strong>{doc.name}</strong> has been submitted by <strong>{doc.employee_name}</strong> and requires your review.</p>
-    <ul>
-        <li><strong>Sub-Type:</strong> {sub_type}</li>
-        <li><strong>Total Amount:</strong> {doc.grand_total} {doc.currency or ""}</li>
-    </ul>
-    <p>Please review and take action.</p>
-    <p>Best regards,<br>HR System</p>
-    """
+#     sub_type = _get_sub_type(doc) or "N/A"
+#     subject = f"New Development Allowance Claim Pending Review: {doc.name}"
+#     message = f"""
+#     <p>Dear Approver,</p>
+#     <p>A new Development Allowance claim <strong>{doc.name}</strong> has been submitted by <strong>{doc.employee_name}</strong> and requires your review.</p>
+#     <ul>
+#         <li><strong>Sub-Type:</strong> {sub_type}</li>
+#         <li><strong>Total Amount:</strong> {doc.grand_total} {doc.currency or ""}</li>
+#     </ul>
+#     <p>Please review and take action.</p>
+#     <p>Best regards,<br>HR System</p>
+#     """
 
-    try:
-        frappe.sendmail(
-            recipients=[approver_email],
-            subject=subject,
-            message=message,
-            reference_doctype=doc.doctype,
-            reference_name=doc.name,
-        )
-    except Exception as e:
-        frappe.log_error(f"Failed to send approver notification: {e}")
+#     try:
+#         frappe.sendmail(
+#             recipients=[approver_email],
+#             subject=subject,
+#             message=message,
+#             reference_doctype=doc.doctype,
+#             reference_name=doc.name,
+#         )
+#     except Exception as e:
+#         frappe.log_error(f"Failed to send approver notification: {e}")
 
 
 def get_or_create_supplier():
