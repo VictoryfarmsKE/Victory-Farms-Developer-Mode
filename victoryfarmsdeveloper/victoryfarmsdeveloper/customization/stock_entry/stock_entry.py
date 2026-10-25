@@ -249,12 +249,15 @@ def make_stock_in_entry(source_name, target_doc=None):
         )
 
     # Call the original function if no duplicate exists
-    #hide end transit button after creating stock in entry
+ # Hide End Transit button after creating stock in entry
+user_roles = frappe.get_roles()
+
+if "Copilot Transit User" in user_roles:
     frappe.db.set_value(
-    "Stock Entry",
-    source_name,
-    "custom_end_transit_clicked",
-    1
+        "Stock Entry",
+        source_name,
+        "custom_end_transit_clicked",
+        1
     )
     return original_make_stock_in_entry(source_name, target_doc)
 
