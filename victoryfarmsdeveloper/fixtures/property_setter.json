@@ -229,5 +229,38 @@
         "property": "reqd",
         "property_type": "Check",
         "value": "1"
+    },
+    {
+        "doctype": "Property Setter",
+        "doc_type": "Job Requisition",
+        "doctype_or_field": "DocField",
+        "field_name": "job_description_tab",
+        "module": "VictoryFarmsDeveloper",
+        "name": "Job Requisition-job_description_tab-hidden",
+        "property": "hidden",
+        "property_type": "Check",
+        "value": "1"
+    },
+    {
+        "doctype": "Property Setter",
+        "doc_type": "Job Requisition",
+        "doctype_or_field": "DocField",
+        "field_name": "description",
+        "module": "VictoryFarmsDeveloper",
+        "name": "Job Requisition-description-hidden",
+        "property": "hidden",
+        "property_type": "Check",
+        "value": "1"
+    },
+    {
+        "doctype": "Property Setter",
+        "doc_type": "Job Requisition",
+        "doctype_or_field": "DocField",
+        "field_name": "description",
+        "module": "VictoryFarmsDeveloper",
+        "name": "Job Requisition-description-reqd",
+        "property": "reqd",
+        "property_type": "Check",
+        "value": "0"
     }
 ]

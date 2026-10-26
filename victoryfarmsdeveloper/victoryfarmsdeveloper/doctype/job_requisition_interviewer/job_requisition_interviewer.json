@@ -21,9 +21,10 @@
   },
   {
    "fieldname": "interviewer_name",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Name",
+   "options": "Employee",
    "reqd": 1
   },
   {
