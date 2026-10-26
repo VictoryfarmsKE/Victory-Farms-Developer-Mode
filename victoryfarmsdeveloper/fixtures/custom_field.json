@@ -2610,8 +2610,9 @@
         "module": "VictoryFarmsDeveloper",
         "name": "Job Requisition-custom_reports_to",
         "fieldname": "custom_reports_to",
-        "fieldtype": "Data",
+        "fieldtype": "Link",
         "label": "Reports To (Job Title and Name)",
+        "options": "Employee",
         "reqd": 1,
         "insert_after": "custom_target_start_date"
     },
@@ -2630,8 +2631,9 @@
         "module": "VictoryFarmsDeveloper",
         "name": "Job Requisition-custom_direct_reports",
         "fieldname": "custom_direct_reports",
-        "fieldtype": "Int",
+        "fieldtype": "Select",
         "label": "Number of Direct Reports",
+        "options": "1\n2\n3\n4\n5\n6\n7\n8\n9\n10",
         "insert_after": "custom_column_a3"
     },
     {
@@ -2772,8 +2774,9 @@
         "module": "VictoryFarmsDeveloper",
         "name": "Job Requisition-custom_budget_grid_level",
         "fieldname": "custom_budget_grid_level",
-        "fieldtype": "Data",
+        "fieldtype": "Link",
         "label": "Budget / Grid Level",
+        "options": "Employee Grade",
         "reqd": 1,
         "insert_after": "custom_section_c"
     },
@@ -2840,8 +2843,9 @@
         "module": "VictoryFarmsDeveloper",
         "name": "Job Requisition-custom_hm_availability",
         "fieldname": "custom_hm_availability",
-        "fieldtype": "Small Text",
+        "fieldtype": "Table",
         "label": "Hiring Manager Availability for Interviews (Dates)",
+        "options": "Job Requisition Availability Date",
         "reqd": 1,
         "insert_after": "custom_interviewers"
     },
@@ -3011,8 +3015,9 @@
         "module": "VictoryFarmsDeveloper",
         "name": "Job Requisition-custom_dept_head_name",
         "fieldname": "custom_dept_head_name",
-        "fieldtype": "Data",
+        "fieldtype": "Link",
         "label": "Department Head (Name)",
+        "options": "Employee",
         "insert_after": "custom_section_g"
     },
     {
@@ -3040,8 +3045,9 @@
         "module": "VictoryFarmsDeveloper",
         "name": "Job Requisition-custom_hr_ops_name",
         "fieldname": "custom_hr_ops_name",
-        "fieldtype": "Data",
+        "fieldtype": "Link",
         "label": "HR Operations Director (Name)",
+        "options": "Employee",
         "insert_after": "custom_dept_head_date"
     },
     {
