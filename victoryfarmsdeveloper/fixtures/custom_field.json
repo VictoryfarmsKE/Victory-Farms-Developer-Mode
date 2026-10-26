@@ -2802,7 +2802,7 @@
         "fieldtype": "Check",
         "label": "Yes, the job description is attached to this requisition",
         "description": "Mandatory: requisitions without a JD are returned",
-        "reqd": 1,
+        "reqd": 0,
         "insert_after": "custom_section_d",
         "hidden": 1
     },
