@@ -9,6 +9,111 @@ REQUIRED_ROUNDS = (
 	"Round 2: Hiring manager",
 )
 
+# Fixed budget amounts by Employee Grade (KES). Grades not listed are treated
+# as flexible / "Not Set" and the user enters the budget manually.
+GRADE_BUDGET_MAP = {
+	# C grades
+	"C10H": 30150,
+	"C10M": 30150,
+	"C1H": 11250,
+	"C1M": 11250,
+	"C2H": 12825,
+	"C2M": 12825,
+	"C3H": 13725,
+	"C3M": 13725,
+	"C4H": 14850,
+	"C4M": 14850,
+	"C5H": 17100,
+	"C5M": 17100,
+	"C6H": 18900,
+	"C6M": 18900,
+	"C7H": 21600,
+	"C7M": 21600,
+	"C8H": 24300,
+	"C8M": 24300,
+	"C9H": 27225,
+	"C9M": 27225,
+	# F grades
+	"F10H": 43425,
+	"F10M": 43425,
+	"F11H": 45697.5,
+	"F11M": 45697.5,
+	"F12H": 47835,
+	"F12M": 47835,
+	"F13H": 50085,
+	"F13M": 50085,
+	"F14H": 52447.5,
+	"F14M": 52447.5,
+	"F15H": 54922.5,
+	"F15M": 54922.5,
+	"F1H": 19350,
+	"F1M": 19350,
+	"F2H": 21825,
+	"F2M": 21825,
+	"F3H": 24525,
+	"F3M": 24525,
+	"F4H": 27000,
+	"F4M": 27000,
+	"F5H": 29925,
+	"F5M": 29925,
+	"F6H": 32625,
+	"F6M": 32625,
+	"F7H": 35550,
+	"F7M": 35550,
+	"F8H": 37800,
+	"F8M": 37800,
+	"F9H": 40500,
+	"F9M": 40500,
+	# L grades
+	"L10H": 30600,
+	"L10M": 30600,
+	"L11H": 32265,
+	"L11M": 32265,
+	"L12H": 33772.5,
+	"L12M": 33772.5,
+	"L13H": 35347.5,
+	"L13M": 35347.5,
+	"L14H": 37012.5,
+	"L14M": 37012.5,
+	"L15H": 38745,
+	"L15M": 38745,
+	"L1H": 11700,
+	"L1M": 11700,
+	"L2H": 13275,
+	"L2M": 13275,
+	"L3H": 14175,
+	"L3M": 14175,
+	"L4H": 15300,
+	"L4M": 15300,
+	"L5H": 17550,
+	"L5M": 17550,
+	"L6H": 19350,
+	"L6M": 19350,
+	"L7H": 22050,
+	"L7M": 22050,
+	"L8H": 24750,
+	"L8M": 24750,
+	"L9H": 27450,
+	"L9M": 27450,
+	# P grades
+	"P1": 9450,
+	"P2": 9900,
+	"P3": 10350,
+	"P4": 10800,
+	"P5": 11250,
+	# S grades
+	"S1": 40000,
+	"S2": 43200,
+	"S3": 46500,
+	"S4": 51900,
+	"S5": 58700,
+	"S6": 65000,
+	"S7": 71600,
+	"S8": 80500,
+	"S9": 89100,
+	"S10": 102200,
+}
+
 
 @frappe.whitelist()
 def get_employee_details(employee):
@@ -33,62 +138,24 @@ def get_employee_details(employee):
 
 
 @frappe.whitelist()
-def get_department_heads(doctype, txt, searchfield, start, page_len, filters):
-	"""Return all employees who are set as department heads (for Link query)."""
-	heads = frappe.get_all(
-		"Department",
-		filters={"department_head": ("is", "set")},
-		pluck="department_head",
-	)
-	if not heads:
-		return []
-
-	search_txt = f"%{txt}%" if txt else "%"
-	return frappe.db.sql(
-		"""
-		SELECT name, employee_name, designation
-		FROM tabEmployee
-		WHERE name IN %(heads)s
-		  AND status = 'Active'
-		  AND (name LIKE %(txt)s OR employee_name LIKE %(txt)s)
-		ORDER BY employee_name
-		LIMIT %(start)s, %(page_len)s
-		""",
-		{"heads": heads, "txt": search_txt, "start": int(start), "page_len": int(page_len)},
-		as_list=1,
-	)
-
-
-@frappe.whitelist()
-def has_hiring_manager_designation():
-	"""Return True if at least one active employee has the Hiring Manager designation."""
-	return frappe.db.exists(
-		"Employee", {"designation": "Hiring Manager", "status": "Active"}
-	)
+def get_grade_budget_mapping(grade):
+	"""Return the budget type and amount for the selected Employee Grade."""
+	if not grade:
+		return {"budget_type": "Flexible", "fixed_amount": 0}
+	fixed_amount = GRADE_BUDGET_MAP.get(grade)
+	if fixed_amount:
+		return {"budget_type": "Fixed", "fixed_amount": fixed_amount}
+	return {"budget_type": "Flexible", "fixed_amount": 0}
 
 
 def validate_job_requisition(doc, method=None):
-	"""Server-side enforcement of the VF Job Requisition Form rules.
-
-	Mirrors the paper template:
-	- Section D: a requisition without a JD is returned.
-	- Section E: interview rounds 1 and 2 must be named before submission.
-	- Section A: non-permanent roles must state duration / end date.
-	"""
+	"""Server-side enforcement of the VF Job Requisition Form rules."""
 	_validate_job_description(doc)
 	_validate_interviewers(doc)
-	_validate_availability_dates(doc)
-	_validate_contract_end_date(doc)
+	_validate_budget(doc)
 
 
 def _validate_job_description(doc):
-	if not doc.get("custom_jd_attached"):
-		frappe.throw(
-			_(
-				"Job description is mandatory: requisitions without a JD are returned. "
-				"Please attach the JD and tick 'Job Description Attached' in Section D."
-			)
-		)
 	if not doc.get("custom_jd_attachment"):
 		frappe.throw(
 			_("Please upload the job description file (Section D: Job Description Attachment).")
@@ -102,29 +169,31 @@ def _validate_interviewers(doc):
 	missing = [r for r in REQUIRED_ROUNDS if r not in rounds]
 	if missing:
 		frappe.throw(
-			_("Interview rounds 1 and 2 must be named before submission. Missing: {0}").format(
-				", ".join(missing)
-			)
+			_(
+				"Round 1 and Round 2 interviewers must be named before submission. Missing: {0}"
+			).format(", ".join(missing))
 		)
 
 	for row in rows:
-		if not (row.get("interviewer_name") or "").strip():
+		if row.get("interview_round") == "Round 2: Hiring manager" and not (row.get("interviewer_name") or "").strip():
 			frappe.throw(
-				_("Interviewer name is required for {0}.").format(row.get("interview_round"))
+				_("Round 2 interviewer name is required.")
 			)
 
 
-def _validate_availability_dates(doc):
-	availability = doc.get("custom_hm_availability") or []
-	if not availability:
-		frappe.throw(_("Please add at least one hiring manager availability date in Section E."))
+def _validate_budget(doc):
+	grade = doc.get("custom_budget_grid_level")
+	if not grade:
+		return
 
-
-def _validate_contract_end_date(doc):
-	employment_type = doc.get("custom_employment_type")
-	if employment_type and employment_type != "Permanent" and not doc.get("custom_contract_end_date"):
-		frappe.throw(
-			_(
-				"'If Not Permanent: Duration / End Date' is required when Employment Type is {0}."
-			).format(employment_type)
-		)
+	if grade in GRADE_BUDGET_MAP:
+		expected = GRADE_BUDGET_MAP[grade]
+		amount = doc.get("custom_budget_amount") or 0
+		if amount and amount != expected:
+			frappe.msgprint(
+				_(
+					"Budget amount for {0} should normally be {1} KES. Please confirm if different."
+				).format(grade, expected),
+				indicator="orange",
+				alert=True,
+			)
