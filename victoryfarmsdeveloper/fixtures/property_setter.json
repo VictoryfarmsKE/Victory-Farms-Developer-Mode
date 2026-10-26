@@ -262,5 +262,27 @@
         "property": "reqd",
         "property_type": "Check",
         "value": "0"
+    },
+    {
+        "doctype": "Property Setter",
+        "doc_type": "Job Requisition",
+        "doctype_or_field": "DocField",
+        "field_name": "designation",
+        "module": "VictoryFarmsDeveloper",
+        "name": "Job Requisition-designation-hidden",
+        "property": "hidden",
+        "property_type": "Check",
+        "value": "1"
+    },
+    {
+        "doctype": "Property Setter",
+        "doc_type": "Job Requisition",
+        "doctype_or_field": "DocField",
+        "field_name": "status",
+        "module": "VictoryFarmsDeveloper",
+        "name": "Job Requisition-status-default",
+        "property": "default",
+        "property_type": "Text",
+        "value": "Pending"
     }
 ]
