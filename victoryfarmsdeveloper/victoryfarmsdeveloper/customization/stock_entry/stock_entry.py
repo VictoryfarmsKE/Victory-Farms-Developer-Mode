@@ -232,23 +232,30 @@ class CustomStockEntry(StockEntry):
             
 @frappe.whitelist()
 def make_stock_in_entry(source_name, target_doc=None):
-    # Check if a stock entry has already been created for this source
     existing_entry = frappe.db.exists(
         "Stock Entry",
         {
             "outgoing_stock_entry": source_name,
-            "docstatus": ["!=", 2],  # Exclude cancelled entries
+            "docstatus": ["!=", 2],
         },
     )
+
     if existing_entry:
-        # Throw an exception to stop further execution
         frappe.throw(
-            _('A Stock Entry has already been created for this transaction: Click <a href="/app/stock-entry/{0}" target="_blank">{0}</a> to go to the created stock entry').format(existing_entry),
+            _('A Stock Entry has already been created for this transaction: Click /app/stock-entry/{0}{0}</a> to go to the created stock entry').format(existing_entry),
             title=_("Duplicate Stock Entry")
         )
 
-    # Call the original function if no duplicate exists
+    if "Copilot Transit User" in frappe.get_roles():
+        frappe.db.set_value(
+            "Stock Entry",
+            source_name,
+            "custom_end_transit_clicked",
+            1
+        )
+
     return original_make_stock_in_entry(source_name, target_doc)
+
 
 PROCESSING_LINE_TYPES = ("Harvesting of Fish", "Fish Processing SUVAC")
 REQUIRED_LINE_TYPES = ("Fish Processing SUVAC",)
