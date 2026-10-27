@@ -21,6 +21,7 @@ fixtures = [
 # include js, css files in header of desk.html
 # app_include_css = "/assets/victoryfarmsdeveloper/css/victoryfarmsdeveloper.css"
 # app_include_js = "/assets/victoryfarmsdeveloper/js/victoryfarmsdeveloper.js"
+app_include_js = ["/assets/victoryfarmsdeveloper/js/report_exports.js"]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/victoryfarmsdeveloper/css/victoryfarmsdeveloper.css"
@@ -216,6 +217,9 @@ override_doctype_class = {
 # }
 
 scheduler_events = {
+    "hourly": [
+        "victoryfarmsdeveloper.setup.report_exports.sweep_waiting_exports"
+    ],
     "daily": [
         "victoryfarmsdeveloper.notifications.check_low_stock.check_branch_low_stock",
         "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check",
@@ -282,6 +286,9 @@ scheduler_events = {
 
 
 doc_events = {
+    "Prepared Report": {
+        "on_update": "victoryfarmsdeveloper.setup.report_exports.release_waiting_exports"
+    },
     "Asset": {
         "autoname": "victoryfarmsdeveloper.custom_scripts.server_scripts.asset.autoname"
         # "validate": "victoryfarmsdeveloper.custom_scripts.server_scripts.asset.calculate_asset_value_from_purchase_receipt"
@@ -343,7 +350,8 @@ override_whitelisted_methods = {
     "erpnext.stock.doctype.stock_entry.stock_entry.make_stock_in_entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.make_stock_in_entry",
     "frappe.desk.reportview.get_count": "victoryfarmsdeveloper.setup.workspace_counts.get_count",
     "frappe.desk.search.search_link": "victoryfarmsdeveloper.setup.till_customer_search.search_link",
-    "frappe.core.doctype.prepared_report.prepared_report.make_prepared_report": "victoryfarmsdeveloper.setup.report_runs.make_prepared_report"
+    "frappe.core.doctype.prepared_report.prepared_report.make_prepared_report": "victoryfarmsdeveloper.setup.report_runs.make_prepared_report",
+    "frappe.desk.query_report.export_query": "victoryfarmsdeveloper.setup.report_exports.export_query"
 }
 #
 # each overriding function accepts a `data` argument;
