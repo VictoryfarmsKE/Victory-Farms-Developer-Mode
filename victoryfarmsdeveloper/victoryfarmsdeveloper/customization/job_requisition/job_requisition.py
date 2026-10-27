@@ -3,11 +3,11 @@
 
 import frappe
 from frappe import _
+from frappe.utils import get_url_to_form
 
-REQUIRED_ROUNDS = (
-	"Round 1: Talent Acquisition team",
-	"Round 2: Hiring manager",
-)
+MANDATORY_ROUND = "Round 2: Hiring manager"
+
+TA_TEAM_ROLE = "HR User"
 
 # Fixed budget amounts by Employee Grade (KES). Grades not listed are treated
 # as flexible / "Not Set" and the user enters the budget manually.
@@ -198,21 +198,10 @@ def _validate_job_description(doc):
 
 def _validate_interviewers(doc):
 	rows = doc.get("custom_interviewers") or []
-	rounds = {(row.get("interview_round") or "").strip() for row in rows}
+	round2_rows = [row for row in rows if row.get("interview_round") == MANDATORY_ROUND]
 
-	missing = [r for r in REQUIRED_ROUNDS if r not in rounds]
-	if missing:
-		frappe.throw(
-			_(
-				"Round 1 and Round 2 interviewers must be named before submission. Missing: {0}"
-			).format(", ".join(missing))
-		)
-
-	for row in rows:
-		if row.get("interview_round") == "Round 2: Hiring manager" and not (row.get("interviewer_name") or "").strip():
-			frappe.throw(
-				_("Round 2 interviewer name is required.")
-			)
+	if not round2_rows or not (round2_rows[0].get("interviewer_name") or "").strip():
+		frappe.throw(_("Round 2 (Hiring Manager) interviewer is required before submission."))
 
 
 def _validate_budget(doc):
@@ -231,3 +220,103 @@ def _validate_budget(doc):
 				indicator="orange",
 				alert=True,
 			)
+
+
+def on_update_job_requisition(doc, method=None):
+	"""Send approval-workflow emails when workflow_state changes.
+
+	- Draft -> Pending Department Head Approval: notify the named Department Head.
+	- -> Approved / Rejected: notify the TA team (HR User role), including the
+	  rejection reason when applicable.
+	"""
+	previous = doc.get_doc_before_save()
+	previous_state = previous.workflow_state if previous else None
+	current_state = doc.workflow_state
+
+	if previous_state == current_state:
+		return
+
+	if current_state == "Pending Department Head Approval":
+		_notify_department_head(doc)
+	elif current_state in ("Approved", "Rejected"):
+		_notify_ta_team(doc, current_state)
+
+
+def _requester_display_name(doc):
+	return (
+		doc.get("requested_by_name")
+		or frappe.db.get_value("Employee", doc.get("requested_by"), "employee_name")
+		or doc.get("requested_by")
+		or doc.owner
+	)
+
+
+def _notify_department_head(doc):
+	dept_head = doc.get("custom_dept_head_name")
+	if not dept_head:
+		frappe.log_error(
+			title="Job Requisition: missing Department Head",
+			message=f"{doc.name} was submitted without a Department Head selected; no approval email sent.",
+		)
+		return
+
+	user = frappe.db.get_value("Employee", dept_head, "user_id")
+	if not user:
+		frappe.log_error(
+			title="Job Requisition: Department Head has no linked User",
+			message=(
+				f"{doc.name}: Department Head {dept_head} has no User ID on their Employee "
+				"record, so the approval email could not be sent."
+			),
+		)
+		return
+
+	dept_head_name = frappe.db.get_value("Employee", dept_head, "employee_name") or dept_head
+	position_title = doc.get("custom_job_position_title") or doc.name
+	link = get_url_to_form(doc.doctype, doc.name)
+
+	subject = _("Action Required: Job Requisition Approval - {0}").format(position_title)
+	message = f"""
+		<p>{_("Good day")} {dept_head_name},</p>
+		<p>{_("A new job requisition for")} <strong>{position_title}</strong>
+		{_("has been submitted by")} {_requester_display_name(doc)} {_("and requires your approval.")}</p>
+		<p>{_("Please click the link below to review and take action:")}</p>
+		<p><a href="{link}">{_("Review Job Requisition")}</a></p>
+		<p>{_("You will be able to Approve or Reject this request. If rejecting, please provide a reason so the requester can revise and resubmit.")}</p>
+	"""
+
+	frappe.sendmail(recipients=[user], subject=subject, message=message)
+
+
+def _notify_ta_team(doc, state):
+	user_names = frappe.get_all(
+		"Has Role", filters={"role": TA_TEAM_ROLE, "parenttype": "User"}, pluck="parent"
+	)
+	if not user_names:
+		return
+
+	recipients = frappe.get_all(
+		"User",
+		filters={"name": ("in", user_names), "enabled": 1},
+		pluck="name",
+	)
+	if not recipients:
+		return
+
+	position_title = doc.get("custom_job_position_title") or doc.name
+	link = get_url_to_form(doc.doctype, doc.name)
+	state_label = _("Approved") if state == "Approved" else _("Rejected")
+
+	reason_html = ""
+	if state == "Rejected" and doc.get("custom_rejection_reason"):
+		reason_html = f"<p><strong>{_('Reason for rejection')}:</strong> {doc.get('custom_rejection_reason')}</p>"
+
+	subject = _("Job Requisition {0}: {1}").format(state_label, position_title)
+	message = f"""
+		<p>{_("The job requisition")} <strong>{position_title}</strong> {_("has been")}
+		<strong>{state_label}</strong> {_("by the Department Head")}.</p>
+		{reason_html}
+		<p><a href="{link}">{_("View Job Requisition")}</a></p>
+	"""
+
+	frappe.sendmail(recipients=recipients, subject=subject, message=message)

@@ -2839,7 +2839,7 @@
         "options": "Job Requisition Interviewer",
         "reqd": 1,
         "insert_after": "custom_section_e",
-        "description": "Round 1 will be conducted by the TA team. Please specify (1) who will be conducting Round 2 and (2) whether a 3rd round interview will be required and if so, with who."
+        "description": "Round 2 (Hiring Manager) is mandatory. Please also specify whether a 3rd round interview will be required and if so, with who."
     },
     {
         "doctype": "Custom Field",
@@ -2851,7 +2851,8 @@
         "label": "Hiring Manager Availability for Interviews (Dates)",
         "options": "Job Requisition Availability Date",
         "reqd": 0,
-        "insert_after": "custom_interviewers"
+        "insert_after": "custom_interviewers",
+        "hidden": 1
     },
     {
         "doctype": "Custom Field",
@@ -3010,7 +3011,7 @@
         "fieldname": "custom_section_g",
         "fieldtype": "Section Break",
         "label": "Approvals",
-        "description": "Both approvals are required (tracked through the approval workflow)",
+        "description": "Approval by the Department Head is required (tracked through the approval workflow).",
         "insert_after": "custom_buddy_mentor"
     },
     {
@@ -3052,7 +3053,8 @@
         "fieldtype": "Link",
         "label": "HR Operations Director (Name)",
         "options": "Employee",
-        "insert_after": "custom_dept_head_date"
+        "insert_after": "custom_dept_head_date",
+        "hidden": 1
     },
     {
         "doctype": "Custom Field",
@@ -3061,7 +3063,8 @@
         "name": "Job Requisition-custom_column_g2",
         "fieldname": "custom_column_g2",
         "fieldtype": "Column Break",
-        "insert_after": "custom_hr_ops_name"
+        "insert_after": "custom_hr_ops_name",
+        "hidden": 1
     },
     {
         "doctype": "Custom Field",
@@ -3071,7 +3074,8 @@
         "fieldname": "custom_hr_ops_date",
         "fieldtype": "Date",
         "label": "HR Operations Director Approval Date",
-        "insert_after": "custom_column_g2"
+        "insert_after": "custom_column_g2",
+        "hidden": 1
     },
     {
         "doctype": "Custom Field",
@@ -3288,6 +3292,18 @@
         "fieldtype": "Check",
         "label": "Radio",
         "insert_after": "custom_airtime_data"
+    },
+    {
+        "doctype": "Custom Field",
+        "dt": "Job Requisition",
+        "module": "VictoryFarmsDeveloper",
+        "name": "Job Requisition-custom_rejection_reason",
+        "fieldname": "custom_rejection_reason",
+        "fieldtype": "Small Text",
+        "label": "Rejection Reason",
+        "read_only": 1,
+        "depends_on": "eval:doc.custom_rejection_reason",
+        "insert_after": "custom_dept_head_date"
     },
     {
         "alignment": null,
