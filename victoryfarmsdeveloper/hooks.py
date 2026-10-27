@@ -112,7 +112,8 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.employee_saves.check",
     "victoryfarmsdeveloper.setup.stock_warehouse_filter.check",
     "victoryfarmsdeveloper.setup.general_ledger_opening.check",
-    "victoryfarmsdeveloper.setup.pos_closing_commits.check"
+    "victoryfarmsdeveloper.setup.pos_closing_commits.check",
+    "victoryfarmsdeveloper.setup.mpesa_requests.check"
 ]
 
 before_request = ["victoryfarmsdeveloper.setup.patches.install_all"]
@@ -288,6 +289,9 @@ scheduler_events = {
 
 
 doc_events = {
+    "POS Settings": {
+        "validate": "victoryfarmsdeveloper.setup.mpesa_requests.validate_pos_settings"
+    },
     "Prepared Report": {
         "on_update": "victoryfarmsdeveloper.setup.report_exports.release_waiting_exports"
     },
