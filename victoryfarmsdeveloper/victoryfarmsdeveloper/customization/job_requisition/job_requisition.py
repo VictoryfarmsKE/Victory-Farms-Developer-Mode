@@ -116,6 +116,40 @@ GRADE_BUDGET_MAP = {
 
 
 @frappe.whitelist()
+def get_current_employee():
+	"""Return the Employee record linked to the logged-in user, if any.
+
+	Matches on Employee.user_id == the current session user. Runs with
+	ignore_permissions because a requester only needs to resolve their own
+	identity, not browse the Employee list.
+	"""
+	user = frappe.session.user
+	if not user or user == "Guest":
+		return {}
+
+	employee = frappe.db.get_value(
+		"Employee",
+		{"user_id": user, "status": "Active"},
+		["name", "employee_name"],
+		as_dict=True,
+	)
+	if not employee:
+		# Fall back to any status in case the employee record hasn't been
+		# marked Active yet, rather than leaving the requester with nothing.
+		employee = frappe.db.get_value(
+			"Employee",
+			{"user_id": user},
+			["name", "employee_name"],
+			as_dict=True,
+		)
+
+	if not employee:
+		return {}
+
+	return {"name": employee.name, "employee_name": employee.employee_name}
+
+
+@frappe.whitelist()
 def get_employee_details(employee):
 	"""Return job title and contact info for the selected employee."""
 	if not employee:
