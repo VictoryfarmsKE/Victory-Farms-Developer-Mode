@@ -228,6 +228,10 @@ def on_update_job_requisition(doc, method=None):
 	- Draft -> Pending Department Head Approval: notify the named Department Head.
 	- -> Approved / Rejected: notify the TA team (HR User role), including the
 	  rejection reason when applicable.
+
+	Email delivery failures (e.g. no outgoing Email Account configured) are
+	caught and logged rather than raised, so a broken mail setup never blocks
+	the workflow transition itself.
 	"""
 	previous = doc.get_doc_before_save()
 	previous_state = previous.workflow_state if previous else None
@@ -236,10 +240,16 @@ def on_update_job_requisition(doc, method=None):
 	if previous_state == current_state:
 		return
 
-	if current_state == "Pending Department Head Approval":
-		_notify_department_head(doc)
-	elif current_state in ("Approved", "Rejected"):
-		_notify_ta_team(doc, current_state)
+	try:
+		if current_state == "Pending Department Head Approval":
+			_notify_department_head(doc)
+		elif current_state in ("Approved", "Rejected"):
+			_notify_ta_team(doc, current_state)
+	except Exception:
+		frappe.log_error(
+			title="Job Requisition: notification email failed",
+			message=frappe.get_traceback(),
+		)
 
 
 def _requester_display_name(doc):
