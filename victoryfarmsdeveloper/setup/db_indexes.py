@@ -12,6 +12,7 @@ FULLTEXT_INDEXES = (
 	("Customer", "ft_customer_name", "customer_name"),
 )
 COMPOSITE_INDEXES = (
+	("POS Invoice", "pos_profile_status_modified", ("pos_profile", "status", "modified")),
 	(
 		"GL Entry",
 		"gl_month_summary_index",
