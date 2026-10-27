@@ -16,7 +16,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Interview Round",
-   "options": "Round 1: Talent Acquisition team\nRound 2: Hiring manager\nRound 3: Another manager",
+   "options": "Round 2: Hiring manager\nRound 3: Another manager",
    "reqd": 1
   },
   {
