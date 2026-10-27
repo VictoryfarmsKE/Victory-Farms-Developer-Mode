@@ -355,6 +355,7 @@ override_whitelisted_methods = {
     "frappe.desk.reportview.get_count": "victoryfarmsdeveloper.setup.workspace_counts.get_count",
     "frappe.desk.search.search_link": "victoryfarmsdeveloper.setup.till_customer_search.search_link",
     "frappe.core.doctype.prepared_report.prepared_report.make_prepared_report": "victoryfarmsdeveloper.setup.report_runs.make_prepared_report",
+    "frappe.desk.query_report.run": "victoryfarmsdeveloper.setup.report_runs.run",
     "frappe.desk.query_report.export_query": "victoryfarmsdeveloper.setup.report_exports.export_query"
 }
 #

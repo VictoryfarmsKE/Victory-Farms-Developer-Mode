@@ -2,7 +2,7 @@ import frappe
 
 LARGE_TABLE_ROWS = 100_000
 LOCK_WAIT_SECONDS = 60
-REORDER_LOCK_WAIT_SECONDS = 10
+SHORT_LOCK_WAIT_SECONDS = 10
 FIELD_INDEXES = (
 	("POS Invoice", "pos_profile"),
 	("Mpesa Payment Register", "transid"),
@@ -31,6 +31,7 @@ COMPOSITE_INDEXES = (
 		"gl_account_date_totals_index",
 		("account", "company", "is_cancelled", "posting_date", "docstatus", "debit", "credit"),
 	),
+	("GL Entry", "is_opening_posting_date_index", ("is_opening", "posting_date")),
 )
 ORDERED_INDEXES = (
 	("GL Entry", "posting_date_company_index", ("posting_date", "company")),
@@ -84,17 +85,20 @@ def ensure_index(doctype, fieldname, index_name):
 def ensure_composite_index(doctype, index_name, fieldnames):
 	if frappe.db.has_index(f"tab{doctype}", index_name):
 		return
+	frappe.db.sql(f"SET SESSION lock_wait_timeout = {SHORT_LOCK_WAIT_SECONDS}")
 	try:
 		frappe.db.add_index(doctype, list(fieldnames), index_name=index_name)
 	except Exception as e:
 		print(f"Skipped index {index_name} on {doctype}, will retry on next migrate: {e}")
+	finally:
+		frappe.db.sql(f"SET SESSION lock_wait_timeout = {LOCK_WAIT_SECONDS}")
 
 
 def ensure_index_order(doctype, index_name, fieldnames):
 	if index_columns(doctype, index_name) in ([], list(fieldnames)):
 		return
 	columns = ", ".join(f"`{fieldname}`" for fieldname in fieldnames)
-	frappe.db.sql(f"SET SESSION lock_wait_timeout = {REORDER_LOCK_WAIT_SECONDS}")
+	frappe.db.sql(f"SET SESSION lock_wait_timeout = {SHORT_LOCK_WAIT_SECONDS}")
 	try:
 		frappe.db.sql_ddl(
 			f"ALTER TABLE `tab{doctype}` DROP INDEX `{index_name}`, ADD INDEX `{index_name}` ({columns}), "
