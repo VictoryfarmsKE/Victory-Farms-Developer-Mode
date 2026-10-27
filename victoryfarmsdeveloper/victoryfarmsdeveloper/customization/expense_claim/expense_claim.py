@@ -1,6 +1,6 @@
 import frappe
 from frappe import _
-from frappe.utils import today, getdate, add_months
+from frappe.utils import today, getdate, add_months, get_url_to_form, fmt_money, formatdate, escape_html
 
 
 VF_STAFF_ALLOWANCES_SUPPLIER = "VF Staff Allowances"
@@ -157,8 +157,8 @@ def on_expense_claim_update(doc, method=None):
 
     if doc.workflow_state == previous_workflow_state:
         return
-    # Email notifications are handled by Notification records configured in the
-    # site UI. Reimbursement document creation (Purchase Order / Additional
+    # Email notifications are sent by on_expense_claim_workflow_change below.
+    # Reimbursement document creation (Purchase Order / Additional
     # Salary) is a manual HR action via the UI, not automatic on approval, so
     # handle_approved_claim is intentionally not called here.
 
@@ -179,7 +179,7 @@ def handle_approved_claim(doc):
 def handle_rejected_claim(doc):
     """Record the rejection (with HR remarks) in the claim's activity log.
 
-    The email to the employee is sent by the site's Notification records.
+    The email to the employee is sent by on_expense_claim_workflow_change.
     """
     create_workflow_comment(doc, "Rejected")
 
@@ -294,79 +294,216 @@ def get_payroll_date(submission_date):
     return submission_date
 
 
-# def send_status_notification(doc, status):
-#     """Send email notification to the requester when claim is approved or rejected."""
-#     employee_email = frappe.db.get_value("Employee", doc.employee, "prefered_email")
-#     if not employee_email:
-#         return
-
-#     subject = f"Development Allowance Claim {status.title()}: {doc.name}"
-#     message = f"""
-#     <p>Dear {doc.employee_name},</p>
-#     <p>Your Development Allowance claim <strong>{doc.name}</strong> has been <strong>{status}</strong>.</p>
-#     """
-
-#     if status == "approved":
-#         if _is_any_row_taxable(doc):
-#             message += f"""
-#             <p>An Additional Salary draft has been created for payroll processing.</p>
-#             """
-#         else:
-#             message += f"""
-#             <p>A Purchase Order has been created for reimbursement.</p>
-#             """
-
-#     if doc.custom_hr_remarks:
-#         message += f"""
-#         <p><strong>HR Remarks:</strong> {doc.custom_hr_remarks}</p>
-#         """
-
-#     message += "<p>Best regards,<br>HR Team</p>"
-
-#     try:
-#         frappe.sendmail(
-#             recipients=[employee_email],
-#             subject=subject,
-#             message=message,
-#             reference_doctype=doc.doctype,
-#             reference_name=doc.name,
-#         )
-#     except Exception as e:
-#         frappe.log_error(f"Failed to send status notification to employee: {e}")
+PAYROLL_OFFICER_ROLE = "Payroll Officer"
+EMAIL_BRAND_COLOR = "#1b7a3d"
 
 
-# def _notify_approver_on_submit(doc):
-#     """Send email to the approver when a Development Allowance claim is submitted."""
-#     if not doc.expense_approver:
-#         return
+def on_expense_claim_workflow_change(doc, method=None):
+    """Send workflow emails for every Expense Claim.
 
-#     approver_email = frappe.db.get_value("User", doc.expense_approver, "email")
-#     if not approver_email:
-#         return
+    - -> Submitted: notify all Payroll Officers that a claim needs a decision.
+    - -> Approved / Rejected: tell the applicant, including the HR Remarks.
 
-#     sub_type = _get_sub_type(doc) or "N/A"
-#     subject = f"New Development Allowance Claim Pending Review: {doc.name}"
-#     message = f"""
-#     <p>Dear Approver,</p>
-#     <p>A new Development Allowance claim <strong>{doc.name}</strong> has been submitted by <strong>{doc.employee_name}</strong> and requires your review.</p>
-#     <ul>
-#         <li><strong>Sub-Type:</strong> {sub_type}</li>
-#         <li><strong>Total Amount:</strong> {doc.grand_total} {doc.currency or ""}</li>
-#     </ul>
-#     <p>Please review and take action.</p>
-#     <p>Best regards,<br>HR System</p>
-#     """
+    Wired to both on_update and on_update_after_submit because the Approve and
+    Reject transitions happen on an already-submitted document. Delivery
+    failures are logged, never raised, so a broken mail setup cannot block the
+    workflow transition itself.
+    """
+    before = doc.get_doc_before_save()
+    previous_state = before.workflow_state if before else None
+    state = doc.workflow_state
 
-#     try:
-#         frappe.sendmail(
-#             recipients=[approver_email],
-#             subject=subject,
-#             message=message,
-#             reference_doctype=doc.doctype,
-#             reference_name=doc.name,
-#         )
-#     except Exception as e:
-#         frappe.log_error(f"Failed to send approver notification: {e}")
+    if not state or state == previous_state:
+        return
+
+    try:
+        if state == "Submitted":
+            _email_payroll_officers(doc)
+        elif state in ("Approved", "Rejected"):
+            _email_applicant(doc, state)
+    except Exception:
+        frappe.log_error(
+            title="Expense Claim: notification email failed",
+            message=frappe.get_traceback(),
+        )
+
+
+def _claim_summary(doc):
+    types = []
+    for row in (doc.expenses or []):
+        label = row.expense_type or ""
+        if row.custom_expense_sub_type:
+            label += f" - {row.custom_expense_sub_type}"
+        if label and label not in types:
+            types.append(label)
+    return ", ".join(types)
+
+
+def _claim_amount(doc):
+    amount = doc.total_claimed_amount or doc.grand_total or 0
+    return fmt_money(amount, currency=doc.get("currency"))
+
+
+def _render_claim_email(
+    doc, banner, banner_bg, banner_fg, greeting, intro, rows, button_label, remarks=None, accent=None
+):
+    """Build the branded HTML body shared by all Expense Claim emails."""
+    link = get_url_to_form(doc.doctype, doc.name)
+
+    table = ""
+    if rows:
+        table_rows = "".join(
+            '<tr style="background:{bg}"><td width="38%" style="padding:8px;color:#6b7280">{label}</td>'
+            '<td style="padding:8px">{value}</td></tr>'.format(
+                bg="#f9fafb" if i % 2 == 0 else "#ffffff", label=escape_html(label), value=value
+            )
+            for i, (label, value) in enumerate(rows)
+        )
+        table = (
+            '<tr><td style="padding:0 28px 8px"><table width="100%" cellpadding="0" cellspacing="0" '
+            'style="border:1px solid #e5e7eb;font-size:14px">' + table_rows + "</table></td></tr>"
+        )
+
+    remarks_box = ""
+    if remarks is not None:
+        remarks_html = escape_html(remarks).replace("\n", "<br>")
+        remarks_box = (
+            '<tr><td style="padding:0 28px 8px"><div style="border-left:4px solid {accent};'
+            'background:{bg};padding:12px 16px"><div style="font-size:12px;color:{fg};'
+            'font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">{title}</div>'
+            '<div style="font-size:14px;line-height:1.5">{body}</div></div></td></tr>'
+        ).format(accent=accent, bg=banner_bg, fg=banner_fg, title=_("HR Remarks"), body=remarks_html)
+
+    return """
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;font-family:Segoe UI,Arial,sans-serif;color:#1f2937">
+<tr><td style="background:{brand};padding:18px 28px;color:#ffffff;font-size:18px;font-weight:600">Victory Farms &middot; {heading}</td></tr>
+<tr><td style="background:{banner_bg};padding:10px 28px;color:{banner_fg};font-size:13px;font-weight:600">{banner}</td></tr>
+<tr><td style="padding:24px 28px 8px;font-size:15px;line-height:1.5"><p style="margin:0 0 12px">{greeting}</p><p style="margin:0 0 16px">{intro}</p></td></tr>
+{table}
+{remarks_box}
+<tr><td align="center" style="padding:24px 28px"><a href="{link}" style="background:{brand};color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:6px;font-weight:600;font-size:15px;display:inline-block">{button_label}</a></td></tr>
+<tr><td style="padding:0 28px 24px;font-size:13px;color:#6b7280;line-height:1.5">{fallback}: {link}</td></tr>
+<tr><td style="background:#f3f4f6;padding:12px 28px;font-size:12px;color:#9ca3af">{footer}</td></tr>
+</table>
+""".format(
+        brand=EMAIL_BRAND_COLOR,
+        heading=_("Expense Claim"),
+        banner=banner,
+        banner_bg=banner_bg,
+        banner_fg=banner_fg,
+        greeting=greeting,
+        intro=intro,
+        table=table,
+        remarks_box=remarks_box,
+        link=link,
+        button_label=button_label,
+        fallback=_("Button not working? Copy this link"),
+        footer=_("Automated message from Victory Farms ERP. Please do not reply."),
+    )
+
+
+def _email_payroll_officers(doc):
+    """Tell every enabled Payroll Officer that a claim is waiting for a decision."""
+    applicant_user = frappe.db.get_value("Employee", doc.employee, "user_id")
+    user_names = frappe.get_all(
+        "Has Role",
+        filters={"role": PAYROLL_OFFICER_ROLE, "parenttype": "User"},
+        pluck="parent",
+    )
+    recipients = frappe.get_all(
+        "User",
+        filters={"name": ("in", user_names or [""]), "enabled": 1},
+        pluck="name",
+    )
+    recipients = [u for u in recipients if u not in ("Administrator", "Guest", applicant_user)]
+    if not recipients:
+        frappe.log_error(
+            title="Expense Claim: no Payroll Officer to notify",
+            message=f"{doc.name} was submitted but no enabled user holds the {PAYROLL_OFFICER_ROLE} role.",
+        )
+        return
+
+    employee_name = escape_html(doc.employee_name or doc.employee)
+    message = _render_claim_email(
+        doc,
+        banner="&#9679; " + _("Pending your review"),
+        banner_bg="#fff3d6",
+        banner_fg="#8a5a00",
+        greeting=_("Dear Payroll Officer,"),
+        intro=_("{0} has submitted an expense claim that needs your decision.").format(
+            "<b>{0}</b>".format(employee_name)
+        ),
+        rows=[
+            (_("Claim number"), "<b>{0}</b>".format(doc.name)),
+            (_("Employee"), "{0} ({1})".format(employee_name, doc.employee)),
+            (_("Claim type"), escape_html(_claim_summary(doc)) or "-"),
+            (_("Total claimed"), "<b>{0}</b>".format(_claim_amount(doc))),
+            (_("Date submitted"), formatdate(doc.posting_date or today())),
+        ],
+        button_label=_("Review & Decide"),
+    )
+    note = (
+        '<p style="max-width:600px;margin:12px auto;font-size:13px;color:#6b7280;'
+        'font-family:Segoe UI,Arial,sans-serif">'
+        + _("You will be asked for HR Remarks when you approve or reject. The applicant will see them.")
+        + "</p>"
+    )
+
+    frappe.sendmail(
+        recipients=recipients,
+        subject=_("Action required: Expense Claim {0} from {1} ({2})").format(
+            doc.name, doc.employee_name or doc.employee, _claim_amount(doc)
+        ),
+        message=message + note,
+        reference_doctype=doc.doctype,
+        reference_name=doc.name,
+    )
+
+
+def _email_applicant(doc, state):
+    """Tell the applicant the decision, with the HR Remarks and a link to the claim."""
+    employee = frappe.db.get_value(
+        "Employee", doc.employee, ["prefered_email", "user_id", "company_email"], as_dict=True
+    ) or {}
+    recipient = employee.get("prefered_email") or employee.get("user_id") or employee.get("company_email")
+    if not recipient:
+        frappe.log_error(
+            title="Expense Claim: applicant has no email address",
+            message=f"{doc.name}: Employee {doc.employee} has no preferred, user or company email; decision email not sent.",
+        )
+        return
+
+    approved = state == "Approved"
+    decided_by = frappe.get_cached_value("User", frappe.session.user, "full_name") or frappe.session.user
+    verb = _("approved") if approved else _("rejected")
+    colour = "#166534" if approved else "#991b1b"
+    remarks = (doc.custom_hr_remarks or "").strip() or _("No remarks were provided.")
+
+    message = _render_claim_email(
+        doc,
+        banner=("&#10003; " + _("Approved")) if approved else ("&#10007; " + _("Rejected")),
+        banner_bg="#dcfce7" if approved else "#fee2e2",
+        banner_fg=colour,
+        greeting=_("Dear {0},").format(escape_html(doc.employee_name or doc.employee)),
+        intro=_("Your expense claim {0} for {1} has been {2} by {3}.").format(
+            "<b>{0}</b>".format(doc.name),
+            "<b>{0}</b>".format(_claim_amount(doc)),
+            '<b style="color:{0}">{1}</b>'.format(colour, verb),
+            escape_html(decided_by),
+        ),
+        rows=[],
+        button_label=_("View Claim"),
+        remarks=remarks,
+        accent="#1b7a3d" if approved else "#dc2626",
+    )
+
+    frappe.sendmail(
+        recipients=[recipient],
+        subject=_("Your Expense Claim {0} has been {1}").format(doc.name, verb),
+        message=message,
+        reference_doctype=doc.doctype,
+        reference_name=doc.name,
+    )
 
 
 def get_or_create_supplier():
