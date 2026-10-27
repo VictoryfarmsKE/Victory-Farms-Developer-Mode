@@ -2631,9 +2631,9 @@
         "module": "VictoryFarmsDeveloper",
         "name": "Job Requisition-custom_direct_reports",
         "fieldname": "custom_direct_reports",
-        "fieldtype": "Select",
+        "fieldtype": "Int",
         "label": "Number of Direct Reports",
-        "options": "1\n2\n3\n4\n5\n6\n7\n8\n9\n10",
+        "non_negative": 1,
         "insert_after": "custom_column_a4",
         "reqd": 1
     },
