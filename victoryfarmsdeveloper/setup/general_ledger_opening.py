@@ -10,6 +10,9 @@ EXPECTED_SOURCE_SHA256 = "5e1be54cebb50c82408bb357f9cd8b8b49e8b5c5adeede29392af6
 original_get_gl_entries = general_ledger.get_gl_entries
 RECENT_DAYS = 400
 SUMMED_FIELDS = ("debit", "credit", "debit_in_account_currency", "credit_in_account_currency")
+FROM_DATE_OR_OPENING = "(posting_date >=%(from_date)s or is_opening = 'Yes')"
+TO_DATE_OR_OPENING = "(posting_date <=%(to_date)s or is_opening = 'Yes')"
+OPENING_INDEX = "is_opening_posting_date_index"
 
 
 def watched_sources():
@@ -39,10 +42,25 @@ def can_sum_opening(filters):
 	)
 
 
-def get_gl_entries(filters, accounting_dimensions):
-	if not can_sum_opening(filters):
-		return original_get_gl_entries(filters, accounting_dimensions)
+def can_split_opening_rows(filters):
+	return (
+		not reads_history(filters)
+		and filters.get("from_date")
+		and filters.get("to_date")
+		and not frappe.db.get_single_value("Accounts Settings", "ignore_is_opening_check_for_reporting")
+		and frappe.db.has_index("tabGL Entry", OPENING_INDEX)
+	)
 
+
+def get_gl_entries(filters, accounting_dimensions):
+	if can_sum_opening(filters):
+		return read_gl_entries(filters, accounting_dimensions, opening_sum_query)
+	if can_split_opening_rows(filters):
+		return read_gl_entries(filters, accounting_dimensions, opening_rows_query)
+	return original_get_gl_entries(filters, accounting_dimensions)
+
+
+def read_gl_entries(filters, accounting_dimensions, build_query):
 	currency_map = get_currency(filters)
 	if filters.get("include_default_book_entries"):
 		filters["company_fb"] = frappe.get_cached_value(
@@ -50,24 +68,7 @@ def get_gl_entries(filters, accounting_dimensions):
 		)
 	columns = selected_columns(filters, accounting_dimensions)
 	conditions = general_ledger.get_conditions(filters)
-	in_period = ", ".join(expression for _name, expression, _opening in columns)
-	before_period = ", ".join(opening for _name, _expression, opening in columns)
-
-	gl_entries = frappe.db.sql(
-		f"""
-		select {in_period}
-		from `tabGL Entry` {period_index(filters)}
-		where company=%(company)s {conditions} and posting_date >= %(from_date)s
-		union all
-		select {before_period}
-		from `tabGL Entry`
-		where company=%(company)s {conditions} and posting_date < %(from_date)s
-		group by account, account_currency
-		{order_by(filters)}
-	""",
-		filters,
-		as_dict=1,
-	)
+	gl_entries = frappe.db.sql(build_query(filters, columns, conditions), filters, as_dict=1)
 
 	party_name_map = general_ledger.get_party_name_map()
 	for gl_entry in gl_entries:
@@ -77,6 +78,42 @@ def get_gl_entries(filters, accounting_dimensions):
 	if filters.get("presentation_currency"):
 		return convert_to_presentation_currency(gl_entries, currency_map, filters)
 	return gl_entries
+
+
+def opening_sum_query(filters, columns, conditions):
+	in_period = ", ".join(expression for _name, expression, _opening in columns)
+	before_period = ", ".join(opening for _name, _expression, opening in columns)
+	return f"""
+		select {in_period}
+		from `tabGL Entry` {period_index(filters)}
+		where company=%(company)s {conditions} and posting_date >= %(from_date)s
+		union all
+		select {before_period}
+		from `tabGL Entry`
+		where company=%(company)s {conditions} and posting_date < %(from_date)s
+		group by account, account_currency
+		{order_by(filters)}
+	"""
+
+
+def opening_rows_query(filters, columns, conditions):
+	fields = ", ".join(expression for _name, expression, _opening in columns)
+	in_period = conditions.replace(FROM_DATE_OR_OPENING, "posting_date >= %(from_date)s").replace(
+		TO_DATE_OR_OPENING, "posting_date <= %(to_date)s"
+	)
+	opening_outside_period = conditions.replace(FROM_DATE_OR_OPENING, "is_opening = 'Yes'").replace(
+		TO_DATE_OR_OPENING, "(posting_date < %(from_date)s or posting_date > %(to_date)s)"
+	)
+	return f"""
+		select {fields}
+		from `tabGL Entry`
+		where company=%(company)s {in_period}
+		union all
+		select {fields}
+		from `tabGL Entry`
+		where company=%(company)s {opening_outside_period}
+		{order_by(filters)}
+	"""
 
 
 def period_index(filters):
