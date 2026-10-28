@@ -9,8 +9,8 @@ from frappe.core.doctype.prepared_report.prepared_report import (
 )
 from frappe.desk import query_report
 from frappe.desk.reportview import clean_params, parse_json
-from frappe.desk.utils import pop_csv_params
-from frappe.utils import add_to_date, cint, now, now_datetime
+from frappe.desk.utils import pop_csv_params, send_report_email
+from frappe.utils import add_to_date, cint, now, now_datetime, nowdate
 
 from victoryfarmsdeveloper.setup import report_runs
 
@@ -225,10 +225,17 @@ def build_export(request):
 	frappe.set_user(doc.user)
 	user_email = frappe.db.get_value("User", doc.user, "email")
 	try:
-		query_report.run_export_query_job(
-			user_email,
+		file_name, file_extension, content = query_report._export_query(
 			frappe._dict(json.loads(doc.form_params)),
 			json.loads(doc.csv_params),
+			populate_response=False,
+		)
+		send_report_email(
+			user_email,
+			f"{doc.report_name}_{nowdate()}",
+			file_extension,
+			content,
+			attached_to_name=doc.report_name,
 		)
 	except Exception:
 		frappe.db.rollback()
