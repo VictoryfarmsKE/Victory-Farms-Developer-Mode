@@ -38,6 +38,7 @@ def search_link(
 	searchfield=None,
 	reference_doctype=None,
 	ignore_user_permissions=False,
+	link_fieldname=None,
 ):
 	text = (txt or "").strip()
 	if doctype != "Customer" or query or searchfield or not text or not is_till_request():
@@ -50,6 +51,7 @@ def search_link(
 			searchfield=searchfield,
 			reference_doctype=reference_doctype,
 			ignore_user_permissions=ignore_user_permissions,
+			**({"link_fieldname": link_fieldname} if link_fieldname else {}),
 		)
 
 	candidates = find_candidates(text)
