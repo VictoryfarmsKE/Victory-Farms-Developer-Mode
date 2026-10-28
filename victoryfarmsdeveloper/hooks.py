@@ -328,7 +328,11 @@ doc_events = {
     "Expense Claim": {
         "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.validate_expense_claim",
         "before_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.before_submit_expense_claim",
-        "on_update": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.on_expense_claim_update"
+        "on_update": [
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.on_expense_claim_update",
+            "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.on_expense_claim_workflow_change"
+        ],
+        "on_update_after_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.on_expense_claim_workflow_change"
     },
     "Salary Slip": {
         "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.sync_additional_salary_notes",
