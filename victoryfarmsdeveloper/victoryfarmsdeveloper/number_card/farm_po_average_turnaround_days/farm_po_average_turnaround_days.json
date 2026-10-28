@@ -1,0 +1,19 @@
+{
+ "color": "#2e9e57",
+ "creation": "2026-10-28 12:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Number Card",
+ "filters_json": "{}",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "label": "Farm PO Average Turnaround Days",
+ "method": "victoryfarmsdeveloper.setup.farm_po_dashboard.average_tt_card",
+ "modified": "2026-10-28 13:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Farm PO Average Turnaround Days",
+ "owner": "Administrator",
+ "show_percentage_stats": 0,
+ "type": "Custom"
+}

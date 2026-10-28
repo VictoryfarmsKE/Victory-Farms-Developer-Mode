@@ -240,7 +240,8 @@ scheduler_events = {
             "victoryfarmsdeveloper.setup.gl_day_totals.enqueue_verify"
         ],
         "0 7 * * *": [
-            "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check"
+            "victoryfarmsdeveloper.notifications.leave_balance_update_check.leave_balance_update_check",
+            "victoryfarmsdeveloper.setup.farm_po_tracker_email.send_daily_tracker"
         ],
         "0 23 * * *": [
             "victoryfarmsdeveloper.notifications.po_pending_approval.send_pending_po_notifications"
@@ -304,7 +305,9 @@ doc_events = {
         "on_change": "victoryfarmsdeveloper.notifications.sales_invoice_status_change.sales_invoice_status_change"
     },
     "Purchase Order": {
-        "on_update": "victoryfarmsdeveloper.notifications.po_pending_approval.send_po_approved_notification"
+        "on_update": "victoryfarmsdeveloper.notifications.po_pending_approval.send_po_approved_notification",
+        "validate": "victoryfarmsdeveloper.setup.po_tracking.stamp_comment_update",
+        "before_update_after_submit": "victoryfarmsdeveloper.setup.po_tracking.stamp_comment_update"
     },
     "Leave Application": {
         "on_update": "victoryfarmsdeveloper.notifications.leave_balance_update_check.queue_leave_balance_update_check"

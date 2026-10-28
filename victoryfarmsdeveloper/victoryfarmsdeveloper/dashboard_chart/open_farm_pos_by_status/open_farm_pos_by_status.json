@@ -1,0 +1,46 @@
+{
+ "chart_name": "Open Farm POs by Status",
+ "chart_type": "Custom",
+ "creation": "2026-10-28 12:00:00.000000",
+ "custom_options": "{\"colors\": [\"#2490ef\", \"#2e9e57\", \"#8cc63f\", \"#f2b705\", \"#ea7a2f\", \"#e5484d\", \"#7c5cbf\", \"#8d99a6\", \"#36b9cc\", \"#5e64ff\"]}",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "filters_json": "{}",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "modified": "2026-10-28 13:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Open Farm POs by Status",
+ "number_of_groups": 0,
+ "owner": "Administrator",
+ "roles": [
+  {
+   "role": "Executive Manager"
+  },
+  {
+   "role": "HOD"
+  },
+  {
+   "role": "Finance Manager"
+  },
+  {
+   "role": "Accounts - VF"
+  },
+  {
+   "role": "Procurement Team"
+  },
+  {
+   "role": "Procurement User - VF"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
+ "source": "Open Farm POs by Status",
+ "timeseries": 0,
+ "type": "Donut",
+ "use_report_chart": 0,
+ "y_axis": []
+}
