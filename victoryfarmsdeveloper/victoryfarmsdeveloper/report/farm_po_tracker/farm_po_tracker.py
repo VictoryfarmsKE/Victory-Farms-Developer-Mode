@@ -93,13 +93,14 @@ def get_orders(filters):
 		values["priority"] = filters.priority
 
 	extra = "".join(f" and {condition}" for condition in conditions)
+	description = "po.custom_po_description" if frappe.get_meta("Purchase Order").has_field("custom_po_description") else "null"
 
 	return frappe.db.sql(
 		f"""
 		select
 			po.name, po.docstatus, po.workflow_state, po.status, po.transaction_date,
 			po.custom_department, dept.custom_po_tracker_group, po.supplier_name,
-			po.custom_po_description, po.custom_priority_level, po.custom_eta,
+			{description} as custom_po_description, po.custom_priority_level, po.custom_eta,
 			po.custom_shipment_status, po.custom_procurement_comment,
 			po.custom_comment_updated_on, po.per_received
 		from `tabPurchase Order` po
