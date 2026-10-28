@@ -1,0 +1,46 @@
+{
+ "chart_name": "Farm PO Average Turnaround by Priority",
+ "chart_type": "Custom",
+ "creation": "2026-10-28 12:00:00.000000",
+ "custom_options": "{\"fieldtype\": \"Float\", \"colors\": [\"#2e9e57\"]}",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "filters_json": "{}",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "modified": "2026-10-28 13:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Farm PO Average Turnaround by Priority",
+ "number_of_groups": 0,
+ "owner": "Administrator",
+ "roles": [
+  {
+   "role": "Executive Manager"
+  },
+  {
+   "role": "HOD"
+  },
+  {
+   "role": "Finance Manager"
+  },
+  {
+   "role": "Accounts - VF"
+  },
+  {
+   "role": "Procurement Team"
+  },
+  {
+   "role": "Procurement User - VF"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
+ "source": "Farm PO Average Turnaround by Priority",
+ "timeseries": 0,
+ "type": "Bar",
+ "use_report_chart": 0,
+ "y_axis": []
+}

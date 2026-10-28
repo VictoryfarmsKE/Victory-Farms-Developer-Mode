@@ -1,0 +1,46 @@
+{
+ "cards": [
+  {
+   "card": "Open Farm POs"
+  },
+  {
+   "card": "Farm POs Past ETA"
+  },
+  {
+   "card": "Farm POs With No Priority"
+  },
+  {
+   "card": "Farm PO Average Turnaround Days"
+  }
+ ],
+ "charts": [
+  {
+   "chart": "Open Farm POs by Group",
+   "width": "Full"
+  },
+  {
+   "chart": "Open Farm POs by Status",
+   "width": "Half"
+  },
+  {
+   "chart": "Farm PO Average Turnaround by Priority",
+   "width": "Half"
+  },
+  {
+   "chart": "Farm PO Average Turnaround by Group",
+   "width": "Full"
+  }
+ ],
+ "creation": "2026-10-28 12:00:00.000000",
+ "dashboard_name": "Farm PO Tracker",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2026-10-28 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "VictoryFarmsDeveloper",
+ "name": "Farm PO Tracker",
+ "owner": "Administrator"
+}
