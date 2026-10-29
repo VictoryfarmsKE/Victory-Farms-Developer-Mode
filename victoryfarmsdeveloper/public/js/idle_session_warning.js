@@ -25,10 +25,17 @@
 	const WARNING_MS = WARNING_LEAD_MINUTES * 60 * 1000;
 	const WARN_AFTER_MS = EXPIRY_MS - WARNING_MS;
 
+	// How often to tell the server "the user is still active" while they're
+	// working, so the server's own Session Expiry clock (which only resets
+	// on real requests, not on mouse/keyboard activity) doesn't quietly run
+	// out before this client-side warning ever gets a chance to show up.
+	const KEEPALIVE_INTERVAL_MS = TEST_MODE ? 60 * 1000 : 5 * 60 * 1000;
+
 	let idleTimer = null;
 	let countdownInterval = null;
 	let overlay = null;
 	let expiresAt = null;
+	let lastKeepAliveAt = 0;
 
 	function buildOverlay() {
 		if (overlay) return overlay;
@@ -63,7 +70,7 @@
 		`;
 		document.body.appendChild(overlay);
 		overlay.querySelector(".vf-idle-stay").addEventListener("click", onUserStillHere);
-		overlay.querySelector(".vf-idle-logout").addEventListener("click", () => frappe.app.logout());
+		overlay.querySelector(".vf-idle-logout").addEventListener("click", forceLogout);
 		return overlay;
 	}
 
@@ -85,7 +92,7 @@
 		const remainingMs = expiresAt - Date.now();
 		if (remainingMs <= 0) {
 			clearInterval(countdownInterval);
-			frappe.app.logout();
+			forceLogout();
 			return;
 		}
 		const remainingSec = Math.ceil(remainingMs / 1000);
@@ -96,26 +103,62 @@
 		overlay.classList.toggle("vf-idle-critical", remainingSec <= CRITICAL_SECONDS);
 	}
 
-	function pingServer() {
-		// Keep the server-side idle clock (System Settings > Session Expiry)
-		// in sync with real activity, not just this client-side timer.
-		frappe.call({
-			method: "frappe.auth.get_logged_user",
-			freeze: false,
-			callback: () => {},
-			error: () => {},
+	// Plain fetch() instead of frappe.call() on purpose: frappe.call's default
+	// error handling pops up Frappe's own dialogs (session-expired confirm,
+	// "Method Not Allowed", etc.), which is exactly the confusing double-popup
+	// behaviour we're trying to avoid. Handling the response ourselves keeps
+	// this entirely under our control.
+	function pingServer(onExpired) {
+		fetch("/api/method/frappe.auth.get_logged_user", {
+			method: "GET",
+			credentials: "same-origin",
+			headers: { "X-Frappe-CSRF-Token": frappe.csrf_token },
+		})
+			.then((res) => {
+				if (!res.ok) throw new Error("session expired");
+			})
+			.catch(() => {
+				if (onExpired) onExpired();
+			});
+	}
+
+	// Logs the user out directly, without Frappe core's "Are you sure you
+	// want to log out?" confirmation (frappe.app.logout()) -- that dialog
+	// makes sense for a deliberate click, but defeats the purpose of an
+	// automatic idle timeout, since by definition no one is there to answer
+	// it when it fires.
+	function forceLogout() {
+		fetch("/api/method/logout", {
+			method: "POST",
+			credentials: "same-origin",
+			headers: { "X-Frappe-CSRF-Token": frappe.csrf_token },
+		}).finally(() => {
+			window.location.href = "/login";
 		});
 	}
 
 	function onUserStillHere() {
-		pingServer();
 		hideWarning();
 		resetTimer();
+		lastKeepAliveAt = Date.now();
+		pingServer(forceLogout);
 	}
 
 	function resetTimer() {
 		clearTimeout(idleTimer);
 		idleTimer = setTimeout(showWarning, WARN_AFTER_MS);
+	}
+
+	// Called on every detected activity event. Besides resetting the
+	// client-side idle timer, this also periodically tells the server the
+	// user is still active, so the server's own Session Expiry clock (which
+	// only resets on real requests) doesn't drift ahead of and quietly
+	// expire before the client-side warning ever gets a chance to show up.
+	function maybeKeepAlive() {
+		const now = Date.now();
+		if (now - lastKeepAliveAt < KEEPALIVE_INTERVAL_MS) return;
+		lastKeepAliveAt = now;
+		pingServer(forceLogout);
 	}
 
 	function onActivity() {
@@ -124,6 +167,7 @@
 		// would silently dismiss a warning the user hasn't acknowledged.
 		if (overlay && overlay.classList.contains("vf-idle-visible")) return;
 		resetTimer();
+		maybeKeepAlive();
 	}
 
 	["mousemove", "mousedown", "keydown", "touchstart", "scroll"].forEach((evt) =>
