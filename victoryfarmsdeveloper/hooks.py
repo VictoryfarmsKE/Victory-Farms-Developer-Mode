@@ -306,8 +306,8 @@ doc_events = {
     },
     "Purchase Order": {
         "on_update": "victoryfarmsdeveloper.notifications.po_pending_approval.send_po_approved_notification",
-        "validate": "victoryfarmsdeveloper.setup.po_tracking.stamp_comment_update",
-        "before_update_after_submit": "victoryfarmsdeveloper.setup.po_tracking.stamp_comment_update"
+        "validate": "victoryfarmsdeveloper.setup.po_tracking.update_tracking_fields",
+        "before_update_after_submit": "victoryfarmsdeveloper.setup.po_tracking.update_tracking_fields"
     },
     "Leave Application": {
         "on_update": "victoryfarmsdeveloper.notifications.leave_balance_update_check.queue_leave_balance_update_check"
