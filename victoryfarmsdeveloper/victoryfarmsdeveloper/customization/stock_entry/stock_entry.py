@@ -247,7 +247,13 @@ def make_stock_in_entry(source_name, target_doc=None):
             _('A Stock Entry has already been created for this transaction: Click <a href="/app/stock-entry/{0}" target="_blank">{0}</a> to go to the created stock entry').format(existing_entry),
             title=_("Duplicate Stock Entry")
         )
-
+    if "Copilot Transit User" in frappe.get_roles():
+        frappe.db.set_value(
+            "Stock Entry",
+            source_name,
+            "custom_end_transit_clicked",
+            1
+        )
     # Call the original function if no duplicate exists
     return original_make_stock_in_entry(source_name, target_doc)
 
