@@ -18,6 +18,7 @@ PRIORITY_COLOURS = {"P1": "#e5484d", "P2": "#ea7a2f", "P3": "#f2b705", "P4": "#8
 EXCLUDED_WORKFLOW_STATES = ("Cancelled", "Frozen")
 RECEIVED = "Received at Farm"
 PARTIALLY_DELIVERED = "Partially Delivered"
+GROUP_EXPRESSION = "coalesce(nullif(po.custom_po_tracker_group, ''), dept.custom_po_tracker_group)"
 
 
 def execute(filters=None):
@@ -79,10 +80,10 @@ def get_orders(filters):
 	}
 
 	if filters.tracker_group:
-		conditions.append("dept.custom_po_tracker_group = %(tracker_group)s")
+		conditions.append(f"{GROUP_EXPRESSION} = %(tracker_group)s")
 		values["tracker_group"] = filters.tracker_group
 	elif cint(filters.farm_groups_only):
-		conditions.append("ifnull(dept.custom_po_tracker_group, '') != ''")
+		conditions.append(f"ifnull({GROUP_EXPRESSION}, '') != ''")
 
 	if filters.department:
 		conditions.append("po.custom_department = %(department)s")
@@ -99,7 +100,7 @@ def get_orders(filters):
 		f"""
 		select
 			po.name, po.docstatus, po.workflow_state, po.status, po.transaction_date,
-			po.custom_department, dept.custom_po_tracker_group, po.supplier_name,
+			po.custom_department, {GROUP_EXPRESSION} as custom_po_tracker_group, po.supplier_name,
 			{description} as custom_po_description, po.custom_priority_level, po.custom_eta,
 			po.custom_shipment_status, po.custom_procurement_comment,
 			po.custom_comment_updated_on, po.per_received

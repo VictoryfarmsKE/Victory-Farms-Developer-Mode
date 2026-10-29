@@ -3546,6 +3546,21 @@
     {
         "doctype": "Custom Field",
         "module": "VictoryFarmsDeveloper",
+        "modified": "2026-10-29 12:00:00.000000",
+        "name": "Purchase Order-custom_po_tracker_group",
+        "dt": "Purchase Order",
+        "fieldname": "custom_po_tracker_group",
+        "fieldtype": "Select",
+        "label": "PO Tracker Group",
+        "options": "\nHatchery\nMaintenance\nProcessing\nLake Operations\nFarm Warehouse\nSecurity\nQuality Control\nWaste Management\nBoats",
+        "insert_after": "custom_shipment_status",
+        "allow_on_submit": 1,
+        "in_standard_filter": 1,
+        "description": "Filled from the department on save. Change it if this PO belongs under another heading."
+    },
+    {
+        "doctype": "Custom Field",
+        "module": "VictoryFarmsDeveloper",
         "modified": "2026-10-19 12:00:00.000000",
         "name": "Department-custom_po_tracker_group",
         "dt": "Department",
