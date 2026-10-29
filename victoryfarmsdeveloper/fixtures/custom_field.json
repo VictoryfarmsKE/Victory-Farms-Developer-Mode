@@ -3456,13 +3456,14 @@
     {
         "doctype": "Custom Field",
         "module": "VictoryFarmsDeveloper",
-        "modified": "2026-10-19 12:00:00.000000",
+        "modified": "2026-10-29 14:00:00.000000",
         "name": "Purchase Order-custom_delivery_tracking_section",
         "dt": "Purchase Order",
         "fieldname": "custom_delivery_tracking_section",
         "fieldtype": "Section Break",
         "label": "Delivery Tracking",
-        "insert_after": "amended_from"
+        "insert_after": "amended_from",
+        "depends_on": "eval:doc.docstatus==1"
     },
     {
         "doctype": "Custom Field",
