@@ -1,0 +1,9 @@
+[
+    {
+        "doctype": "Workflow State",
+        "module": "VictoryFarmsDeveloper",
+        "name": "Pending Department Head Approval",
+        "style": "Primary",
+        "workflow_state_name": "Pending Department Head Approval"
+    }
+]
