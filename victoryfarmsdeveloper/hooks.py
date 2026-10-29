@@ -23,9 +23,11 @@ fixtures = [
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/victoryfarmsdeveloper/css/victoryfarmsdeveloper.css"
-# app_include_js = "/assets/victoryfarmsdeveloper/js/victoryfarmsdeveloper.js"
-app_include_js = ["/assets/victoryfarmsdeveloper/js/report_exports.js"]
+app_include_css = ["/assets/victoryfarmsdeveloper/css/idle_session_warning.css"]
+app_include_js = [
+    "/assets/victoryfarmsdeveloper/js/report_exports.js",
+    "/assets/victoryfarmsdeveloper/js/idle_session_warning.js",
+]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/victoryfarmsdeveloper/css/victoryfarmsdeveloper.css"
@@ -114,7 +116,8 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.stock_warehouse_filter.check",
     "victoryfarmsdeveloper.setup.general_ledger_opening.check",
     "victoryfarmsdeveloper.setup.pos_closing_commits.check",
-    "victoryfarmsdeveloper.setup.mpesa_requests.check"
+    "victoryfarmsdeveloper.setup.mpesa_requests.check",
+    "victoryfarmsdeveloper.setup.session_security.enforce"
 ]
 
 before_request = ["victoryfarmsdeveloper.setup.patches.install_all"]
