@@ -26,6 +26,7 @@ fixtures = [
 app_include_css = ["/assets/victoryfarmsdeveloper/css/idle_session_warning.css"]
 app_include_js = [
     "/assets/victoryfarmsdeveloper/js/report_exports.js",
+    "/assets/victoryfarmsdeveloper/js/report_loading.js",
     "/assets/victoryfarmsdeveloper/js/idle_session_warning.js",
 ]
 
