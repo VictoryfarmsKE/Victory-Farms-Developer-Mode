@@ -61,3 +61,13 @@ def running_report(report_name, filters):
 		"name",
 		order_by="creation desc",
 	)
+
+
+@frappe.whitelist()
+def running_prepared_report(report_name: str, filters: dict[str, Any] | str | list | None = None):
+	return running_report(report_name, filters)
+
+
+@frappe.whitelist()
+def prepared_report_status(name: str):
+	return frappe.db.get_value("Prepared Report", {"name": name, "owner": frappe.session.user}, "status")
