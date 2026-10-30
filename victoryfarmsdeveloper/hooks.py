@@ -339,8 +339,11 @@ doc_events = {
     "Salary Slip": {
         "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.sync_additional_salary_notes",
         "on_update": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.sync_additional_salary_notes",
-        # "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.create_journal_entry_on_submit",
-        # "on_cancel": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.salary_slip.salary_slip.unlink_journal_entry_on_cancel"
+        "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payroll_entry.payroll_entry.create_journal_entry_if_last_slip"
+       },
+    "Payroll Entry": {
+        "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payroll_entry.payroll_entry.create_journal_entry_on_submit",
+        "on_cancel": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.payroll_entry.payroll_entry.cancel_journal_entry_on_cancel"
        },
     "Job Requisition": {
         "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.job_requisition.job_requisition.validate_job_requisition",
@@ -436,6 +439,28 @@ override_doctype_dashboards = {
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
+
+# Monkey patches
+# --------------
+
+# Payroll: the consolidated draft Journal Entry in
+# customization/payroll_entry replaces HRMS's built-in accrual JV, which
+# fires unconditionally inside submit_salary_slips_for_employees and has no
+# configuration switch. Skip it for Victory Farms Ltd only; every other
+# company keeps the stock behavior.
+try:
+	from hrms.payroll.doctype.payroll_entry.payroll_entry import PayrollEntry
+
+	_stock_make_accrual_jv_entry = PayrollEntry.make_accrual_jv_entry
+
+	def _make_accrual_jv_entry_skip_vfl(self, *args, **kwargs):
+		if self.company == "Victory Farms Ltd":
+			return None
+		return _stock_make_accrual_jv_entry(self, *args, **kwargs)
+
+	PayrollEntry.make_accrual_jv_entry = _make_accrual_jv_entry_skip_vfl
+except ImportError:
+	pass
 
 default_log_clearing_doctypes = {
     "SMS Delivery": 30
