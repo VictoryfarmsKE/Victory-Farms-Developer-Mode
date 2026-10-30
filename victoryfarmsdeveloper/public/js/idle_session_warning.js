@@ -37,6 +37,52 @@
 	let expiresAt = null;
 	let lastKeepAliveAt = 0;
 
+	// Frappe core has a long-standing bug (frappe/frappe#39831, #35209,
+	// #35091): once a session genuinely expires, *any* background request
+	// the desk UI makes (notifications, list view settings, workspace
+	// counts, etc. -- not just this script's own calls) gets misrouted
+	// through a broken permission check and surfaces as a raw "Method Not
+	// Allowed / you are not permitted to access this resource" dialog
+	// instead of a clean redirect to the login page. Since we can't fix
+	// Frappe core, catch that specific pattern wherever it's shown and
+	// force our own clean redirect instead of leaving the confusing dialog
+	// on screen. Both frappe.msgprint and frappe.confirm are patched since
+	// it isn't guaranteed which one Frappe uses to render it.
+	function looksLikeExpiredSessionMessage(msg, title) {
+		const text = typeof msg === "string" ? msg : (msg && msg.message) || "";
+		const msgTitle = typeof msg === "object" && msg ? msg.title : title;
+		return (
+			(msgTitle && String(msgTitle).indexOf("Method Not Allowed") !== -1) ||
+			String(text).indexOf("not permitted to access this resource") !== -1
+		);
+	}
+
+	function patchMsgprintForExpiredSession() {
+		if (frappe.msgprint && !frappe.msgprint.vf_session_patch) {
+			const original = frappe.msgprint;
+			frappe.msgprint = function (msg, title, ...rest) {
+				if (looksLikeExpiredSessionMessage(msg, title)) {
+					forceLogout();
+					return;
+				}
+				return original.call(this, msg, title, ...rest);
+			};
+			frappe.msgprint.vf_session_patch = true;
+		}
+
+		if (frappe.confirm && !frappe.confirm.vf_session_patch) {
+			const originalConfirm = frappe.confirm;
+			frappe.confirm = function (msg, ...rest) {
+				if (looksLikeExpiredSessionMessage(msg)) {
+					forceLogout();
+					return;
+				}
+				return originalConfirm.call(this, msg, ...rest);
+			};
+			frappe.confirm.vf_session_patch = true;
+		}
+	}
+
 	function buildOverlay() {
 		if (overlay) return overlay;
 		overlay = document.createElement("div");
@@ -174,5 +220,11 @@
 		document.addEventListener(evt, onActivity, { passive: true })
 	);
 
-	frappe.ready(resetTimer);
+	patchMsgprintForExpiredSession();
+	frappe.ready(() => {
+		// frappe.msgprint may be (re)assigned after this script first loads;
+		// patch again once the desk is fully ready to be safe.
+		patchMsgprintForExpiredSession();
+		resetTimer();
+	});
 })();
