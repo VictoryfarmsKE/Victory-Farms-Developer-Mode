@@ -367,6 +367,7 @@ doc_events = {
 # }
 override_whitelisted_methods = {
     "erpnext.stock.doctype.stock_entry.stock_entry.make_stock_in_entry": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.stock_entry.stock_entry.make_stock_in_entry",
+    "erpnext.accounts.utils.update_cost_center": "victoryfarmsdeveloper.setup.cost_center_rename.update_cost_center",
     "frappe.desk.reportview.get_count": "victoryfarmsdeveloper.setup.workspace_counts.get_count",
     "frappe.desk.search.search_link": "victoryfarmsdeveloper.setup.till_customer_search.search_link",
     "frappe.core.doctype.prepared_report.prepared_report.make_prepared_report": "victoryfarmsdeveloper.setup.report_runs.make_prepared_report",
