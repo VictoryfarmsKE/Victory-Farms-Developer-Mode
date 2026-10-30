@@ -3011,7 +3011,7 @@
         "fieldname": "custom_section_g",
         "fieldtype": "Section Break",
         "label": "Approvals",
-        "description": "Approval by the Department Head is required (tracked through the approval workflow).",
+        "description": "Approval by the Overhead Approver is required (tracked through the approval workflow).",
         "insert_after": "custom_buddy_mentor"
     },
     {
@@ -3021,7 +3021,7 @@
         "name": "Job Requisition-custom_dept_head_name",
         "fieldname": "custom_dept_head_name",
         "fieldtype": "Link",
-        "label": "Department Head (Name)",
+        "label": "Overhead Approver",
         "options": "Employee",
         "insert_after": "custom_section_g"
     },
@@ -3041,7 +3041,8 @@
         "name": "Job Requisition-custom_dept_head_date",
         "fieldname": "custom_dept_head_date",
         "fieldtype": "Date",
-        "label": "Department Head Approval Date",
+        "label": "Overhead Approver Approval Date",
+        "read_only": 1,
         "insert_after": "custom_column_g1"
     },
     {
