@@ -40,6 +40,10 @@ FIELD_INDEXES = (
 	("Stock Entry", "asset"),
 	("Material Request Item", "asset"),
 	("Material Request Item", "wip_composite_asset"),
+	("POS Invoice", "consolidated_invoice"),
+	("POS Invoice Merge Log", "consolidated_invoice"),
+	("POS Invoice Merge Log", "consolidated_credit_note"),
+	("Stock Entry", "sales_invoice_no"),
 )
 FULLTEXT_INDEXES = (
 	("Customer", "ft_customer_name", "customer_name"),
