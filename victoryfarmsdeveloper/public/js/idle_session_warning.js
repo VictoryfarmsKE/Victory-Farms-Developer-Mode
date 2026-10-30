@@ -216,15 +216,43 @@
 		maybeKeepAlive();
 	}
 
+	// More reliable than patching frappe.msgprint/frappe.confirm directly:
+	// Frappe's internal AJAX calls go through jQuery, and modern Frappe's
+	// bundled JS sometimes holds its own internal reference to msgprint
+	// rather than looking up frappe.msgprint fresh on every call, which can
+	// make patching that function unreliable. jQuery's "ajaxError" event on
+	// document, however, fires for *every* failed AJAX request site-wide,
+	// independent of which internal function later decides what dialog (if
+	// any) to show for it -- so this catches the error at its source,
+	// before Frappe's own (buggy) dialog gets a chance to render at all.
+	function installAjaxErrorInterceptor() {
+		if (!window.jQuery || window.jQuery(document).data("vf_session_patch")) return;
+		window.jQuery(document).on("ajaxError", (event, jqXHR) => {
+			let message = "";
+			try {
+				const resp = jqXHR.responseJSON || JSON.parse(jqXHR.responseText || "{}");
+				message = (resp && (resp._error_message || resp.message)) || "";
+			} catch (e) {
+				message = jqXHR.responseText || "";
+			}
+			if (looksLikeExpiredSessionMessage(message)) {
+				forceLogout();
+			}
+		});
+		window.jQuery(document).data("vf_session_patch", true);
+	}
+
 	["mousemove", "mousedown", "keydown", "touchstart", "scroll"].forEach((evt) =>
 		document.addEventListener(evt, onActivity, { passive: true })
 	);
 
 	patchMsgprintForExpiredSession();
+	installAjaxErrorInterceptor();
 	frappe.ready(() => {
 		// frappe.msgprint may be (re)assigned after this script first loads;
 		// patch again once the desk is fully ready to be safe.
 		patchMsgprintForExpiredSession();
+		installAjaxErrorInterceptor();
 		resetTimer();
 	});
 })();
