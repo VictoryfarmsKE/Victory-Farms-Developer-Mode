@@ -84,7 +84,7 @@ def validate_expense_claim(doc, method=None):
 
 
 def _require_hr_remarks_on_decision(doc):
-    """The Payroll Officer must explain an approval or rejection.
+    """The approver must explain an approval or rejection.
 
     The form asks for the remarks in a dialog when Approve/Reject is clicked;
     this enforces it for every other path (API, bulk actions) as well. The
@@ -294,14 +294,15 @@ def get_payroll_date(submission_date):
     return submission_date
 
 
-PAYROLL_OFFICER_ROLE = "Payroll Officer"
+EXPENSE_APPROVER_ROLE = "Expense Claim Approver"
 EMAIL_BRAND_COLOR = "#1b7a3d"
 
 
 def on_expense_claim_workflow_change(doc, method=None):
     """Send workflow emails for every Expense Claim.
 
-    - -> Submitted: notify all Payroll Officers that a claim needs a decision.
+    - -> Submitted: notify everyone with the Expense Claim Approver role that a
+      claim needs a decision.
     - -> Approved / Rejected: tell the applicant, including the HR Remarks.
 
     Wired to both on_update and on_update_after_submit because the Approve and
@@ -403,11 +404,11 @@ def _render_claim_email(
 
 
 def _email_payroll_officers(doc):
-    """Tell every enabled Payroll Officer that a claim is waiting for a decision."""
+    """Tell every enabled Expense Claim Approver that a claim is waiting for a decision."""
     applicant_user = frappe.db.get_value("Employee", doc.employee, "user_id")
     user_names = frappe.get_all(
         "Has Role",
-        filters={"role": PAYROLL_OFFICER_ROLE, "parenttype": "User"},
+        filters={"role": EXPENSE_APPROVER_ROLE, "parenttype": "User"},
         pluck="parent",
     )
     recipients = frappe.get_all(
@@ -418,8 +419,8 @@ def _email_payroll_officers(doc):
     recipients = [u for u in recipients if u not in ("Administrator", "Guest", applicant_user)]
     if not recipients:
         frappe.log_error(
-            title="Expense Claim: no Payroll Officer to notify",
-            message=f"{doc.name} was submitted but no enabled user holds the {PAYROLL_OFFICER_ROLE} role.",
+            title="Expense Claim: no approver to notify",
+            message=f"{doc.name} was submitted but no enabled user holds the {EXPENSE_APPROVER_ROLE} role.",
         )
         return
 
@@ -429,7 +430,7 @@ def _email_payroll_officers(doc):
         banner="&#9679; " + _("Pending your review"),
         banner_bg="#fff3d6",
         banner_fg="#8a5a00",
-        greeting=_("Dear Payroll Officer,"),
+        greeting=_("Dear Approver,"),
         intro=_("{0} has submitted an expense claim that needs your decision.").format(
             "<b>{0}</b>".format(employee_name)
         ),
@@ -545,35 +546,36 @@ def get_default_service_item():
 
 @frappe.whitelist()
 def get_designated_approver():
-    """Return the designated Expense Claim approver (Payroll Officer).
+    """Return the designated Expense Claim approver.
 
-    The approver is the enabled User with the Payroll Officer role.
+    The approver is the enabled User with the Expense Claim Approver role.
     If multiple users have the role, prefer the one matching the
     configured email (Vincent Njuguna). Falls back to the first
-    Payroll Officer found.
+    Expense Claim Approver found.
     """
     DESIGNATED_EMAIL = "vincentn@victoryfarmskenya.com"
 
     # Try the designated user first
     user = frappe.db.get_value(
         "User",
-        {"email": DESIGNATED_EMAIL, "enabled": 1, "name": ["in", frappe.get_all("Has Role", filters={"role": "Payroll Officer"}, pluck="parent")]},
+        {"email": DESIGNATED_EMAIL, "enabled": 1, "name": ["in", frappe.get_all("Has Role", filters={"role": EXPENSE_APPROVER_ROLE}, pluck="parent")]},
         "name",
     )
     if user:
         return user
 
-    # Fallback: first enabled Payroll Officer
+    # Fallback: first enabled Expense Claim Approver
     user = frappe.db.sql(
         """
         SELECT u.name
         FROM `tabUser` u
         INNER JOIN `tabHas Role` r ON r.parent = u.name
-        WHERE r.role = 'Payroll Officer'
+        WHERE r.role = %s
             AND u.enabled = 1
         ORDER BY u.creation ASC
         LIMIT 1
         """,
+        (EXPENSE_APPROVER_ROLE,),
         as_dict=True,
     )
     return user[0].name if user else None
