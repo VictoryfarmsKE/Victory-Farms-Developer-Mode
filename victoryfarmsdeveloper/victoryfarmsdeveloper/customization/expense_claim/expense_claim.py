@@ -301,8 +301,7 @@ EMAIL_BRAND_COLOR = "#1b7a3d"
 def on_expense_claim_workflow_change(doc, method=None):
     """Send workflow emails for every Expense Claim.
 
-    - -> Submitted: notify everyone with the Expense Claim Approver role that a
-      claim needs a decision.
+    - -> Submitted: notify the claim's designated approver that it needs a decision.
     - -> Approved / Rejected: tell the applicant, including the HR Remarks.
 
     Wired to both on_update and on_update_after_submit because the Approve and
@@ -319,7 +318,7 @@ def on_expense_claim_workflow_change(doc, method=None):
 
     try:
         if state == "Submitted":
-            _email_payroll_officers(doc)
+            _email_approver(doc)
         elif state in ("Approved", "Rejected"):
             _email_applicant(doc, state)
     except Exception:
@@ -403,26 +402,23 @@ def _render_claim_email(
     )
 
 
-def _email_payroll_officers(doc):
-    """Tell every enabled Expense Claim Approver that a claim is waiting for a decision."""
+def _email_approver(doc):
+    """Tell the claim's designated approver that it is waiting for a decision.
+
+    Goes to the claim's Expense Approver (set to Vincent by get_designated_approver),
+    not to everyone holding the Expense Claim Approver role, so other role holders
+    are not emailed.
+    """
     applicant_user = frappe.db.get_value("Employee", doc.employee, "user_id")
-    user_names = frappe.get_all(
-        "Has Role",
-        filters={"role": EXPENSE_APPROVER_ROLE, "parenttype": "User"},
-        pluck="parent",
-    )
-    recipients = frappe.get_all(
-        "User",
-        filters={"name": ("in", user_names or [""]), "enabled": 1},
-        pluck="name",
-    )
-    recipients = [u for u in recipients if u not in ("Administrator", "Guest", applicant_user)]
-    if not recipients:
+    approver = doc.get("expense_approver") or get_designated_approver()
+    if not approver or approver == applicant_user or not frappe.db.get_value("User", approver, "enabled"):
         frappe.log_error(
             title="Expense Claim: no approver to notify",
-            message=f"{doc.name} was submitted but no enabled user holds the {EXPENSE_APPROVER_ROLE} role.",
+            message=f"{doc.name} was submitted but no enabled approver (other than the applicant) was found.",
         )
         return
+    recipients = [approver]
+    approver_name = frappe.db.get_value("User", approver, "first_name") or _("Approver")
 
     employee_name = escape_html(doc.employee_name or doc.employee)
     message = _render_claim_email(
@@ -430,7 +426,7 @@ def _email_payroll_officers(doc):
         banner="&#9679; " + _("Pending your review"),
         banner_bg="#fff3d6",
         banner_fg="#8a5a00",
-        greeting=_("Dear Approver,"),
+        greeting=_("Dear {0},").format(escape_html(approver_name)),
         intro=_("{0} has submitted an expense claim that needs your decision.").format(
             "<b>{0}</b>".format(employee_name)
         ),
