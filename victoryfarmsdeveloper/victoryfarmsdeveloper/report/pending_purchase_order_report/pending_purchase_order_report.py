@@ -185,13 +185,6 @@ def get_data(filters):
         WHERE
             {where_clause}
 
-            AND EXISTS (
-                SELECT 1
-                FROM `tabEmployee` procurement_employee
-                WHERE procurement_employee.user_id = po.owner
-                    AND procurement_employee.department = 'Procurement - VFL'
-            )
-
         ORDER BY
             po.creation ASC
     """
