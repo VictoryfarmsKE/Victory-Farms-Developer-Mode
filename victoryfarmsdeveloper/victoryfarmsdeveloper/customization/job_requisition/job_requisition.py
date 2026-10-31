@@ -3,7 +3,7 @@
 
 import frappe
 from frappe import _
-from frappe.utils import get_url_to_form
+from frappe.utils import get_url_to_form, today
 
 MANDATORY_ROUND = "Round 2: Hiring manager"
 
@@ -187,6 +187,22 @@ def validate_job_requisition(doc, method=None):
 	_validate_job_description(doc)
 	_validate_interviewers(doc)
 	_validate_budget(doc)
+	_validate_approver(doc)
+
+
+def _validate_approver(doc):
+	"""A requester must not approve their own requisition."""
+	approver = doc.get("custom_dept_head_name")
+	if not approver:
+		return
+
+	if doc.get("requested_by") and approver == doc.get("requested_by"):
+		frappe.throw(_("You cannot be your own Overhead Approver. Please select someone else."))
+
+	approver_user = frappe.db.get_value("Employee", approver, "user_id")
+	requester_user = doc.get("owner") or frappe.session.user
+	if approver_user and approver_user == requester_user:
+		frappe.throw(_("You cannot be your own Overhead Approver. Please select someone else."))
 
 
 def _validate_job_description(doc):
@@ -225,9 +241,10 @@ def _validate_budget(doc):
 def on_update_job_requisition(doc, method=None):
 	"""Send approval-workflow emails when workflow_state changes.
 
-	- Draft -> Pending Department Head Approval: notify the named Department Head.
-	- -> Approved / Rejected: notify the TA team (HR User role), including the
-	  rejection reason when applicable.
+	- Draft -> Pending Department Head Approval: notify the named Overhead Approver.
+	- -> Approved / Rejected: stamp the approval date, then notify the TA team
+	  (HR User role) and the requester, including the rejection reason when
+	  applicable.
 
 	Email delivery failures (e.g. no outgoing Email Account configured) are
 	caught and logged rather than raised, so a broken mail setup never blocks
@@ -240,11 +257,17 @@ def on_update_job_requisition(doc, method=None):
 	if previous_state == current_state:
 		return
 
+	if current_state in ("Approved", "Rejected"):
+		doc.custom_dept_head_date = today()
+		frappe.db.set_value(
+			doc.doctype, doc.name, "custom_dept_head_date", doc.custom_dept_head_date, update_modified=False
+		)
+
 	try:
 		if current_state == "Pending Department Head Approval":
 			_notify_department_head(doc)
 		elif current_state in ("Approved", "Rejected"):
-			_notify_ta_team(doc, current_state)
+			_notify_decision(doc, current_state)
 	except Exception:
 		frappe.log_error(
 			title="Job Requisition: notification email failed",
@@ -265,17 +288,17 @@ def _notify_department_head(doc):
 	dept_head = doc.get("custom_dept_head_name")
 	if not dept_head:
 		frappe.log_error(
-			title="Job Requisition: missing Department Head",
-			message=f"{doc.name} was submitted without a Department Head selected; no approval email sent.",
+			title="Job Requisition: missing Overhead Approver",
+			message=f"{doc.name} was submitted without an Overhead Approver selected; no approval email sent.",
 		)
 		return
 
 	user = frappe.db.get_value("Employee", dept_head, "user_id")
 	if not user:
 		frappe.log_error(
-			title="Job Requisition: Department Head has no linked User",
+			title="Job Requisition: Overhead Approver has no linked User",
 			message=(
-				f"{doc.name}: Department Head {dept_head} has no User ID on their Employee "
+				f"{doc.name}: Overhead Approver {dept_head} has no User ID on their Employee "
 				"record, so the approval email could not be sent."
 			),
 		)
@@ -298,18 +321,32 @@ def _notify_department_head(doc):
 	frappe.sendmail(recipients=[user], subject=subject, message=message)
 
 
-def _notify_ta_team(doc, state):
+def _requester_user(doc):
+	user = None
+	if doc.get("requested_by"):
+		user = frappe.db.get_value("Employee", doc.get("requested_by"), "user_id")
+	return user or doc.owner
+
+
+def _notify_decision(doc, state):
+	"""Email the TA team and the requester about the approver's decision."""
 	user_names = frappe.get_all(
 		"Has Role", filters={"role": TA_TEAM_ROLE, "parenttype": "User"}, pluck="parent"
 	)
-	if not user_names:
-		return
+	recipients = set()
+	if user_names:
+		recipients.update(
+			frappe.get_all(
+				"User",
+				filters={"name": ("in", user_names), "enabled": 1},
+				pluck="name",
+			)
+		)
 
-	recipients = frappe.get_all(
-		"User",
-		filters={"name": ("in", user_names), "enabled": 1},
-		pluck="name",
-	)
+	requester = _requester_user(doc)
+	if requester and frappe.db.get_value("User", requester, "enabled"):
+		recipients.add(requester)
+
 	if not recipients:
 		return
 
@@ -324,9 +361,9 @@ def _notify_ta_team(doc, state):
 	subject = _("Job Requisition {0}: {1}").format(state_label, position_title)
 	message = f"""
 		<p>{_("The job requisition")} <strong>{position_title}</strong> {_("has been")}
-		<strong>{state_label}</strong> {_("by the Department Head")}.</p>
+		<strong>{state_label}</strong> {_("by the Overhead Approver")}.</p>
 		{reason_html}
 		<p><a href="{link}">{_("View Job Requisition")}</a></p>
 	"""
 
-	frappe.sendmail(recipients=recipients, subject=subject, message=message)
+	frappe.sendmail(recipients=sorted(recipients), subject=subject, message=message)

@@ -15,7 +15,9 @@
                 "parent": "Job Requisition Approval",
                 "parentfield": "states",
                 "parenttype": "Workflow",
-                "state": "Draft"
+                "state": "Draft",
+                "update_field": "status",
+                "update_value": "Pending"
             },
             {
                 "allow_edit": "All",
@@ -24,7 +26,9 @@
                 "parent": "Job Requisition Approval",
                 "parentfield": "states",
                 "parenttype": "Workflow",
-                "state": "Pending Department Head Approval"
+                "state": "Pending Department Head Approval",
+                "update_field": "status",
+                "update_value": "Pending"
             },
             {
                 "allow_edit": "System Manager",
@@ -33,7 +37,9 @@
                 "parent": "Job Requisition Approval",
                 "parentfield": "states",
                 "parenttype": "Workflow",
-                "state": "Approved"
+                "state": "Approved",
+                "update_field": "status",
+                "update_value": "Open & Approved"
             },
             {
                 "allow_edit": "All",
@@ -42,7 +48,9 @@
                 "parent": "Job Requisition Approval",
                 "parentfield": "states",
                 "parenttype": "Workflow",
-                "state": "Rejected"
+                "state": "Rejected",
+                "update_field": "status",
+                "update_value": "Rejected"
             }
         ],
         "transitions": [
