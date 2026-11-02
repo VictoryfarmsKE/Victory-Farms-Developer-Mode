@@ -262,6 +262,29 @@ class CustomAppraisalPayout(AppraisalPayout):
 
 			entry.total_bonus = entry.individual_bonus + entry.department_bonus + entry.company_bonus
 
+		self.validate_department_bonus_potential()
+
+	def validate_department_bonus_potential(self):
+		missing = {}
+		for entry in self.appraisal_payout_details:
+			if flt(entry.department_bonus) and not flt(entry.bonus_potential_department):
+				missing.setdefault(entry.department, []).append(entry.employee_name or entry.employee)
+
+		if not missing:
+			return
+
+		rows = "".join(
+			"<li>{0}: {1}</li>".format(frappe.bold(department), ", ".join(employees))
+			for department, employees in missing.items()
+		)
+		frappe.throw(
+			_("Bonus Potential is not set on these departments, so their department bonus cannot be calculated:<ul>{0}</ul>Set the Bonus Potential on each department, then calculate the payout again.").format(rows),
+			title=_("Department Bonus Potential missing"),
+		)
+
+	def before_submit(self):
+		self.validate_department_bonus_potential()
+
 	def on_submit(self):
 		self.create_additional_salaries()
 
