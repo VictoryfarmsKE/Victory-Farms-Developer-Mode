@@ -1,6 +1,7 @@
 import functools
 
 from victoryfarmsdeveloper.setup import (
+	company_month_sales,
 	employee_saves,
 	financial_statement_totals,
 	general_ledger_opening,
@@ -24,3 +25,4 @@ def install_once():
 	general_ledger_opening.install()
 	pos_closing_commits.install()
 	mpesa_requests.install()
+	company_month_sales.install()
