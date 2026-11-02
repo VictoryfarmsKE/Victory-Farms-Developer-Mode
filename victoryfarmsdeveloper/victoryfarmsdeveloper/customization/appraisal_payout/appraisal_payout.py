@@ -202,6 +202,10 @@ class CustomAppraisalPayout(AppraisalPayout):
 		company_bonus_potential = frappe.db.get_value("Company", self.company, "custom_bonus_potential_company")
 		nv_setting_doc = frappe.get_cached_doc("Navari Custom Payroll Settings")
 		for entry in self.appraisal_payout_details:
+			entry.bonus_potential = flt(frappe.db.get_value("Employee", entry.employee, "bonus_potential"))
+			entry.bonus_potential_department = (
+				flt(frappe.db.get_value("Department", entry.department, "bonus_potential")) if entry.department else 0
+			)
 			bonus_calculation_amount = self.get_amount_used_for_bonus_calculation(entry.employee)
 
 			individual_score = self.get_individual_appraisal_score(entry.employee)
