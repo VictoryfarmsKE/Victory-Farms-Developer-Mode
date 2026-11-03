@@ -118,6 +118,7 @@ after_migrate = [
     "victoryfarmsdeveloper.setup.general_ledger_opening.check",
     "victoryfarmsdeveloper.setup.pos_closing_commits.check",
     "victoryfarmsdeveloper.setup.mpesa_requests.check",
+    "victoryfarmsdeveloper.setup.linked_doctypes_scan.check",
     "victoryfarmsdeveloper.setup.session_security.enforce"
 ]
 
