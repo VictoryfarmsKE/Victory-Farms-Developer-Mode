@@ -5,7 +5,6 @@ LOCK_WAIT_SECONDS = 60
 SHORT_LOCK_WAIT_SECONDS = 10
 FIELD_INDEXES = (
 	("POS Invoice", "pos_profile"),
-	("GL Entry", "cost_center"),
 	("Payment Ledger Entry", "cost_center"),
 	("Sales Taxes and Charges", "cost_center"),
 	("Sales Invoice Item", "cost_center"),
@@ -72,6 +71,7 @@ COMPOSITE_INDEXES = (
 )
 ORDERED_INDEXES = (
 	("GL Entry", "posting_date_company_index", ("posting_date", "company")),
+	("GL Entry", "cost_center_index", ("cost_center", "account")),
 )
 
 
@@ -132,13 +132,15 @@ def ensure_composite_index(doctype, index_name, fieldnames):
 
 
 def ensure_index_order(doctype, index_name, fieldnames):
-	if index_columns(doctype, index_name) in ([], list(fieldnames)):
+	current = index_columns(doctype, index_name)
+	if current == list(fieldnames):
 		return
 	columns = ", ".join(f"`{fieldname}`" for fieldname in fieldnames)
+	drop = f"DROP INDEX `{index_name}`, " if current else ""
 	frappe.db.sql(f"SET SESSION lock_wait_timeout = {SHORT_LOCK_WAIT_SECONDS}")
 	try:
 		frappe.db.sql_ddl(
-			f"ALTER TABLE `tab{doctype}` DROP INDEX `{index_name}`, ADD INDEX `{index_name}` ({columns}), "
+			f"ALTER TABLE `tab{doctype}` {drop}ADD INDEX `{index_name}` ({columns}), "
 			"ALGORITHM=INPLACE, LOCK=NONE"
 		)
 	except Exception as e:
