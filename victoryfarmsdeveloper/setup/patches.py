@@ -4,6 +4,7 @@ from victoryfarmsdeveloper.setup import (
 	employee_saves,
 	financial_statement_totals,
 	general_ledger_opening,
+	linked_doctypes_scan,
 	mpesa_requests,
 	pos_closing_commits,
 	stock_warehouse_filter,
@@ -24,3 +25,4 @@ def install_once():
 	general_ledger_opening.install()
 	pos_closing_commits.install()
 	mpesa_requests.install()
+	linked_doctypes_scan.install()
