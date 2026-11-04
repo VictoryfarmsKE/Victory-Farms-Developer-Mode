@@ -3023,6 +3023,7 @@
         "fieldtype": "Link",
         "label": "Overhead Approver",
         "options": "Employee",
+        "reqd": 1,
         "insert_after": "custom_section_g"
     },
     {
