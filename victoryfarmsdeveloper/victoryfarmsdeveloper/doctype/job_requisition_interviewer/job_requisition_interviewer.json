@@ -22,6 +22,7 @@
   {
    "fieldname": "interviewer_name",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "in_list_view": 1,
    "label": "Name",
    "options": "Employee",
