@@ -3,11 +3,12 @@
 
 import frappe
 from frappe import _
-from frappe.utils import get_url_to_form, today
+from frappe.utils import escape_html, get_url_to_form, today
 
 MANDATORY_ROUND = "Round 2: Hiring manager"
 
-TA_TEAM_ROLE = "HR User"
+# Approved/Rejected decisions are mailed to this shared Talent Acquisition mailbox.
+TA_MAILBOX = "talentacquisition@victoryfarmskenya.com"
 
 # Fixed budget amounts by Employee Grade (KES). Grades not listed are treated
 # as flexible / "Not Set" and the user enters the budget manually.
@@ -242,8 +243,8 @@ def on_update_job_requisition(doc, method=None):
 	"""Send approval-workflow emails when workflow_state changes.
 
 	- Draft -> Pending Department Head Approval: notify the named Overhead Approver.
-	- -> Approved / Rejected: stamp the approval date, then notify the TA team
-	  (HR User role) and the requester, including the rejection reason when
+	- -> Approved / Rejected: stamp the approval date, then notify the TA
+	  mailbox and the requester, including the rejection reason when
 	  applicable.
 
 	Email delivery failures (e.g. no outgoing Email Account configured) are
@@ -284,6 +285,117 @@ def _requester_display_name(doc):
 	)
 
 
+def _first_name(employee):
+	"""Return the Employee's first name, falling back to the first word of the full name."""
+	values = frappe.db.get_value("Employee", employee, ["first_name", "employee_name"], as_dict=True) or {}
+	first = (values.get("first_name") or "").strip()
+	if not first:
+		first = (values.get("employee_name") or "").strip().split(" ")[0]
+	return first or employee
+
+
+STATUS_COLORS = {
+	"Pending": ("#92400e", "#fef3c7"),
+	"Approved": ("#166534", "#dcfce7"),
+	"Rejected": ("#991b1b", "#fee2e2"),
+}
+BRAND_COLOR = "#1b5e3b"
+
+
+def _render_email(greeting, intro, status, rows, button_label, link, note_html=""):
+	"""Return the Job Requisition email as an email-safe HTML card (inline CSS, tables)."""
+	text_color, badge_bg = STATUS_COLORS.get(status, STATUS_COLORS["Pending"])
+	label_style = "padding:8px 12px;color:#6b7280;font-size:13px;border-bottom:1px solid #e5e7eb;width:40%;"
+	value_style = "padding:8px 12px;color:#111827;font-size:14px;border-bottom:1px solid #e5e7eb;"
+	detail_rows = "".join(
+		f"<tr><td style='{label_style}'>{escape_html(str(label))}</td>"
+		f"<td style='{value_style}'><strong>{escape_html(str(value))}</strong></td></tr>"
+		for label, value in rows
+		if value
+	)
+	title = _("Job Requisition")
+	footer = _("This is an automated message from the Victory Farms ERP.")
+	return f"""
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:24px 0;font-family:Arial,Helvetica,sans-serif;">
+<tr><td align="center">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+	<tr><td style="background:{BRAND_COLOR};padding:18px 24px;color:#ffffff;font-size:18px;font-weight:bold;">Victory Farms &middot; {title}</td></tr>
+	<tr><td style="padding:24px;color:#111827;font-size:14px;line-height:1.5;">
+		<p style="margin:0 0 12px;">{escape_html(greeting)},</p>
+		<p style="margin:0 0 16px;">{intro}</p>
+		<p style="margin:0 0 16px;"><span style="display:inline-block;padding:4px 12px;border-radius:12px;background:{badge_bg};color:{text_color};font-size:12px;font-weight:bold;">{escape_html(status)}</span></p>
+		<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:6px;margin-bottom:16px;">{detail_rows}</table>
+		{note_html}
+		<p style="margin:20px 0;"><a href="{link}" style="display:inline-block;background:{BRAND_COLOR};color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:6px;font-weight:bold;">{escape_html(button_label)}</a></p>
+	</td></tr>
+	<tr><td style="background:#f9fafb;padding:12px 24px;color:#9ca3af;font-size:12px;">{footer}</td></tr>
+</table>
+</td></tr>
+</table>
+"""
+
+
+def _email_rows(doc):
+	return [
+		(_("Position"), doc.get("custom_job_position_title") or doc.name),
+		(_("Requested by"), _requester_display_name(doc)),
+		(_("Department"), doc.get("department")),
+		(_("Positions"), doc.get("no_of_positions")),
+		(_("Requisition"), doc.name),
+	]
+
+
+STATUS_COLORS = {
+	"Pending": ("#92400e", "#fef3c7"),
+	"Approved": ("#166534", "#dcfce7"),
+	"Rejected": ("#991b1b", "#fee2e2"),
+}
+BRAND_COLOR = "#1b5e3b"
+
+
+def _render_email(greeting, intro, status, rows, button_label, link, note_html=""):
+	"""Return the Job Requisition email as an email-safe HTML card (inline CSS, tables)."""
+	text_color, badge_bg = STATUS_COLORS.get(status, STATUS_COLORS["Pending"])
+	label_style = "padding:8px 12px;color:#6b7280;font-size:13px;border-bottom:1px solid #e5e7eb;width:40%;"
+	value_style = "padding:8px 12px;color:#111827;font-size:14px;border-bottom:1px solid #e5e7eb;"
+	detail_rows = "".join(
+		f"<tr><td style='{label_style}'>{escape_html(str(label))}</td>"
+		f"<td style='{value_style}'><strong>{escape_html(str(value))}</strong></td></tr>"
+		for label, value in rows
+		if value
+	)
+	title = _("Job Requisition")
+	footer = _("This is an automated message from the Victory Farms ERP.")
+	return f"""
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:24px 0;font-family:Arial,Helvetica,sans-serif;">
+<tr><td align="center">
+<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;">
+	<tr><td style="background:{BRAND_COLOR};padding:18px 24px;color:#ffffff;font-size:18px;font-weight:bold;">Victory Farms &middot; {title}</td></tr>
+	<tr><td style="padding:24px;color:#111827;font-size:14px;line-height:1.5;">
+		<p style="margin:0 0 12px;">{escape_html(greeting)},</p>
+		<p style="margin:0 0 16px;">{intro}</p>
+		<p style="margin:0 0 16px;"><span style="display:inline-block;padding:4px 12px;border-radius:12px;background:{badge_bg};color:{text_color};font-size:12px;font-weight:bold;">{escape_html(status)}</span></p>
+		<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:6px;margin-bottom:16px;">{detail_rows}</table>
+		{note_html}
+		<p style="margin:20px 0;"><a href="{link}" style="display:inline-block;background:{BRAND_COLOR};color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:6px;font-weight:bold;">{escape_html(button_label)}</a></p>
+	</td></tr>
+	<tr><td style="background:#f9fafb;padding:12px 24px;color:#9ca3af;font-size:12px;">{footer}</td></tr>
+</table>
+</td></tr>
+</table>
+"""
+
+
+def _email_rows(doc):
+	return [
+		(_("Position"), doc.get("custom_job_position_title") or doc.name),
+		(_("Requested by"), _requester_display_name(doc)),
+		(_("Department"), doc.get("department")),
+		(_("Positions"), doc.get("no_of_positions")),
+		(_("Requisition"), doc.name),
+	]
+
+
 def _notify_department_head(doc):
 	dept_head = doc.get("custom_dept_head_name")
 	if not dept_head:
@@ -304,19 +416,24 @@ def _notify_department_head(doc):
 		)
 		return
 
-	dept_head_name = frappe.db.get_value("Employee", dept_head, "employee_name") or dept_head
 	position_title = doc.get("custom_job_position_title") or doc.name
-	link = get_url_to_form(doc.doctype, doc.name)
-
 	subject = _("Action Required: Job Requisition Approval - {0}").format(position_title)
-	message = f"""
-		<p>{_("Good day")} {dept_head_name},</p>
-		<p>{_("A new job requisition for")} <strong>{position_title}</strong>
-		{_("has been submitted by")} {_requester_display_name(doc)} {_("and requires your approval.")}</p>
-		<p>{_("Please click the link below to review and take action:")}</p>
-		<p><a href="{link}">{_("Review Job Requisition")}</a></p>
-		<p>{_("You will be able to Approve or Reject this request. If rejecting, please provide a reason so the requester can revise and resubmit.")}</p>
-	"""
+	hint = _(
+		"You can Approve or Reject this request. If rejecting, please give a reason so the requester can revise and resubmit."
+	)
+	message = _render_email(
+		greeting=f"{_('Good day')} {_first_name(dept_head)}",
+		intro=(
+			f"{_('A new job requisition for')} <strong>{escape_html(position_title)}</strong> "
+			f"{_('has been submitted by')} {escape_html(_requester_display_name(doc))} "
+			f"{_('and requires your approval.')}"
+		),
+		status="Pending",
+		rows=_email_rows(doc),
+		button_label=_("Review Job Requisition"),
+		link=get_url_to_form(doc.doctype, doc.name),
+		note_html=f"<p style='margin:0;color:#6b7280;font-size:13px;'>{hint}</p>",
+	)
 
 	frappe.sendmail(recipients=[user], subject=subject, message=message)
 
@@ -329,41 +446,36 @@ def _requester_user(doc):
 
 
 def _notify_decision(doc, state):
-	"""Email the TA team and the requester about the approver's decision."""
-	user_names = frappe.get_all(
-		"Has Role", filters={"role": TA_TEAM_ROLE, "parenttype": "User"}, pluck="parent"
-	)
-	recipients = set()
-	if user_names:
-		recipients.update(
-			frappe.get_all(
-				"User",
-				filters={"name": ("in", user_names), "enabled": 1},
-				pluck="name",
-			)
-		)
+	"""Email the Talent Acquisition mailbox and the requester about the approver's decision."""
+	recipients = {TA_MAILBOX}
 
 	requester = _requester_user(doc)
 	if requester and frappe.db.get_value("User", requester, "enabled"):
 		recipients.add(requester)
 
-	if not recipients:
-		return
-
 	position_title = doc.get("custom_job_position_title") or doc.name
-	link = get_url_to_form(doc.doctype, doc.name)
 	state_label = _("Approved") if state == "Approved" else _("Rejected")
 
-	reason_html = ""
+	note_html = ""
 	if state == "Rejected" and doc.get("custom_rejection_reason"):
-		reason_html = f"<p><strong>{_('Reason for rejection')}:</strong> {doc.get('custom_rejection_reason')}</p>"
+		reason_label = _("Reason for rejection")
+		note_html = (
+			"<p style='margin:0;padding:12px;background:#fee2e2;border-radius:6px;color:#991b1b;'>"
+			f"<strong>{reason_label}:</strong> {escape_html(doc.get('custom_rejection_reason'))}</p>"
+		)
 
 	subject = _("Job Requisition {0}: {1}").format(state_label, position_title)
-	message = f"""
-		<p>{_("The job requisition")} <strong>{position_title}</strong> {_("has been")}
-		<strong>{state_label}</strong> {_("by the Overhead Approver")}.</p>
-		{reason_html}
-		<p><a href="{link}">{_("View Job Requisition")}</a></p>
-	"""
+	message = _render_email(
+		greeting=_("Good day"),
+		intro=(
+			f"{_('The job requisition for')} <strong>{escape_html(position_title)}</strong> "
+			f"{_('has been')} <strong>{state_label}</strong> {_('by the Overhead Approver')}."
+		),
+		status=state,
+		rows=_email_rows(doc),
+		button_label=_("View Job Requisition"),
+		link=get_url_to_form(doc.doctype, doc.name),
+		note_html=note_html,
+	)
 
 	frappe.sendmail(recipients=sorted(recipients), subject=subject, message=message)
