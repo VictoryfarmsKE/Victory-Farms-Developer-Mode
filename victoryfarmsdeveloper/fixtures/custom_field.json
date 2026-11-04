@@ -2613,6 +2613,7 @@
         "fieldtype": "Link",
         "label": "Reports To (Job Title and Name)",
         "options": "Employee",
+        "ignore_user_permissions": 1,
         "reqd": 1,
         "insert_after": "custom_section_a_row2"
     },
@@ -2735,6 +2736,7 @@
         "fieldtype": "Link",
         "label": "If Replacement: Employee",
         "options": "Employee",
+        "ignore_user_permissions": 1,
         "depends_on": "eval:doc.custom_requisition_reason && doc.custom_requisition_reason !== \"New role\"",
         "insert_after": "custom_column_b1"
     },
@@ -3001,6 +3003,7 @@
         "fieldtype": "Link",
         "label": "Buddy / Mentor (Name)",
         "options": "Employee",
+        "ignore_user_permissions": 1,
         "insert_after": "custom_column_f3"
     },
     {
@@ -3023,6 +3026,7 @@
         "fieldtype": "Link",
         "label": "Overhead Approver",
         "options": "Employee",
+        "ignore_user_permissions": 1,
         "reqd": 1,
         "insert_after": "custom_section_g"
     },
@@ -3055,6 +3059,7 @@
         "fieldtype": "Link",
         "label": "HR Operations Director (Name)",
         "options": "Employee",
+        "ignore_user_permissions": 1,
         "insert_after": "custom_dept_head_date",
         "hidden": 1
     },
