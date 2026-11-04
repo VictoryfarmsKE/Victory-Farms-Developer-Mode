@@ -4,14 +4,6 @@
    {
     "card": "Claims Pending Approval",
     "doctype": "Number Card Link"
-   },
-   {
-    "card": "Claims Approved (This Month)",
-    "doctype": "Number Card Link"
-   },
-   {
-    "card": "Claims Rejected (This Month)",
-    "doctype": "Number Card Link"
    }
   ],
   "charts": [

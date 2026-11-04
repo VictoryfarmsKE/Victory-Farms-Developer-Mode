@@ -430,5 +430,50 @@
         "property_type": "Check",
         "row_name": null,
         "value": "1"
+    },
+    {
+        "default_value": null,
+        "doc_type": "Expense Claim",
+        "docstatus": 0,
+        "doctype": "Property Setter",
+        "doctype_or_field": "DocField",
+        "field_name": "grand_total",
+        "modified": "2026-11-12 00:00:00.000000",
+        "module": "VictoryFarmsDeveloper",
+        "name": "Expense Claim-grand_total-options",
+        "property": "options",
+        "property_type": "Text",
+        "row_name": null,
+        "value": "currency"
+    },
+    {
+        "default_value": null,
+        "doc_type": "Expense Claim",
+        "docstatus": 0,
+        "doctype": "Property Setter",
+        "doctype_or_field": "DocField",
+        "field_name": "total_claimed_amount",
+        "modified": "2026-11-12 00:00:00.000000",
+        "module": "VictoryFarmsDeveloper",
+        "name": "Expense Claim-total_claimed_amount-options",
+        "property": "options",
+        "property_type": "Text",
+        "row_name": null,
+        "value": "currency"
+    },
+    {
+        "default_value": null,
+        "doc_type": "Expense Claim",
+        "docstatus": 0,
+        "doctype": "Property Setter",
+        "doctype_or_field": "DocField",
+        "field_name": "total_amount_reimbursed",
+        "modified": "2026-11-12 00:00:00.000000",
+        "module": "VictoryFarmsDeveloper",
+        "name": "Expense Claim-total_amount_reimbursed-options",
+        "property": "options",
+        "property_type": "Text",
+        "row_name": null,
+        "value": "currency"
     }
 ]
