@@ -5,6 +5,10 @@ from frappe.utils import today, getdate, add_months, get_url_to_form, fmt_money,
 
 VF_STAFF_ALLOWANCES_SUPPLIER = "VF Staff Allowances"
 DEVELOPMENT_ALLOWANCE_COMPONENT = "Development Allowance"
+PENDING_APPROVAL_STATE = "Pending Approval (Payroll Officer)"
+# "Submitted" is the state's old name; accepted until every site has run the
+# rename_expense_claim_submitted_state patch.
+PENDING_STATES = (PENDING_APPROVAL_STATE, "Submitted")
 
 
 def _has_development_allowance_rows(doc):
@@ -91,7 +95,7 @@ def _require_hr_remarks_on_decision(doc):
     applicant is never asked for remarks.
     """
     before = doc.get_doc_before_save()
-    if not before or before.workflow_state != "Submitted":
+    if not before or before.workflow_state not in PENDING_STATES:
         return
     if doc.workflow_state in ("Approved", "Rejected") and not (doc.custom_hr_remarks or "").strip():
         frappe.throw(_("HR Remarks are required to approve or reject a claim."))
@@ -301,8 +305,10 @@ EMAIL_BRAND_COLOR = "#1b7a3d"
 def on_expense_claim_workflow_change(doc, method=None):
     """Send workflow emails for every Expense Claim.
 
-    - -> Submitted: notify the claim's designated approver that it needs a decision.
-    - -> Approved / Rejected: tell the applicant, including the HR Remarks.
+    - -> Pending Approval (Payroll Officer): notify the claim's designated approver
+      that it needs a decision.
+    - -> Approved / Rejected: record the decision on HRMS's own fields and tell
+      the applicant, including the HR Remarks.
 
     Wired to both on_update and on_update_after_submit because the Approve and
     Reject transitions happen on an already-submitted document. Delivery
@@ -316,8 +322,17 @@ def on_expense_claim_workflow_change(doc, method=None):
     if not state or state == previous_state:
         return
 
+    if state in ("Approved", "Rejected"):
+        try:
+            _record_decision(doc, state)
+        except Exception:
+            frappe.log_error(
+                title="Expense Claim: could not record decision",
+                message=frappe.get_traceback(),
+            )
+
     try:
-        if state == "Submitted":
+        if state in PENDING_STATES:
             _email_approver(doc)
         elif state in ("Approved", "Rejected"):
             _email_applicant(doc, state)
@@ -326,6 +341,36 @@ def on_expense_claim_workflow_change(doc, method=None):
             title="Expense Claim: notification email failed",
             message=frappe.get_traceback(),
         )
+
+
+def on_submit_expense_claim(doc, method=None):
+    """Keep approval_status truthful while a submitted claim awaits its decision.
+
+    HRMS on_submit refuses "Draft", so _sync_approval_status marks the claim
+    "Approved" just to let it submit. Document hooks run after the controller's
+    own on_submit, so once HRMS has accepted the claim put it back: otherwise
+    HRMS dashboards and reports count (and treat as payable) a claim nobody has
+    approved yet. _record_decision sets the real value when the decision is made.
+    """
+    if doc.workflow_state in PENDING_STATES:
+        doc.db_set("approval_status", "Draft", update_modified=False)
+        doc.set_status(update=True)
+
+
+def _record_decision(doc, state):
+    """Copy the Approve/Reject decision onto HRMS's own approval_status and status.
+
+    Frappe does not run validate for a post-submit workflow transition, so
+    _sync_approval_status never sees Approve/Reject and approval_status keeps the
+    "Approved" it was given at submission. HRMS dashboards and reports read
+    approval_status/status, so write the decision straight to the database.
+    """
+    # Sanctioned amounts are deliberately left alone on Reject: HRMS only reverses
+    # a claim's accounting entry on cancel while total_sanctioned_amount > 0.
+    doc.db_set(
+        "approval_status", "Rejected" if state == "Rejected" else "Approved", update_modified=False
+    )
+    doc.set_status(update=True)
 
 
 def _claim_summary(doc):
