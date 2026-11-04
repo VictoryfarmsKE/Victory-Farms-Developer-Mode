@@ -338,6 +338,7 @@ doc_events = {
     "Expense Claim": {
         "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.validate_expense_claim",
         "before_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.before_submit_expense_claim",
+        "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.on_submit_expense_claim",
         "on_update": [
             "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.on_expense_claim_update",
             "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.on_expense_claim_workflow_change"

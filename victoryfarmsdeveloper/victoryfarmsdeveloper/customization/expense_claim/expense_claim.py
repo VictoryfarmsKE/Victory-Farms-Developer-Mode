@@ -343,6 +343,20 @@ def on_expense_claim_workflow_change(doc, method=None):
         )
 
 
+def on_submit_expense_claim(doc, method=None):
+    """Keep approval_status truthful while a submitted claim awaits its decision.
+
+    HRMS on_submit refuses "Draft", so _sync_approval_status marks the claim
+    "Approved" just to let it submit. Document hooks run after the controller's
+    own on_submit, so once HRMS has accepted the claim put it back: otherwise
+    HRMS dashboards and reports count (and treat as payable) a claim nobody has
+    approved yet. _record_decision sets the real value when the decision is made.
+    """
+    if doc.workflow_state in PENDING_STATES:
+        doc.db_set("approval_status", "Draft", update_modified=False)
+        doc.set_status(update=True)
+
+
 def _record_decision(doc, state):
     """Copy the Approve/Reject decision onto HRMS's own approval_status and status.
 
@@ -351,16 +365,11 @@ def _record_decision(doc, state):
     "Approved" it was given at submission. HRMS dashboards and reports read
     approval_status/status, so write the decision straight to the database.
     """
+    # Sanctioned amounts are deliberately left alone on Reject: HRMS only reverses
+    # a claim's accounting entry on cancel while total_sanctioned_amount > 0.
     doc.db_set(
         "approval_status", "Rejected" if state == "Rejected" else "Approved", update_modified=False
     )
-    if state == "Rejected":
-        for row in (doc.expenses or []):
-            if row.sanctioned_amount:
-                frappe.db.set_value(
-                    "Expense Claim Detail", row.name, "sanctioned_amount", 0, update_modified=False
-                )
-        doc.db_set("total_sanctioned_amount", 0, update_modified=False)
     doc.set_status(update=True)
 
 

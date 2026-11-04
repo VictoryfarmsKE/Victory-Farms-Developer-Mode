@@ -385,5 +385,50 @@
         "property_type": "Data",
         "row_name": null,
         "value": "Payment Status"
+    },
+    {
+        "default_value": null,
+        "doc_type": "Expense Claim",
+        "docstatus": 0,
+        "doctype": "Property Setter",
+        "doctype_or_field": "DocField",
+        "field_name": "workflow_state",
+        "modified": "2026-11-11 00:00:00.000000",
+        "module": "VictoryFarmsDeveloper",
+        "name": "Expense Claim-workflow_state-fieldtype",
+        "property": "fieldtype",
+        "property_type": "Select",
+        "row_name": null,
+        "value": "Select"
+    },
+    {
+        "default_value": null,
+        "doc_type": "Expense Claim",
+        "docstatus": 0,
+        "doctype": "Property Setter",
+        "doctype_or_field": "DocField",
+        "field_name": "workflow_state",
+        "modified": "2026-11-11 00:00:00.000000",
+        "module": "VictoryFarmsDeveloper",
+        "name": "Expense Claim-workflow_state-options",
+        "property": "options",
+        "property_type": "Text",
+        "row_name": null,
+        "value": "\nDraft\nPending Approval (Payroll Officer)\nApproved\nRejected"
+    },
+    {
+        "default_value": null,
+        "doc_type": "Expense Claim",
+        "docstatus": 0,
+        "doctype": "Property Setter",
+        "doctype_or_field": "DocField",
+        "field_name": "currency",
+        "modified": "2026-11-11 00:00:00.000000",
+        "module": "VictoryFarmsDeveloper",
+        "name": "Expense Claim-currency-in_list_view",
+        "property": "in_list_view",
+        "property_type": "Check",
+        "row_name": null,
+        "value": "1"
     }
 ]
