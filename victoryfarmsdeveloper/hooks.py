@@ -13,6 +13,8 @@ fixtures = [
     {"dt": "Server Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Custom Field", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Property Setter", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+    {"dt": "Number Card", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+    {"dt": "Dashboard", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Workflow", "filters": [["name", "=", "Job Requisition Approval"]]},
     {"dt": "Workflow State", "filters": [["workflow_state_name", "in", ["Pending Department Head Approval"]]]},
 ]
