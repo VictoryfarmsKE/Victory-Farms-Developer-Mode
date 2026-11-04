@@ -284,6 +284,15 @@ def _requester_display_name(doc):
 	)
 
 
+def _first_name(employee):
+	"""Return the Employee's first name, falling back to the first word of the full name."""
+	values = frappe.db.get_value("Employee", employee, ["first_name", "employee_name"], as_dict=True) or {}
+	first = (values.get("first_name") or "").strip()
+	if not first:
+		first = (values.get("employee_name") or "").strip().split(" ")[0]
+	return first or employee
+
+
 def _notify_department_head(doc):
 	dept_head = doc.get("custom_dept_head_name")
 	if not dept_head:
@@ -304,7 +313,7 @@ def _notify_department_head(doc):
 		)
 		return
 
-	dept_head_name = frappe.db.get_value("Employee", dept_head, "employee_name") or dept_head
+	dept_head_name = _first_name(dept_head)
 	position_title = doc.get("custom_job_position_title") or doc.name
 	link = get_url_to_form(doc.doctype, doc.name)
 
