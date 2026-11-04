@@ -12,6 +12,8 @@ fixtures = [
     {"dt": "Server Script", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Custom Field", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Property Setter", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+    {"dt": "Number Card", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
+    {"dt": "Dashboard", "filters": [["module", "like", "VictoryFarmsDeveloper"]]},
     {"dt": "Workflow", "filters": [["name", "=", "Job Requisition Approval"]]},
     {"dt": "Workflow State", "filters": [["workflow_state_name", "in", ["Pending Department Head Approval"]]]},
 ]
@@ -335,6 +337,7 @@ doc_events = {
     "Expense Claim": {
         "validate": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.validate_expense_claim",
         "before_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.before_submit_expense_claim",
+        "on_submit": "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.on_submit_expense_claim",
         "on_update": [
             "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.on_expense_claim_update",
             "victoryfarmsdeveloper.victoryfarmsdeveloper.customization.expense_claim.expense_claim.on_expense_claim_workflow_change"

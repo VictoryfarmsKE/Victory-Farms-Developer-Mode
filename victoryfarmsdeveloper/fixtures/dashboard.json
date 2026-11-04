@@ -1,0 +1,30 @@
+[
+ {
+  "cards": [
+   {
+    "card": "Claims Pending Approval",
+    "doctype": "Number Card Link"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "Department wise Expense Claims",
+    "doctype": "Dashboard Chart Link",
+    "width": "Half"
+   },
+   {
+    "chart": "Expense Claims",
+    "doctype": "Dashboard Chart Link",
+    "width": "Half"
+   }
+  ],
+  "dashboard_name": "Expense Claim Approvals",
+  "docstatus": 0,
+  "doctype": "Dashboard",
+  "is_default": 0,
+  "is_standard": 0,
+  "modified": "2026-11-04 12:00:00.000000",
+  "module": "VictoryFarmsDeveloper",
+  "name": "Expense Claim Approvals"
+ }
+]
