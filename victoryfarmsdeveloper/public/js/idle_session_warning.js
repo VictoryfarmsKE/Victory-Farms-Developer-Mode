@@ -8,17 +8,16 @@
  * proactively warning the user and clearing the screen before that cutoff,
  * instead of leaving a stale screen visible until the next API call fails.
  *
- * TEST_MODE mirrors victoryfarmsdeveloper/setup/session_security.py.
- * Flip both together when moving from testing to the production policy.
+ * SESSION_EXPIRY_MINUTES must match SESSION_EXPIRY in
+ * victoryfarmsdeveloper/setup/session_security.py.
  */
 (() => {
 	if (window.vf_idle_session_warning_installed) return;
 	window.vf_idle_session_warning_installed = true;
 
 	// ---- Configuration -------------------------------------------------
-	const TEST_MODE = true;
-	const SESSION_EXPIRY_MINUTES = TEST_MODE ? 15 : 120;
-	const WARNING_LEAD_MINUTES = TEST_MODE ? 5 : 15;
+	const SESSION_EXPIRY_MINUTES = 120;
+	const WARNING_LEAD_MINUTES = 15;
 	const CRITICAL_SECONDS = 60; // last minute: animation speeds up, turns red
 
 	const EXPIRY_MS = SESSION_EXPIRY_MINUTES * 60 * 1000;
@@ -29,7 +28,7 @@
 	// working, so the server's own Session Expiry clock (which only resets
 	// on real requests, not on mouse/keyboard activity) doesn't quietly run
 	// out before this client-side warning ever gets a chance to show up.
-	const KEEPALIVE_INTERVAL_MS = TEST_MODE ? 60 * 1000 : 5 * 60 * 1000;
+	const KEEPALIVE_INTERVAL_MS = 5 * 60 * 1000;
 
 	let idleTimer = null;
 	let countdownInterval = null;
