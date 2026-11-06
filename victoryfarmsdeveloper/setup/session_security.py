@@ -8,7 +8,7 @@ one-off patch would never re-apply. Running this on every migrate keeps the
 value enforced and version-controlled instead of silently drifting.
 
 The policy is a 2-hour idle timeout with a 15-minute warning. The warning
-lead time lives in `public/js/idle_session_warning.js` and must be kept in
+lead time lives in `public/js/idle_session_warning.v2.js` and must be kept in
 step with the value here, since the client JS cannot read Python constants
 directly.
 """
